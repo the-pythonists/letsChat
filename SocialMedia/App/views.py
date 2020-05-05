@@ -6,7 +6,7 @@ from django.http import JsonResponse
 import random
 from django.core.mail import send_mail
 from django.core.mail import send_mail
-from .models import userRegistration
+from .models import userRegistration,Friend_Requests
 from django.contrib.auth.hashers import make_password,check_password
 
 
@@ -15,8 +15,8 @@ def index(request):
 
 def signup(request):
 	if request.method == "POST":
-		fName = request.POST.get('firstName')
-		lName = request.POST.get('lastName')
+		fName = request.POST.get('firstName').title()
+		lName = request.POST.get('lastName').title()
 		# userName = request.POST.get('userName','DefaultValue')
 		email = request.POST.get('Email')
 		otp = request.POST.get('OneTimePass')
@@ -60,13 +60,47 @@ def login(request):
 		for e in loginValidate:
 			holdername = e.firstName + ' ' + e.lastName
 			userpass = e.password
-
+			pic = e.profilePic
+			print(str(pic))
 		if check_password(password,userpass) == True:
-			request.session['is_logged'] = email
+			request.session['user'] = email
 			request.session['name'] = holdername
-			params = {'name':holdername}
+			request.session['pic'] = str(pic)
+			params = {'name':holdername,'pic':pic}
 			return render(request,'DashBoard.html',params)
 			# return HttpResponse(holdername+email)
 		else:
 			return HttpResponse('Invalid')
 		
+def notifications(request):
+	fRequests = Friend_Requests.objects.filter(receiverId=request.session['user'])
+	# for i in fRequests:
+		
+	params = {'request':fRequests}
+	return render(request,'Notifications.html',params)
+
+def profile(request):
+	if request.method == 'POST':
+		name = request.POST.get('profile')
+		profileDetail = userRegistration.objects.filter(userId=name)
+		params = {'user':profileDetail}
+	return render(request,'Profile.html',params)
+
+def addfriend(request):
+	if request.method == 'POST':
+		profileId = request.POST.get('profileId')
+		sendRequest = Friend_Requests(senderId=request.session['user'],receiverId=profileId)
+		sendRequest.save()
+	return HttpResponse('Sent Successfully')
+
+def search(request):
+	if request.method == "POST":
+		query = request.POST.get('search').title()
+		userProfile = userRegistration.objects.filter(firstName=query) | userRegistration.objects.filter(lastName=query)
+		if userProfile:
+			params = {'Users':userProfile,'name':request.session['name']}
+			return render(request,'Search.html',params)
+		else:
+			return HttpResponse('No user')
+	else:
+		return HttpResponse('No POST method')

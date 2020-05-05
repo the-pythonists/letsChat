@@ -28,8 +28,9 @@
     <div class="top_menu">
       <div class="logo">LetsChat</div>
       <ul>
-        <li><a href="#">
-          <i class="fas fa-search"></i></a></li>
+        <li><form action="/search/" method="POST">{% csrf_token %}
+          <input type="text" name="search">
+          <i class="fas fa-search"></i></form></li>
         <li><a href="#">
           <i class="fas fa-bell"></i>
           </a></li>
@@ -43,8 +44,8 @@
   <div class="sidebar">
       <ul>
 
-      	<li><a href="#">
-          <span class="icon"><i class=""><img src="{% static 'images/testimonials-2.png' %}" style="width:45px;height:45px;border-radius:50%;vertical-align:middle;"></i></span>
+      	<li><a href="/profile/">
+          <span class="icon"><i class=""><img src="{{pic.url}}" style="width:45px;height:45px;border-radius:50%;vertical-align:middle;"></i></span>
           <span class="title" style="font-weight:bold">{{name}}</span></a>
       	</li>
 
@@ -59,7 +60,7 @@
           <span class="icon"><i class="far fa-comment-alt"></i></span>
           <span class="title">Messages</span>
           </a></li>
-        <li><a href="#" class="active">
+        <li><a href="/notifications/" class="active">
           <span class="icon"><i class="fas fa-bell"></i></span>
           <span class="title">Notification</span>
           </a></li>
@@ -84,7 +85,7 @@
 
       <div style="background:rgba(191, 191, 191, 0.5);padding:2%;width:90%;">
       		<div>
-      			<img src="{% static 'images/testimonials-2.png' %}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
+      			<img src="{{pic.url}}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
       			<span style="font-weight:bold;padding-left:8px;">{{name}}</span>
       			<br><br>
       			<img src="{% static 'images/landing-users.png' %}" style="width:100%;">
@@ -94,7 +95,7 @@
       			<hr>
       			<br>
       			<form method="post" action="#">
-      				<img src="{% static 'images/testimonials-2.png' %}" style="width:50px;height:50px;border-radius:50%;vertical-align: middle;">
+      				<img src="{{pic.url}}" style="width:50px;height:50px;border-radius:50%;vertical-align: middle;">
       				<input type="text" placeholder="Drop your Comment" style="width:90%;padding:8px;">
       			</form>
       		</div>

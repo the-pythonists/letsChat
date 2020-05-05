@@ -22,9 +22,13 @@ from App import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',views.index,name='index'),
+    path("search/",views.search,name="search"),
     path('signup/',views.signup,name='signup'),
     path('login/',views.login,name='login'),
     path("OtpGeneration/", views.OtpGeneration,name="OtpGeneration"),#Otp Generation
+    path("profile/",views.profile,name="profile"),
+    path("addfriend/",views.addfriend,name="addfriend"),
+    path("notifications/",views.notifications,name="notifications")
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
