@@ -1,0 +1,55 @@
+*{
+	margin:0;
+	padding:0;
+	box-sizing: border-box;
+
+}
+
+header h2{
+	padding-top:2%;
+	color:rgba(0, 150, 136, 1);
+	padding:2% 2% 2% 2%;
+}
+
+header{
+	border-bottom:4px solid grey;
+}
+
+#createAccountDiv{
+	padding:4%;
+	align-content: center;
+	margin-top:5%;
+	color:grey;
+}
+
+
+#message {
+    display:none;
+    background: #f1f1f1;
+    color: #000;
+    position: relative;
+    padding:10px 20px;
+	width:100%;
+	margin:auto;
+	margin-top:-5px;
+}
+#message p {
+    padding: 0px 35px;
+    font-size: 18px;
+}
+.valid {
+    color: green;
+}
+.valid:before {
+    position: relative;
+    left: -35px;
+    content: "\2713";
+}
+.invalid {
+    color: red;
+}
+.invalid:before {
+    position: relative;
+    left: -35px;
+    content: "\00D7";
+}

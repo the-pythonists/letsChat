@@ -1,0 +1,119 @@
+*{
+	margin:0;
+	padding:0;
+	box-sizing: border-box;
+
+}
+
+body{
+	background:url("/static/images/landing-users.png");
+	background-repeat:repeat;
+	background-position: center;
+	background-size: cover;
+	width:100%;
+	height:100%;
+	font-family: "Lato", sans-serif;
+
+}
+
+.overlay{
+	background:rgba(0, 150, 136, 0.72);
+	background-repeat:repeat;
+	background-position: center;
+	background-size: cover;
+
+	width:100%;
+	height:100vh;
+	
+
+	
+
+}
+
+#header_Top{
+	width:100vw;
+	height:auto;
+	text-decoration: none;
+	padding:2%;
+	color:white;
+}
+
+header a:hover{
+	text-decoration: none;
+}
+
+
+.sidenav {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  top:0;
+  left:0;
+  z-index: 1;
+  background-color:rgba(0, 150, 136, 1);
+  color:white;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+}
+
+.sidenav a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 25px;
+  color: white;
+  display: block;
+  transition: 0.3s;
+}
+
+.sidenav a:hover {
+  color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
+}
+
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
+
+#Quotes{
+	color:white;
+	margin-top:20%;
+	text-align: left;
+	font-size:3em;
+	margin-left:5%;
+	margin-right:5%;
+}
+
+#landinglogin_div{
+
+	margin-top:10%;
+	
+	
+	margin-left:5%;
+	margin-right:5%;
+	align-content: center;
+	border:2px solid grey;
+	padding:2% 2% 2% 2%;
+	background-color:white;
+
+}
+
+.form-control{
+	width:100%;
+	padding-top:30px;
+	padding-bottom:30px;
+	align-items: center;
+}
+
+.btn-block{
+	padding:15px;
+	margin-bottom:10px;
+}
