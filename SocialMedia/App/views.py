@@ -1,17 +1,25 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponse
+from django.http import HttpResponse,HttpResponseRedirect
 from django.conf import settings
 from django.http import JsonResponse
 import random
 from django.core.mail import send_mail
 from django.core.mail import send_mail
-from .models import userRegistration,Friend_Requests
+from .models import userRegistration,Friend_Requests,UserPost
 from django.contrib.auth.hashers import make_password,check_password
+import datetime
+import uuid
 
 
 def index(request):
-    return render(request,'index.html')
+	if request.session.has_key('user'):
+		userInfo = userRegistration.objects.get(userId=request.session['user'])
+		userData = UserPost.objects.filter(userId=request.session['user']).order_by('-date') # '-' for descending order
+		params = {'userInfo':userInfo,'userData':userData}
+		return render(request,'DashBoard.html',params)
+	else:
+		return render(request,'index.html')
 
 def signup(request):
 	if request.method == "POST":
@@ -56,21 +64,23 @@ def login(request):
 	if request.method == 'POST':
 		email = request.POST.get("login_Email")
 		password = request.POST.get("password")
-		loginValidate = userRegistration.objects.filter(userId=email)
-		for e in loginValidate:
-			holdername = e.firstName + ' ' + e.lastName
-			userpass = e.password
-			pic = e.profilePic
-			print(str(pic))
-		if check_password(password,userpass) == True:
-			request.session['user'] = email
-			request.session['name'] = holdername
-			request.session['pic'] = str(pic)
-			params = {'name':holdername,'pic':pic}
-			return render(request,'DashBoard.html',params)
-			# return HttpResponse(holdername+email)
+		loginValidate = userRegistration.objects.get(userId=email)
+		encryptPass = loginValidate.password
+
+		if check_password(password,encryptPass) == True:
+			request.session['user'] = str(loginValidate.userId)
+			name = request.session['user']
+			request.session['name'] = str(userRegistration.firstName) + ' ' + str(userRegistration.lastName)
+			request.session['pic'] = str(userRegistration.profilePic)
+			return HttpResponseRedirect('/')
+			
 		else:
-			return HttpResponse('Invalid')
+			return render(request,'index.html')
+	else:
+		if request.session.has_key('user'):
+			return HttpResponseRedirect('/')
+		else:
+			return render(request,'index.html')
 		
 def notifications(request):
 	fRequests = Friend_Requests.objects.filter(receiverId=request.session['user'])
@@ -104,3 +114,21 @@ def search(request):
 			return HttpResponse('No user')
 	else:
 		return HttpResponse('No POST method')
+
+def PostSubmission(request):
+	if request.session.has_key('user'):
+		Id = uuid.uuid4().hex		
+		user = request.session['user']
+		PostMessage = request.POST.get('Post_Title','DefaultValue')
+		PostMedia = request.FILES.get('MediaFile')
+	
+		PostStatus=UserPost(postId=Id,userId=user,post=PostMedia,Message=PostMessage).save()
+		return HttpResponseRedirect('/')
+	else:
+		return HttpResponseRedirect('/')
+	# return render(request,'DashBoard.Html',{"flag":"Your post has uploaded"})
+
+def test(request):
+	# del request.session['user']
+	import uuid
+	return HttpResponse(uuid.uuid4().hex)
