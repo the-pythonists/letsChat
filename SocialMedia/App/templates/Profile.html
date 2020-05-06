@@ -1,0 +1,20 @@
+<html>
+    <head>
+
+    </head>
+    <body>
+    <form action="/addfriend/" method="POST">{% csrf_token %}
+        {% for data in user %}
+        <input type="hidden" name="profileId" value="{{data.userId}}">
+        <img src="{{data.profilePic.url}}"><br>
+        {{data.firstName}} {{data.lastName}}<br>
+        {{data.mobile}}<br>
+        {{data.emailAddress}}
+        <input type="submit" name="" value="Add Friend" id="">
+        {% endfor %}
+        
+        </form>
+
+
+    </body>
+</html>

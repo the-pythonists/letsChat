@@ -1,0 +1,12 @@
+<html>
+    <head>
+        <title>
+            Notifications
+        </title>
+    </head>
+    <body>
+        {% for r in request %}
+        {{r.senderId}}
+        {% endfor %}
+    </body>
+</html>
