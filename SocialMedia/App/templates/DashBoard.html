@@ -43,10 +43,9 @@
   
   <div class="sidebar">
       <ul>
-
       	<li><a href="/profile/">
-          <span class="icon"><i class=""><img src="{{pic.url}}" style="width:45px;height:45px;border-radius:50%;vertical-align:middle;"></i></span>
-          <span class="title" style="font-weight:bold">{{name}}</span></a>
+          <span class="icon"><i class=""><img src="{{userInfo.profilePic.url}}" style="width:45px;height:45px;border-radius:50%;vertical-align:middle;"></i></span>
+          <span class="title" style="font-weight:bold">{{userInfo.firstName}} {{userInfo.lastName}}</span></a>
       	</li>
 
         <li><a href="#">
@@ -71,33 +70,46 @@
   <div class="main_container">
     <div class="">
       
-      <form method="Post" action="#" id="PostWrapper">
-      		<h4>Post</h4>
-      		<textarea name="Post_Title" placeholder="what's on your mind?" style="width:90%;height:15vh;padding:2%;"></textarea>
-      		<div id="PostOpt">
-	      		<a href="#" class="icon"><i class="fas fa-map-marker-alt" id="Post_Icon_Cusomize"></i></a>
-	      		<a href="#" class="icon"><i class="fas fa-photo-video" id="Post_Icon_Cusomize"></i></a>
-	      		<input type="submit" name="Post" id="SubmitPost">
-      		</div>
-      	</form>
+      <div id="PostAlert"><h4 style="color:rgba(0, 150, 136, 1);">{{flag}} <span style="float:right;"><i class="far fa-times-circle" onclick="PostAlertClose()"></i></span></h4></div>
+      <form method="Post" action="{% url 'PostSubmission' %}" id="PostWrapper"  enctype="multipart/form-data">
+        {% csrf_token %}
+          <h4>Post</h4>
+          <textarea name="Post_Title" placeholder="what's on your mind?" style="width:90%;height:15vh;padding:2%;"></textarea>
+          <div id="PostOpt">
+            <a href="#" class="icon"><i class="fas fa-map-marker-alt" id="Post_Icon_Cusomize"></i></a>
+            <!-- <a href="#" class="icon"><i class="fas fa-photo-video" id="Post_Icon_Cusomize"> -->
+              <label id="upfile1" style="cursor:pointer" class="fas fa-photo-video">
+                <input type="file" name="MediaFile"  class="fas fa-photo-video" id="file1" style="display:none;">
+              </label></i></a>
+            <a href="#" class="icon"><i class="far fa-grin" id="Post_Icon_Cusomize"></i></a>
+            <input type="submit" name="Post" id="SubmitPost">
+          </div>
+        </form>
       </div>
       <br><br>
 
       <div style="background:rgba(191, 191, 191, 0.5);padding:2%;width:90%;">
       		<div>
-      			<img src="{{pic.url}}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
-      			<span style="font-weight:bold;padding-left:8px;">{{name}}</span>
-      			<br><br>
-      			<img src="{% static 'images/landing-users.png' %}" style="width:100%;">
-      			<br>
+            {% for data in userData %}
+      			<img src="{{userInfo.profilePic.url}}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
+      			<span style="font-weight:bold;padding-left:8px;">{{userInfo.firstName}} {{userInfo.lastName}}</span>
+            <br><br>
+            {{data.Message}}
+            <br><br>
+            {% if data.post %}
+      			<img src="{{data.post.url}}" style="width:100%;">
+            <br>
+            {% endif %}
       			<a href="#"><i class="fas fa-thumbs-up" id="PostResponse"></i></a>
       			<a href="#"><i class="far fa-comment-alt" id="PostResponse"></i></a>
       			<hr>
       			<br>
       			<form method="post" action="#">
-      				<img src="{{pic.url}}" style="width:50px;height:50px;border-radius:50%;vertical-align: middle;">
+      				<img src="{{userInfo.profilePic.url}}" style="width:50px;height:50px;border-radius:50%;vertical-align: middle;">
       				<input type="text" placeholder="Drop your Comment" style="width:90%;padding:8px;">
-      			</form>
+            </form>
+            <br><br>
+            {% endfor %}
       		</div>
       </div>
     </div>

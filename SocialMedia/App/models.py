@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import datetime    
 
 class userRegistration(models.Model):
     userId = models.CharField(max_length=50,default='')
@@ -15,3 +16,14 @@ class userRegistration(models.Model):
 class Friend_Requests(models.Model):
     senderId = models.CharField(max_length=50,default='')
     receiverId = models.CharField(max_length=50,default='')
+    senderName=models.CharField(max_length=75,default='')
+
+    def __str__(self):
+        return self.senderName
+
+class UserPost(models.Model):
+    postId = models.CharField(max_length=100,default='') 
+    userId = models.CharField(max_length=50,default='')
+    post = models.ImageField(upload_to="profiles")
+    Message = models.CharField(max_length=5000,default="")
+    date = models.DateTimeField(default=datetime.now, blank=True)
