@@ -6,7 +6,18 @@
     </head>
     <body>
         {% for r in request %}
-        {{r.senderId}}
+        {{r.senderName}}
+        <input type="button" onclick="addrequest('{{r.senderId}}');" name="" value="Confirm" id="add">
+        <input type="button" onclick="deleterequest();" name="" value="Ignore" id="ignore">
         {% endfor %}
+
+<script>
+    function addrequest(Id){
+
+        // btnValue = document.getElementById("add").value;
+        alert(Id);
+    }
+</script>
+
     </body>
 </html>

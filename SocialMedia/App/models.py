@@ -27,3 +27,12 @@ class UserPost(models.Model):
     post = models.ImageField(upload_to="profiles")
     Message = models.CharField(max_length=5000,default="")
     date = models.DateTimeField(default=datetime.now, blank=True)
+
+class Likes(models.Model):
+    postId = models.CharField(max_length=100)
+    postLikes = models.IntegerField(default=0)
+    postLikedBy = models.CharField(max_length=50,default='')
+    postLikedOf = models.CharField(max_length=50,default='')
+
+    def __str__(self):
+        return self.postId

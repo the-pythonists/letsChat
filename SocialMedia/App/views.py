@@ -6,7 +6,7 @@ from django.http import JsonResponse
 import random
 from django.core.mail import send_mail
 from django.core.mail import send_mail
-from .models import userRegistration,Friend_Requests,UserPost
+from .models import userRegistration,Friend_Requests,UserPost,Likes
 from django.contrib.auth.hashers import make_password,check_password
 import datetime
 import uuid
@@ -60,6 +60,16 @@ def OtpGeneration(request):
 	# request.session["Email"]=Email
 	return JsonResponse({'Result':"Successfully"})
 
+@csrf_exempt
+def postlike(request):
+	Id = request.POST.get('postID')
+	likes = Likes.objects.get(postId=Id)
+	postLikedBy = request.session['user']
+	postLikedOf = "To be Written"
+	print(Id)
+	# return HttpResponse(likes.postLikes)
+	return JsonResponse({'Result':likes.postLikes})
+
 def login(request):
 	if request.method == 'POST':
 		email = request.POST.get("login_Email")
@@ -70,8 +80,8 @@ def login(request):
 		if check_password(password,encryptPass) == True:
 			request.session['user'] = str(loginValidate.userId)
 			name = request.session['user']
-			request.session['name'] = str(userRegistration.firstName) + ' ' + str(userRegistration.lastName)
-			request.session['pic'] = str(userRegistration.profilePic)
+			request.session['name'] = str(loginValidate.firstName) + ' ' + str(loginValidate.lastName)
+			request.session['pic'] = str(loginValidate.profilePic)
 			return HttpResponseRedirect('/')
 			
 		else:
@@ -89,6 +99,14 @@ def notifications(request):
 	params = {'request':fRequests}
 	return render(request,'Notifications.html',params)
 
+def album(request):
+	if request.session.has_key('user'):
+		photos = UserPost.objects.filter(userId=request.session['user'])
+		params = {'photos':photos}
+		return render(request,'Album.html',params)
+	else:
+		return HttpResponseRedirect('/')
+
 def profile(request):
 	if request.method == 'POST':
 		name = request.POST.get('profile')
@@ -96,19 +114,28 @@ def profile(request):
 		params = {'user':profileDetail}
 	return render(request,'Profile.html',params)
 
+@csrf_exempt
 def addfriend(request):
-	if request.method == 'POST':
-		profileId = request.POST.get('profileId')
-		sendRequest = Friend_Requests(senderId=request.session['user'],receiverId=profileId)
+	profileId = request.POST.get('profileId')
+	action = int(request.POST.get('action'))
+
+	if action == 1:
+		sendRequest = Friend_Requests(senderId=request.session['user'],receiverId=profileId,senderName=request.session['name'])
 		sendRequest.save()
-	return HttpResponse('Sent Successfully')
+		return JsonResponse({"Result":"Successfully Sent"})
+
+	elif action == 0:
+		Friend_Requests.objects.filter(senderId=request.session['user'],receiverId=profileId).delete()
+		return JsonResponse({"Result":"Successfully Canceled"})
+	else:
+		return JsonResponse({'Result':'Nothing Done'})
 
 def search(request):
 	if request.method == "POST":
 		query = request.POST.get('search').title()
 		userProfile = userRegistration.objects.filter(firstName=query) | userRegistration.objects.filter(lastName=query)
 		if userProfile:
-			params = {'Users':userProfile,'name':request.session['name']}
+			params = {'Users':userProfile,'name':request.session['user']}
 			return render(request,'Search.html',params)
 		else:
 			return HttpResponse('No user')
@@ -123,12 +150,13 @@ def PostSubmission(request):
 		PostMedia = request.FILES.get('MediaFile')
 	
 		PostStatus=UserPost(postId=Id,userId=user,post=PostMedia,Message=PostMessage).save()
+		likes = Likes(postId=Id).save()
 		return HttpResponseRedirect('/')
 	else:
 		return HttpResponseRedirect('/')
 	# return render(request,'DashBoard.Html',{"flag":"Your post has uploaded"})
 
 def test(request):
-	# del request.session['user']
+	del request.session['user']
 	import uuid
 	return HttpResponse(uuid.uuid4().hex)

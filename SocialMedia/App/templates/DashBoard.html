@@ -51,7 +51,7 @@
         <li><a href="#">
           <span class="icon"><i class="fas fa-user-friends"></i></span>
           <span class="title">Friends</span></a></li>
-        <li><a href="#">
+        <li><a href="/album/">
           <span class="icon"><i class="fas fa-photo-video"></i></span>
           <span class="title">Photos</span>
           </a></li>
@@ -94,13 +94,17 @@
       			<img src="{{userInfo.profilePic.url}}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
       			<span style="font-weight:bold;padding-left:8px;">{{userInfo.firstName}} {{userInfo.lastName}}</span>
             <br><br>
+            {% if data.Message %}
             {{data.Message}}
+            <input type="hidden" value="{{data.postId}}" id="like">
+            {% endif %}
             <br><br>
             {% if data.post %}
-      			<img src="{{data.post.url}}" style="width:100%;">
+            <img src="{{data.post.url}}" style="width:100%;">
             <br>
             {% endif %}
-      			<a href="#"><i class="fas fa-thumbs-up" id="PostResponse"></i></a>
+            <p id="{{data.postId}}"></p>
+      			<a><i class="fas fa-thumbs-up" id="PostResponse" name="{{data.postId}}" onclick="likePost('{{data.postId}}')"></i></a>
       			<a href="#"><i class="far fa-comment-alt" id="PostResponse"></i></a>
       			<hr>
       			<br>
@@ -116,6 +120,28 @@
     
   </div>
 </div>
-	
+  
+<script>
+  function likePost(data){
+    Id = data
+    console.log(data);
+    $.ajax({
+      method:'POST',
+      url:'/postlike/',
+      data:{
+        postID : Id
+      },
+      success:function(e){
+        likeCount = e['Result']
+        console.log(e['Result'])
+        document.getElementsByName(Id)[0].style.color="blue";
+        document.getElementById(Id).innerHTML=likeCount;
+      },
+      error:function(data){
+        console.log('Failed');
+      }
+    })
+  }
+</script>
 </body>
 </html>

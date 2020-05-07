@@ -1,20 +1,52 @@
 <html>
     <head>
-
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     </head>
     <body>
-    <form action="/addfriend/" method="POST">{% csrf_token %}
         {% for data in user %}
-        <input type="hidden" name="profileId" value="{{data.userId}}">
+        <input type="hidden" id="profile" name="profileId" value="{{data.userId}}">
         <img src="{{data.profilePic.url}}"><br>
         {{data.firstName}} {{data.lastName}}<br>
         {{data.mobile}}<br>
         {{data.emailAddress}}
-        <input type="submit" name="" value="Add Friend" id="">
+        <input type="button" onclick="request();" name="" value="Add Friend" id="addbtn">
         {% endfor %}
         
-        </form>
-
-
+<script>
+    function request(){
+        userProfile = document.getElementById("profile").value;
+        btnvalue = document.getElementById("addbtn").value;
+        
+        if(btnvalue === 'Add Friend'){
+        
+            $.ajax({
+            method:'POST',
+            url:'/addfriend/',
+            data:{
+                profileId:userProfile,
+                action:1 // 1 for adding
+            },
+            success:function(e){
+                document.getElementById('addbtn').value="Cancel Request";
+            }
+        })
+        }
+        else if(btnvalue === 'Cancel Request'){
+            $.ajax({
+            method:'POST',
+            url:'/addfriend/',
+            data:{
+                profileId:userProfile,
+                action:0 // 0 for cancelling
+            },
+            success:function(e){
+                document.getElementById('addbtn').value="Add Freind";
+            }
+        })
+        }
+        
+        
+    }
+</script>
     </body>
 </html>
