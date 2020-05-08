@@ -6,7 +6,7 @@ from django.http import JsonResponse
 import random
 from django.core.mail import send_mail
 from django.core.mail import send_mail
-from .models import userRegistration,Friend_Requests,UserPost,Likes
+from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,FriendList
 from django.contrib.auth.hashers import make_password,check_password
 import datetime
 import uuid
@@ -85,7 +85,9 @@ def login(request):
 			return HttpResponseRedirect('/')
 			
 		else:
-			return render(request,'index.html')
+			return HttpResponse('Error')
+			
+			# return render(request,'index.html')
 	else:
 		if request.session.has_key('user'):
 			return HttpResponseRedirect('/')
@@ -130,6 +132,45 @@ def addfriend(request):
 	else:
 		return JsonResponse({'Result':'Nothing Done'})
 
+@csrf_exempt
+def requestConfirm(request):
+	# senderId = request.POST.get('sender')
+	# receiverId = request.session['user']
+	# action = int(request.POST.get('action'))
+	receiverId = 'sj@gmail.com'
+	senderId = 'danish@gmail.com'
+	action = 1
+	if action == 1:
+		if FriendList.objects.filter(loggedUser=receiverId):
+			
+			loggerUserObj = FriendList.objects.get(loggedUser=receiverId)
+			# print(loggerUserObj.Friends.all())
+			for i in loggerUserObj.Friends.all():
+				print(i)
+			# friendName = AllFriends(FriendID=senderId)
+			# friendName.save() 
+			# loggerUserObj.Friends.add(friendName)
+
+		else:
+			loggerUserObj = FriendList.objects.create(loggedUser=receiverId)
+			friendName = AllFriends(FriendID=senderId)
+			friendName.save() 
+			loggerUserObj.Friends.add(friendName)
+	
+	# elif action == 0:
+	# 	Friend_Requests.objects.filter(senderId=senderId,receiverId=receiverId).delete()
+
+	# else:
+	# 	pass
+	# loggerUserObj = FriendList.objects.create(loggedUser=receiverId)
+	# friendName = AllFriends(FriendID=senderId)
+	# friendName.save() 
+	# loggerUserObj.Friends.add(friendName)
+
+	Friend_Requests.objects.filter(senderId=senderId,receiverId=receiverId).delete()
+
+	return JsonResponse({'Result':'Succuss'})
+
 def search(request):
 	if request.method == "POST":
 		query = request.POST.get('search').title()
@@ -156,7 +197,13 @@ def PostSubmission(request):
 		return HttpResponseRedirect('/')
 	# return render(request,'DashBoard.Html',{"flag":"Your post has uploaded"})
 
-def test(request):
+def testfn(request):
 	del request.session['user']
-	import uuid
-	return HttpResponse(uuid.uuid4().hex)
+
+	# hawaiian_pizza = FriendList.objects.create(loggedUser='user')
+	# pineapple = AllFriends(FriendID='id')
+	# pineapple.save() 
+	# hawaiian_pizza.Friends.add(pineapple)
+	# # res = hawaiian_pizza.testField.all()
+
+	return HttpResponse('res')

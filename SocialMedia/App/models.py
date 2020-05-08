@@ -36,3 +36,18 @@ class Likes(models.Model):
 
     def __str__(self):
         return self.postId
+
+
+
+class AllFriends(models.Model):
+    FriendID = models.CharField(max_length=50,default='')
+
+    def __str__(self):
+        return self.FriendID
+
+class FriendList(models.Model):
+    loggedUser = models.CharField(max_length=100,default='')
+    Friends = models.ManyToManyField(AllFriends)
+
+    def __str__(self):
+        return self.loggedUser

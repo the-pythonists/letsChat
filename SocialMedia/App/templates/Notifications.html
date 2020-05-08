@@ -3,20 +3,47 @@
         <title>
             Notifications
         </title>
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     </head>
     <body>
+        <div id="req">
         {% for r in request %}
         {{r.senderName}}
-        <input type="button" onclick="addrequest('{{r.senderId}}');" name="" value="Confirm" id="add">
-        <input type="button" onclick="deleterequest();" name="" value="Ignore" id="ignore">
-        {% endfor %}
+        <div id="{{r.senderId}}">
 
+        
+        <input type="button" onclick="addrequest('{{r.senderId}}');" name="" value="Confirm" id="add">
+        <input type="button" onclick="addrequest();" name="" value="Ignore" id="ignore">
+        {% endfor %}
+    </div>
+    </div>
 <script>
     function addrequest(Id){
 
         // btnValue = document.getElementById("add").value;
         alert(Id);
-    }
+
+    sender = Id
+    console.log(sender);
+    $.ajax({
+      method:'POST',
+      url:'/requestConfirm/',
+      data:{
+        sender : sender,
+        action:1
+      },
+      success:function(e){
+        // msg = e['Result']
+        console.log(e['Result'])
+        document.getElementById(Id).style.display="none";
+      },
+      error:function(data){
+        console.log('Failed');
+      }
+    })
+  }
+
+    
 </script>
 
     </body>
