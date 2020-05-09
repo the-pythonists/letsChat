@@ -8,9 +8,9 @@
     <body>
         <div id="req">
         {% for r in request %}
-        {{r.senderName}}
+        
         <div id="{{r.senderId}}">
-
+            {{r.senderName}}
         
         <input type="button" onclick="addrequest('{{r.senderId}}');" name="" value="Confirm" id="add">
         <input type="button" onclick="addrequest();" name="" value="Ignore" id="ignore">

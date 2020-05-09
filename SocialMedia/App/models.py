@@ -47,7 +47,7 @@ class AllFriends(models.Model):
 
 class FriendList(models.Model):
     loggedUser = models.CharField(max_length=100,default='')
-    Friends = models.ManyToManyField(AllFriends)
+    Friends = models.ManyToManyField(AllFriends,default='')
 
     def __str__(self):
         return self.loggedUser

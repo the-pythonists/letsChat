@@ -35,6 +35,11 @@ def signup(request):
 			accountSave = userRegistration(userId=email, firstName=fName, lastName=lName, mobile=mobile,
 				emailAddress = email, password = make_password(pwd))
 			accountSave.save()
+			friendListObj = FriendList.objects.create(loggedUser=email)
+			# friendName = AllFriends(FriendID=friendId)
+			# friendName.save() 
+			# loggerUserObj.Friends.add(friendName)
+
 			return HttpResponse('Account Created')
 			
 		else:
@@ -48,7 +53,7 @@ def OtpGeneration(request):
 	# print(Email)
 	RandomValue=random.randint(1001,99999)
 	RandomValue="LetsChat"+str(RandomValue)
-	# print(RandomValue)
+	print(RandomValue)
 	message=f"Your Email Address  {Email}  Your OTP is {RandomValue} Do not share your password to anyone."
 	send_mail(
     	'LetsChat',
@@ -111,8 +116,23 @@ def album(request):
 
 def profile(request):
 	if request.method == 'POST':
-		name = request.POST.get('profile')
-		profileDetail = userRegistration.objects.filter(userId=name)
+		profileId = request.POST.get('profile')
+		profileDetail = userRegistration.objects.filter(userId=profileId)
+
+		# loggerUserObj = FriendList.objects.get(Friends=request.session['user'])
+		data = FriendList.objects.all()
+		print(data)
+		if profileId in data:
+			print('present')
+		for i in data:
+			for f in i.Friends.all():
+				print(f)
+				if str(f) == profileId:
+					print(f)
+					print('Found')
+					break
+				# print(f)
+		# print(loggerUserObj)
 		params = {'user':profileDetail}
 	return render(request,'Profile.html',params)
 
@@ -134,40 +154,50 @@ def addfriend(request):
 
 @csrf_exempt
 def requestConfirm(request):
-	# senderId = request.POST.get('sender')
-	# receiverId = request.session['user']
+	# friendId = request.POST.get('sender')
+	# myId = request.session['user']
 	# action = int(request.POST.get('action'))
-	receiverId = 'sj@gmail.com'
-	senderId = 'danish@gmail.com'
+	myId = 'sj@gmail.com'
+	friendId = 'sarthak@gmail.com'
 	action = 1
 	if action == 1:
-		if FriendList.objects.filter(loggedUser=receiverId):
-			
-			loggerUserObj = FriendList.objects.get(loggedUser=receiverId)
-			# print(loggerUserObj.Friends.all())
-			for i in loggerUserObj.Friends.all():
-				print(i)
-			# friendName = AllFriends(FriendID=senderId)
-			# friendName.save() 
-			# loggerUserObj.Friends.add(friendName)
+		if FriendList.objects.filter(loggedUser=myId):
+			loggerUserObj = FriendList.objects.get(loggedUser=myId)
 
+			for i in loggerUserObj.Friends.all():
+				if str(i) == friendId:
+					return JsonResponse({'Result':'Present'})
+					break
+				else:
+					print('else part')
+					friendName = AllFriends(FriendID=friendId)
+					friendName.save() 
+					loggerUserObj.Friends.add(friendName)
 		else:
-			loggerUserObj = FriendList.objects.create(loggedUser=receiverId)
-			friendName = AllFriends(FriendID=senderId)
+			loggerUserObj = FriendList.objects.create(loggedUser=myId)
+			friendName = AllFriends(FriendID=friendId)
 			friendName.save() 
 			loggerUserObj.Friends.add(friendName)
-	
-	# elif action == 0:
-	# 	Friend_Requests.objects.filter(senderId=senderId,receiverId=receiverId).delete()
+############ FOR SECOND RECORD
+		# if FriendList.objects.filter(loggedUser=friendId):
+		# 	loggerUserObj = FriendList.objects.get(loggedUser=friendId)
 
-	# else:
-	# 	pass
-	# loggerUserObj = FriendList.objects.create(loggedUser=receiverId)
-	# friendName = AllFriends(FriendID=senderId)
-	# friendName.save() 
-	# loggerUserObj.Friends.add(friendName)
+		# 	for i in loggerUserObj.Friends.all():
+		# 		if str(i) == myId:
+		# 			return JsonResponse({'Result':'Present'})
+		# 			break
+		# 		else:
+		# 			print('else part')
+		# 			friendName = AllFriends(FriendID=myId)
+		# 			friendName.save() 
+		# 			loggerUserObj.Friends.add(friendName)
+		# else:
+		# 	loggerUserObj = FriendList.objects.create(loggedUser=friendId)
+		# 	friendName = AllFriends(FriendID=myId)
+		# 	friendName.save() 
+		# 	loggerUserObj.Friends.add(friendName)
 
-	Friend_Requests.objects.filter(senderId=senderId,receiverId=receiverId).delete()
+	Friend_Requests.objects.filter(senderId=friendId,receiverId=myId).delete()
 
 	return JsonResponse({'Result':'Succuss'})
 
@@ -198,12 +228,11 @@ def PostSubmission(request):
 	# return render(request,'DashBoard.Html',{"flag":"Your post has uploaded"})
 
 def testfn(request):
-	del request.session['user']
+	# del request.session['user']
 
-	# hawaiian_pizza = FriendList.objects.create(loggedUser='user')
-	# pineapple = AllFriends(FriendID='id')
-	# pineapple.save() 
-	# hawaiian_pizza.Friends.add(pineapple)
-	# # res = hawaiian_pizza.testField.all()
+	loggerUserObj = FriendList.objects.get(loggedUser='test@gmail.com')
+	friendName = AllFriends(FriendID='friendId')
+	friendName.save() 
+	loggerUserObj.Friends.add(friendName)
 
 	return HttpResponse('res')
