@@ -44,7 +44,7 @@
     <div class="container jumbotron">
         <div class="fb-profile">
             <img align="left" class="fb-image-lg" src="{{data.coverPic.url}}" alt="Profile image example" />
-            <img align="left" class="fb-image-profile thumbnail" src="{{data.profilePic.url}}" alt="Profile image example" id="avtar" style="border:6px solid rgba(0, 150, 136, 0.8);/>
+            <img align="left" class="fb-image-profile thumbnail" src="{{data.profilePic.url}}" alt="Profile image example" id="avtar" style="border:6px solid rgba(0, 150, 136, 0.8)";/>
             <div class="fb-profile-text">
                 <h2 hidden id="currentUserId">{{currentUserId}}</h2>
                 <button type="button" class="btn btn-primary btn-lg pull-right" data-toggle="modal" data-target="#myModal" style="display:none;" id="EditProfileButton">
@@ -303,7 +303,7 @@
     <!--Cover Iamge-->
     <!-- Modal  for Cover Page Edit-->
     <div class="modal fade-scale" id="CoverImage1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <form method="Post" action="{%url 'userCoverInsert'%}"  enctype="multipart/form-data">{%csrf_token%}
+        <form method="Post" action=""  enctype="multipart/form-data">{%csrf_token%}
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -326,7 +326,7 @@
 
     <!-- Modal  for profile Page Edit-->
     <div class="modal fade-scale" id="ProfileImage1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <form action="{%url 'userProfileInsert'%}" method="POST" enctype="multipart/form-data"> {% csrf_token %}
+    <form action="" method="POST" enctype="multipart/form-data"> {% csrf_token %}
 
     <input type="hidden" name="ProfileUser" value="{{data.userId}}">
       <div class="modal-dialog" role="document">

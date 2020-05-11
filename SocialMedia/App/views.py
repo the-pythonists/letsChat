@@ -9,8 +9,10 @@ from django.core.mail import send_mail
 from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends
 from django.contrib.auth.hashers import make_password,check_password
 import datetime
-import uuid
-
+import uuid,json
+from django.utils.datastructures import MultiValueDictKeyError
+from django.db.models import Q
+from django.core import serializers
 
 def index(request):
 	if request.session.has_key('user'):
@@ -114,15 +116,81 @@ def album(request):
 def profile(request):
 	if request.method == 'POST':
 		profileId = request.POST.get('profile')
-		profileDetail = userRegistration.objects.filter(userId=profileId)
+	else:
+		profileId = request.session['user']
+	profileDetail = userRegistration.objects.filter(userId=profileId)
 
-		friends = AllFriends.objects.get(userId=request.session['user']).Friends
-		if profileId in friends:
-			isFriend = True
+	friends = AllFriends.objects.get(userId=request.session['user']).Friends
+	if profileId in friends:
+		isFriend = True
+	else:
+		isFriend = False
+	params = {'user':profileDetail,'isFriend':isFriend}
+	return render(request,'Profile1.html',params)
+
+def Userprofile(request):
+	return render(request,'Userprofile.html')
+	
+def userProfileInsert(request):
+	if request.method == "POST":
+		profileUserId=request.POST.get('ProfileUser','DefaultValue')
+		profileImage=request.FILES['profileImage']
+		loginUser=request.session['user']
+		if profileUserId==loginUser:
+			status=userRegistration.objects.filter(userId=loginUser).update(profilePic=profileImage)
+			return HttpResponseRedirect('/')
 		else:
-			isFriend = False
-		params = {'user':profileDetail,'isFriend':isFriend}
-		return render(request,'Profile.html',params)
+			return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
+	else:
+		return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
+
+def friendSearch(request):
+	return render(request,'Friends.html')
+
+@csrf_exempt
+def outgoingRequest(request):
+	if request.method == "POST":
+		liveResult = Friend_Requests.objects.filter(senderId=request.session['user'])
+		reciverId=[]
+		
+		for e in liveResult:
+			reciverId.append(e.receiverId)
+		return JsonResponse({"reciverId":reciverId})
+
+
+@csrf_exempt
+def incomingRequest(request):
+	if request.method == "POST":
+		liveResult = Friend_Requests.objects.filter(receiverId=request.session['user'])
+		senderName=[]
+		senderId=[]
+		
+		for e in liveResult:
+			senderName.append(e.senderName)
+			senderId.append(e.senderId)
+		return JsonResponse({"senderName":senderName,"senderId":senderId})
+		
+
+@csrf_exempt
+def liveSearchProcess(request):
+	from django.core import serializers
+	from django.http import JsonResponse
+	if request.method == "POST":
+		name=request.POST.get('search','DefaultValue')
+		liveResult = userRegistration.objects.filter(Q(firstName__icontains=name) | Q(lastName__icontains=name))
+		print(liveResult)
+		name=[]
+		pic=[]
+		uId=[]
+		for e in liveResult:
+			fullName = e.firstName+ ' ' +e.lastName
+			name.append(fullName)
+			uId.append(e.userId)
+			pic.append(e.profilePic.url)
+		print(pic)
+		return JsonResponse({"Username":name,"Id":uId,"picture":pic})
+		
+
 
 @csrf_exempt
 def addfriend(request):
@@ -193,10 +261,23 @@ def PostSubmission(request):
 	# return render(request,'DashBoard.Html',{"flag":"Your post has uploaded"})
 
 def testfn(request):
-	del request.session['user']
+	# del request.session['user']
 	# AllFriends(userId='sj27754@gmail.com').save()
 
 	
-
-	return HttpResponse('Success')
+	return render(request,'Profile1.html')
+	# return HttpResponse('Success')
 	# return HttpResponseRedirect('/')
+
+def userCoverInsert(request):
+	if request.method == "POST":
+		profileUserId=request.POST.get('coverUser','DefaultValue')
+		coverImage=request.FILES['coverImage']
+		loginUser=request.session['user']
+		if profileUserId==loginUser:
+			status=userRegistration.objects.filter(userId=loginUser).update(coverPic=coverImage)
+			return HttpResponseRedirect('/')
+		else:
+			return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
+	else:
+		return HttpResponse('<center><h1>you did somethong wrong</h1></center>')

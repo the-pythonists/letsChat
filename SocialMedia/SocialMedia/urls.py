@@ -33,7 +33,15 @@ urlpatterns = [
     path("profile/",views.profile,name="profile"),
     path("addfriend/",views.addfriend,name="addfriend"),
     path("requestConfirm/",views.requestConfirm,name="requestConfirm"),
-    path("notifications/",views.notifications,name="notifications")
+    path("notifications/",views.notifications,name="notifications"),
+    path("userCoverInsert/",views.userCoverInsert,name="userCoverInsert"),#User Cover Pic Store
+    path("friendSearch/", views.friendSearch,name="friendSearch"),#friend Search
+    path("liveSearchProcess/",views.liveSearchProcess,name="liveSearchProcess"),#live Search Process
+    path("incomingRequest/",views.incomingRequest,name="incomingRequest"),#incoming Request
+    path("outgoingRequest/",views.outgoingRequest,name="outgoingRequest"),#incoming Request
+    path("Userprofile/",views.Userprofile,name="Userprofile"),#User Profile
+    path("userProfileInsert/",views.userProfileInsert,name="userProfileInsert"),#User Profile Store
+
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
