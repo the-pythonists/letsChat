@@ -6,7 +6,7 @@ from django.http import JsonResponse
 import random
 from django.core.mail import send_mail
 from django.core.mail import send_mail
-from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,FriendList
+from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends
 from django.contrib.auth.hashers import make_password,check_password
 import datetime
 import uuid
@@ -35,10 +35,7 @@ def signup(request):
 			accountSave = userRegistration(userId=email, firstName=fName, lastName=lName, mobile=mobile,
 				emailAddress = email, password = make_password(pwd))
 			accountSave.save()
-			friendListObj = FriendList.objects.create(loggedUser=email)
-			# friendName = AllFriends(FriendID=friendId)
-			# friendName.save() 
-			# loggerUserObj.Friends.add(friendName)
+			AllFriends(userId=email).save()
 
 			return HttpResponse('Account Created')
 			
@@ -119,22 +116,13 @@ def profile(request):
 		profileId = request.POST.get('profile')
 		profileDetail = userRegistration.objects.filter(userId=profileId)
 
-		# loggerUserObj = FriendList.objects.get(Friends=request.session['user'])
-		data = FriendList.objects.all()
-		print(data)
-		if profileId in data:
-			print('present')
-		for i in data:
-			for f in i.Friends.all():
-				print(f)
-				if str(f) == profileId:
-					print(f)
-					print('Found')
-					break
-				# print(f)
-		# print(loggerUserObj)
-		params = {'user':profileDetail}
-	return render(request,'Profile.html',params)
+		friends = AllFriends.objects.get(userId=request.session['user']).Friends
+		if profileId in friends:
+			isFriend = True
+		else:
+			isFriend = False
+		params = {'user':profileDetail,'isFriend':isFriend}
+		return render(request,'Profile.html',params)
 
 @csrf_exempt
 def addfriend(request):
@@ -154,48 +142,25 @@ def addfriend(request):
 
 @csrf_exempt
 def requestConfirm(request):
-	# friendId = request.POST.get('sender')
-	# myId = request.session['user']
-	# action = int(request.POST.get('action'))
-	myId = 'sj@gmail.com'
-	friendId = 'sarthak@gmail.com'
-	action = 1
+	friendId = request.POST.get('sender')
+	myId = request.session['user']
+	action = int(request.POST.get('action'))
+	# myId = 'abc@gmail.com'
+	# friendId = 'test@gmail.com'
+	# action = 1
 	if action == 1:
-		if FriendList.objects.filter(loggedUser=myId):
-			loggerUserObj = FriendList.objects.get(loggedUser=myId)
+	
+		myList = AllFriends.objects.get(userId=myId)
+		myList.Friends.append(friendId)
+		myNewList = myList.Friends
+		AllFriends.objects.filter(userId=myId).update(userId=myId,Friends=myNewList)
+	
+		friendList = AllFriends.objects.get(userId=friendId)
+		friendList.Friends.append(myId)
+		friendNewList = friendList.Friends
+		AllFriends.objects.filter(userId=friendId).update(userId=friendId,Friends=friendNewList)
+		
 
-			for i in loggerUserObj.Friends.all():
-				if str(i) == friendId:
-					return JsonResponse({'Result':'Present'})
-					break
-				else:
-					print('else part')
-					friendName = AllFriends(FriendID=friendId)
-					friendName.save() 
-					loggerUserObj.Friends.add(friendName)
-		else:
-			loggerUserObj = FriendList.objects.create(loggedUser=myId)
-			friendName = AllFriends(FriendID=friendId)
-			friendName.save() 
-			loggerUserObj.Friends.add(friendName)
-############ FOR SECOND RECORD
-		# if FriendList.objects.filter(loggedUser=friendId):
-		# 	loggerUserObj = FriendList.objects.get(loggedUser=friendId)
-
-		# 	for i in loggerUserObj.Friends.all():
-		# 		if str(i) == myId:
-		# 			return JsonResponse({'Result':'Present'})
-		# 			break
-		# 		else:
-		# 			print('else part')
-		# 			friendName = AllFriends(FriendID=myId)
-		# 			friendName.save() 
-		# 			loggerUserObj.Friends.add(friendName)
-		# else:
-		# 	loggerUserObj = FriendList.objects.create(loggedUser=friendId)
-		# 	friendName = AllFriends(FriendID=myId)
-		# 	friendName.save() 
-		# 	loggerUserObj.Friends.add(friendName)
 
 	Friend_Requests.objects.filter(senderId=friendId,receiverId=myId).delete()
 
@@ -228,11 +193,10 @@ def PostSubmission(request):
 	# return render(request,'DashBoard.Html',{"flag":"Your post has uploaded"})
 
 def testfn(request):
-	# del request.session['user']
+	del request.session['user']
+	# AllFriends(userId='sj27754@gmail.com').save()
 
-	loggerUserObj = FriendList.objects.get(loggedUser='test@gmail.com')
-	friendName = AllFriends(FriendID='friendId')
-	friendName.save() 
-	loggerUserObj.Friends.add(friendName)
+	
 
-	return HttpResponse('res')
+	return HttpResponse('Success')
+	# return HttpResponseRedirect('/')

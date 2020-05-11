@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import datetime    
+from django_mysql.models import ListCharField
 
 class userRegistration(models.Model):
     userId = models.CharField(max_length=50,default='')
@@ -21,6 +22,17 @@ class Friend_Requests(models.Model):
     def __str__(self):
         return self.senderName
 
+class AllFriends(models.Model):
+    userId = models.CharField(max_length=50)
+    Friends = ListCharField(
+        base_field=models.CharField(max_length=10),
+        max_length=(10 * 100)
+    )
+
+
+    def __str__(self):
+        return self.userId
+
 class UserPost(models.Model):
     postId = models.CharField(max_length=100,default='') 
     userId = models.CharField(max_length=50,default='')
@@ -39,15 +51,15 @@ class Likes(models.Model):
 
 
 
-class AllFriends(models.Model):
-    FriendID = models.CharField(max_length=50,default='')
+# class AllFriends(models.Model):
+#     FriendID = models.CharField(max_length=50,default='',blank=True,null=True)
 
-    def __str__(self):
-        return self.FriendID
+#     def __str__(self):
+#         return self.FriendID
 
-class FriendList(models.Model):
-    loggedUser = models.CharField(max_length=100,default='')
-    Friends = models.ManyToManyField(AllFriends,default='')
+# class FriendList(models.Model):
+#     loggedUser = models.CharField(max_length=100,default='')
+#     Friends = models.ManyToManyField(AllFriends,default='',blank=True,null=True)
 
-    def __str__(self):
-        return self.loggedUser
+#     def __str__(self):
+#         return self.loggedUser

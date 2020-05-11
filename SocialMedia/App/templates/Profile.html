@@ -9,7 +9,11 @@
         {{data.firstName}} {{data.lastName}}<br>
         {{data.mobile}}<br>
         {{data.emailAddress}}
+        {% if isFriend %}
+        <input type="button" onclick="" name="" value="Remove Friend" id="rmvbtn">
+        {% else %}
         <input type="button" onclick="request();" name="" value="Add Friend" id="addbtn">
+        {% endif %}
         {% endfor %}
         
 <script>
