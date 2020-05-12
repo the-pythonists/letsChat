@@ -21,7 +21,7 @@ from App import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('testfn/',views.testfn,name='test'),
+    path('logout/',views.logout,name='logout'),
     path('',views.index,name='index'),
     path("search/",views.search,name="search"),
     path('signup/',views.signup,name='signup'),
@@ -31,6 +31,7 @@ urlpatterns = [
     path("postlike/",views.postlike,name="postlike"),
     path("album/",views.album,name="album"),
     path("profile/",views.profile,name="profile"),
+    path("myfriends/",views.myfriends,name="myfriends"),
     path("addfriend/",views.addfriend,name="addfriend"),
     path("requestConfirm/",views.requestConfirm,name="requestConfirm"),
     path("notifications/",views.notifications,name="notifications"),

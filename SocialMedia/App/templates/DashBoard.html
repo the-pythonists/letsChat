@@ -18,6 +18,33 @@
 </head>
 <body>
 
+<!--Search bar-->
+<div id="myOverlay" class="overlay">
+  <span class="closebtn" onclick="closeSearch()" title="Close Overlay">×</span>
+  <div class="overlay-content">
+    <form action="/search/" method="POST">{% csrf_token %}
+      <input type="text" placeholder="Search.." name="search">
+      <button type="submit"><i class="fa fa-search"></i></button>
+    </form>
+  </div>
+</div>
+
+<!--logOut Section-->
+<div id="myOverlayLogOut" class="overlay">
+  <span class="closebtn" onclick="closeLogOut()" title="Close Overlay">×</span>
+  <div class="overlay-content-logOut">
+    
+    <div id="logOutDiv">
+      <p>Change Password</p>
+      <br><hr>
+      <p>Notifications</p><br><hr>
+      <p onclick="nightMode()">Night Mode</p><br><hr>
+      <p ><a href="/logout/" style="color: rgba(0, 150, 136, 1);"> LogOut</a></p><br><hr>
+      <p style="padding-bottom:2%;" onclick="closeLogOut()">Cancel</p>      
+    </div>
+  </div>
+</div>
+
 <div class="wrapper">
   <div class="top_navbar">
     <div class="hamburger">
@@ -27,15 +54,28 @@
     </div>
     <div class="top_menu">
       <div class="logo">LetsChat</div>
+      <div id="wrapper1">
+        <li class="input-button">
+          <div class="input-wrapper1" style="float:left;">
+            <input type="text" id="KUNDE" placeholder="Search by name or ID." value="" />
+            <div id="loader" style="display:none;">
+              <img src="loader.gif" />
+            </div>
+          </div>
+          <div style="float:left;margin-left:10px;">
+            <button id="buton" type="button" class="btn-style" value="search" onclick="find();">Hent</button>
+          </div>
+        </li>
+      </div>
       <ul>
-        <li><form action="/search/" method="POST">{% csrf_token %}
-          <input type="text" name="search">
-          <i class="fas fa-search"></i></form></li>
+        <li><form action="#" method="POST">{% csrf_token %}
+          <a><i class="fas fa-search" class="openBtn" onclick="openSearch()" style="margin-top:8px;"></i>
+          </form></a></li>
         <li><a href="#">
           <i class="fas fa-bell"></i>
           </a></li>
         <li><a href="#">
-          <i class="fas fa-user"></i>
+          <i class="fas fa-user" class="openBtn" onclick="openLogOut()"></i>
           </a></li>
       </ul>
     </div>
@@ -48,7 +88,7 @@
           <span class="title" style="font-weight:bold">{{userInfo.firstName}} {{userInfo.lastName}}</span></a>
       	</li>
 
-        <li><a href="#">
+        <li><a href="/myfriends/">
           <span class="icon"><i class="fas fa-user-friends"></i></span>
           <span class="title">Friends</span></a></li>
         <li><a href="/album/">
@@ -73,8 +113,8 @@
       <div id="PostAlert"><h4 style="color:rgba(0, 150, 136, 1);">{{flag}} <span style="float:right;"><i class="far fa-times-circle" onclick="PostAlertClose()"></i></span></h4></div>
       <form method="Post" action="{% url 'PostSubmission' %}" id="PostWrapper"  enctype="multipart/form-data">
         {% csrf_token %}
-          <h4>Post</h4>
-          <textarea name="Post_Title" placeholder="what's on your mind?" style="width:90%;height:15vh;padding:2%;"></textarea>
+          <h4>Create Post</h4>
+          <textarea name="Post_Title" placeholder="what's on your mind?" style="width:90%;height:15vh;padding:2%;" oninput="visibleButton()" id="TextPost"></textarea>
           <div id="PostOpt">
             <a href="#" class="icon"><i class="fas fa-map-marker-alt" id="Post_Icon_Cusomize"></i></a>
             <!-- <a href="#" class="icon"><i class="fas fa-photo-video" id="Post_Icon_Cusomize"> -->
@@ -82,7 +122,7 @@
                 <input type="file" name="MediaFile"  class="fas fa-photo-video" id="file1" style="display:none;">
               </label></i></a>
             <a href="#" class="icon"><i class="far fa-grin" id="Post_Icon_Cusomize"></i></a>
-            <input type="submit" name="Post" id="SubmitPost">
+            <input type="submit" name="Post" id="SubmitPost" style="display:none;" value="Post">
           </div>
         </form>
       </div>
@@ -144,4 +184,5 @@
   }
 </script>
 </body>
+<script type="text/javascript" src="{%static 'js/script1.js'%}"></script>
 </html>

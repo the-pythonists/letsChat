@@ -64,6 +64,15 @@ def OtpGeneration(request):
 	# request.session["Email"]=Email
 	return JsonResponse({'Result':"Successfully"})
 
+def myfriends(request):
+	lt = []
+	friendList = AllFriends.objects.get(userId=request.session['user']).Friends
+	for name in friendList:
+		lt.append(userRegistration.objects.filter(userId=name))
+		
+	params = {'myFriends':lt}
+	return render(request,'MyFriends.html',params)
+
 @csrf_exempt
 def postlike(request):
 	Id = request.POST.get('postID')
@@ -304,14 +313,12 @@ def PostSubmission(request):
 		return HttpResponseRedirect('/')
 	# return render(request,'DashBoard.Html',{"flag":"Your post has uploaded"})
 
-def testfn(request):
-	# del request.session['user']
-	AllFriends(userId='test@gmail.com').save()
-
-	
-	return render(request,'Profile1.html')
-	# return HttpResponse('Success')
-	# return HttpResponseRedirect('/')
+def logout(request):
+	if request.session.has_key('user'):
+		del request.session['user']
+		return HttpResponseRedirect('/')
+	else:
+		return HttpResponseRedirect('/')
 
 def userCoverInsert(request):
 	if request.method == "POST":
