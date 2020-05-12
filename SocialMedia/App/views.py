@@ -114,22 +114,40 @@ def album(request):
 		return HttpResponseRedirect('/')
 
 def profile(request):
+	# Checking if profile is of other person or self profile
 	if request.method == 'POST':
 		profileId = request.POST.get('profile')
 	else:
 		profileId = request.session['user']
 	profileDetail = userRegistration.objects.filter(userId=profileId)
+	
+	# checking if searched person is req receiver or sender
+	if Friend_Requests.objects.filter(receiverId=profileId,senderId=request.session['user']):
+		isRequest = True
+		isRequested = False
 
+	elif Friend_Requests.objects.filter(receiverId=request.session['user'],senderId=profileId):
+		isRequested = True
+		isRequest = False
+	else:
+		isRequest = False
+		isRequested = False
+
+	# Extracting friend list of searched user
 	friends = AllFriends.objects.get(userId=request.session['user']).Friends
+	# Logic for setting button of Add Friend, Unfriend
 	if profileId in friends:
 		isFriend = True
 	else:
 		isFriend = False
-	params = {'user':profileDetail,'isFriend':isFriend}
+
+	request.session['Watchprofile'] = profileId
+	params = {'user':profileDetail,'currentUserId':request.session['user'],
+		'isFriend':isFriend,'isRequest':isRequest,'isRequested':isRequested}
 	return render(request,'Profile1.html',params)
 
 def Userprofile(request):
-	return render(request,'Userprofile.html')
+	return render(request,'Profile1.html')
 	
 def userProfileInsert(request):
 	if request.method == "POST":
@@ -195,28 +213,54 @@ def liveSearchProcess(request):
 @csrf_exempt
 def addfriend(request):
 	profileId = request.POST.get('profileId')
-	action = int(request.POST.get('action'))
+	action = request.POST.get('action')
+	request.session['friendProfile'] = profileId
 
-	if action == 1:
+	if action == 'add':
 		sendRequest = Friend_Requests(senderId=request.session['user'],receiverId=profileId,senderName=request.session['name'])
 		sendRequest.save()
 		return JsonResponse({"Result":"Successfully Sent"})
 
-	elif action == 0:
+	elif action == 'cancel':
 		Friend_Requests.objects.filter(senderId=request.session['user'],receiverId=profileId).delete()
 		return JsonResponse({"Result":"Successfully Canceled"})
+	
+	elif action == 'unfriend':
+		friend = AllFriends.objects.get(userId=request.session['user'])
+		friend.Friends.remove(profileId)
+		friendList = friend.Friends
+		AllFriends.objects.filter(userId=request.session['user']).update(userId=request.session['user'],Friends=friendList)
+		
+		friend1 = AllFriends.objects.get(userId=profileId)
+		friend1.Friends.remove(request.session['user'])
+		friendList1 = friend1.Friends
+		AllFriends.objects.filter(userId=profileId).update(userId=profileId,Friends=friendList1)
+
+		return JsonResponse({"Result":"Successfully Removed"})
+	
+	elif action == 'confirm':
+		print('here')
+		return HttpResponseRedirect('/requestConfirm')
+		# return JsonResponse({'Result':'Successfully Confirmed'})
 	else:
 		return JsonResponse({'Result':'Nothing Done'})
 
 @csrf_exempt
 def requestConfirm(request):
-	friendId = request.POST.get('sender')
-	myId = request.session['user']
-	action = int(request.POST.get('action'))
+	if request.method == 'POST':
+		friendId = request.POST.get('sender')
+		myId = request.session['user']
+		action = request.POST.get('action')
 	# myId = 'abc@gmail.com'
 	# friendId = 'test@gmail.com'
 	# action = 1
-	if action == 1:
+	else:
+		print('called')
+		friendId = request.session['friendProfile']
+		myId = request.session['user']
+		action = 'add'
+
+	if action == 'add':
 	
 		myList = AllFriends.objects.get(userId=myId)
 		myList.Friends.append(friendId)
@@ -262,7 +306,7 @@ def PostSubmission(request):
 
 def testfn(request):
 	# del request.session['user']
-	# AllFriends(userId='sj27754@gmail.com').save()
+	AllFriends(userId='test@gmail.com').save()
 
 	
 	return render(request,'Profile1.html')

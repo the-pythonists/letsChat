@@ -25,8 +25,8 @@ class Friend_Requests(models.Model):
 class AllFriends(models.Model):
     userId = models.CharField(max_length=50)
     Friends = ListCharField(
-        base_field=models.CharField(max_length=10),
-        max_length=(10 * 100)
+        base_field=models.CharField(max_length=50),
+        max_length=(100 * 100)
     )
 
 

@@ -50,7 +50,15 @@
                 <button type="button" class="btn btn-primary btn-lg pull-right" data-toggle="modal" data-target="#myModal" style="display:none;" id="EditProfileButton">
                   Edit Profile
                 </button>
+                {% if isFriend %}
+                <input type="button" onclick="request();" name="" value="Unfriend" id="addbtn" class="btn btn-danger pull-right"  style="display:block;">
+                {% elif isRequest %}
+                <input type="button" onclick="request();" name="" value="Cancel Request" id="addbtn" class="btn btn-secondary pull-right"  style="display:block;">
+                {% elif isRequested %}
+                <input type="button" onclick="request();" name="" value="Confirm Request" id="addbtn" class="btn btn-success pull-right"  style="display:block;">
+                {% else %}
                 <input type="button" onclick="request();" name="" value="Add Friend" id="addbtn" class="btn btn-danger pull-right"  style="display:none;">
+                {% endif %}
                 <h2 id="headerName">{{data.firstName}} {{data.lastName}}</h2>
                 <h4 id="headerQuote">{{data.quote}}</h4>
 

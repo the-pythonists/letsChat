@@ -109,18 +109,18 @@ function edit(){
 
 
 function request(){
-  alert("Done");
+  // alert("Done");
         userProfile = document.getElementById("profile").value;
         btnvalue = document.getElementById("addbtn").value;
+        console.log(btnvalue);
         
         if(btnvalue === 'Add Friend'){
-        
             $.ajax({
             method:'POST',
             url:'/addfriend/',
             data:{
                 profileId:userProfile,
-                action:1 // 1 for adding
+                action:'add' // 1 for adding
             },
             success:function(e){
                 document.getElementById('addbtn').value="Cancel Request";
@@ -133,13 +133,40 @@ function request(){
             url:'/addfriend/',
             data:{
                 profileId:userProfile,
-                action:0 // 0 for cancelling
+                action:'cancel' // 0 for cancelling
             },
             success:function(e){
                 document.getElementById('addbtn').value="Add Friend";
             }
         })
         }
+        else if(btnvalue === 'Unfriend'){
+          $.ajax({
+          method:'POST',
+          url:'/addfriend/',
+          data:{
+              profileId:userProfile,
+              action:'unfriend' // 1 for adding
+          },
+          success:function(e){
+              document.getElementById('addbtn').value="Add Friend";
+          }
+      })
+      }
+      else if(btnvalue === 'Confirm Request'){
+        $.ajax({
+        method:'POST',
+        url:'/addfriend/',
+        data:{
+            profileId:userProfile,
+            action:'confirm' // 1 for adding
+        },
+        success:function(e){
+            document.getElementById('addbtn').value="Unfriend";
+        }
+    })
+    }
+      
         
         
     }
