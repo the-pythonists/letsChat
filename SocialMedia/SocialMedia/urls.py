@@ -26,6 +26,7 @@ urlpatterns = [
     path("search/",views.search,name="search"),
     path('signup/',views.signup,name='signup'),
     path('login/',views.login,name='login'),
+    path("uservalidate/", views.uservalidate,name="uservalidate"),
     path("OtpGeneration/", views.OtpGeneration,name="OtpGeneration"),#Otp Generation
     path("PostSubmission/",views.PostSubmission,name="PostSubmission"),
     path("postlike/",views.postlike,name="postlike"),

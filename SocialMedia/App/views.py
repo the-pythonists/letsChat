@@ -18,7 +18,15 @@ def index(request):
 	if request.session.has_key('user'):
 		userInfo = userRegistration.objects.get(userId=request.session['user'])
 		userData = UserPost.objects.filter(userId=request.session['user']).order_by('-date') # '-' for descending order
-		params = {'userInfo':userInfo,'userData':userData}
+		
+		friends = AllFriends.objects.get(userId=request.session['user']).Friends
+		# print(friends)
+		postList = [userData]
+		for name in friends:
+			friendsPosts = UserPost.objects.filter(userId=name).order_by('-date')
+			postList.append(friendsPosts)
+			print(friendsPosts)
+		params = {'userInfo':userInfo,'userData':postList}
 		return render(request,'DashBoard.html',params)
 	else:
 		return render(request,'index.html')
@@ -27,24 +35,38 @@ def signup(request):
 	if request.method == "POST":
 		fName = request.POST.get('firstName').title()
 		lName = request.POST.get('lastName').title()
-		# userName = request.POST.get('userName','DefaultValue')
+		username = request.POST.get('userName')
 		email = request.POST.get('Email')
 		otp = request.POST.get('OneTimePass')
 		pwd = request.POST.get('Password')
 		mobile = request.POST.get('Mobile')
 		
 		if((otp == request.session["Otp"])):
-			accountSave = userRegistration(userId=email, firstName=fName, lastName=lName, mobile=mobile,
-				emailAddress = email, password = make_password(pwd))
-			accountSave.save()
-			AllFriends(userId=email).save()
-
-			return HttpResponse('Account Created')
+			if userRegistration.objects.filter(userId=email):
+				return render(request,'CreateAccount.html',{'message':'Account Already Present with Given Email'})
+			elif userRegistration.objects.filter(mobile=mobile):
+				return render(request,'CreateAccount.html',{'message':'Account Already Present with Given Mobile Number'}) 
+			else:
+				accountSave = userRegistration(userId=email, firstName=fName, lastName=lName, userName=username, 
+				mobile=mobile,emailAddress = email, password = make_password(pwd))
+				accountSave.save()
+				AllFriends(userId=email).save()
+				return HttpResponseRedirect('/')
+			# return HttpResponse('Account Created')
 			
 		else:
 			return HttpResponse("NotSame")
 	else:
 		return render(request,'CreateAccount.html')
+
+@csrf_exempt
+def uservalidate(request):
+	username = request.POST.get('username')
+	if userRegistration.objects.filter(userName=username):
+		return JsonResponse({'Result':1})
+	else:
+		return JsonResponse({'Result':0})
+	
 
 @csrf_exempt
 def OtpGeneration(request):
@@ -306,7 +328,7 @@ def PostSubmission(request):
 		PostMessage = request.POST.get('Post_Title','DefaultValue')
 		PostMedia = request.FILES.get('MediaFile')
 	
-		PostStatus=UserPost(postId=Id,userId=user,post=PostMedia,Message=PostMessage).save()
+		PostStatus=UserPost(postId=Id,userId=user,userName=request.session['name'],post=PostMedia,Message=PostMessage).save()
 		likes = Likes(postId=Id).save()
 		return HttpResponseRedirect('/')
 	else:

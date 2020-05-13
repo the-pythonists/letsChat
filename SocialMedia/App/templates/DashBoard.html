@@ -114,7 +114,7 @@
       <form method="Post" action="{% url 'PostSubmission' %}" id="PostWrapper"  enctype="multipart/form-data">
         {% csrf_token %}
           <h4>Create Post</h4>
-          <textarea name="Post_Title" placeholder="what's on your mind?" style="width:90%;height:15vh;padding:2%;" oninput="visibleButton()" id="TextPost"></textarea>
+          <textarea name="Post_Title" placeholder="what's on your mind?" style="width:90%;height:15vh;padding:2%;resize: none;" oninput="visibleButton()" id="TextPost"></textarea>
           <div id="PostOpt">
             <a href="#" class="icon"><i class="fas fa-map-marker-alt" id="Post_Icon_Cusomize"></i></a>
             <!-- <a href="#" class="icon"><i class="fas fa-photo-video" id="Post_Icon_Cusomize"> -->
@@ -130,9 +130,10 @@
 
       <div style="background:rgba(191, 191, 191, 0.5);padding:2%;width:90%;">
       		<div>
-            {% for data in userData %}
-      			<img src="{{userInfo.profilePic.url}}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
-      			<span style="font-weight:bold;padding-left:8px;">{{userInfo.firstName}} {{userInfo.lastName}}</span>
+            {% for query in userData %}
+            {% for data in query %}
+      			<img src="{{data.profilePic.url}}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
+      			<span style="font-weight:bold;padding-left:8px;">{{data.userName}} {{data.lastName}}</span>
             <br><br>
             {% if data.Message %}
             {{data.Message}}
@@ -153,6 +154,7 @@
       				<input type="text" placeholder="Drop your Comment" style="width:90%;padding:8px;">
             </form>
             <br><br>
+            {% endfor %}
             {% endfor %}
       		</div>
       </div>

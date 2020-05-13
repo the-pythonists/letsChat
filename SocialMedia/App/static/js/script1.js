@@ -48,4 +48,11 @@ function openLogOut() {
 	  
   }
   
+  //Validation for Post Image
+$(":file").on("change", function(e) {
+
+	console.log(this.files[0].type);
+	document.getElementById("SubmitPost").style.display="block";
+  
+  })
   
