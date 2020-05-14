@@ -1,38 +1,100 @@
-{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
   <title></title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-  <link rel="stylesheet" type="text/css" href="{% static 'css/album.css' %}">
-  <link rel="stylesheet" type="text/css" href="lightbox.min.css">
-  <script type="text/javascript" src="lightbox-plus-jquery.min.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css" />
+  {%load static%}
+<link rel="StyleSheet" type="text/css" href="{%static 'css/album.css'%}">
 </head>
 <body>
+
+<header>
+  <h4 id="brand">LetsChat</h4>
+</header>
+
 <!-- Page Content -->
-<div class="container">
 
-  <h1 class="font-weight-light text-center text-lg-left mt-4 mb-0">LetsChat</h1>
+<br><br><br><br>
+<div class="tab">
+  <button class="tablinks" onclick="openCity(event, 'profle')">Profile</button>
+  <button class="tablinks" onclick="openCity(event, 'cover')">Cover</button>
+  <button class="tablinks" onclick="openCity(event, 'post')">Post</button>
+</div>
 
-  <hr class="mt-2 mb-5">
+<div id="profle" class="tabcontent" style="display:block;">
   {{img.post.url}}
-  <div class="row text-center text-lg-left" >
-    {% for img in photos %}
-    {% if img.post %}
-    <div class="col-lg-3 col-md-4 col-6" class="gallery">
-      <a href="{{img.post.url}}" class="d-block mb-4 h-100" data-lightbox="mygallery">
-            <img class="img-fluid img-thumbnail" src="{{img.post.url}}" alt="">
-          </a>
-    </div>
-    {% endif %}
-    {% endfor %}
+  <div class="container gallerys">
+
+
+
+            {% for img in photos %}
+            {% if img.post %}
+            <a href="{{img.post.url}}" target="_blank">
+            <img src="{{img.post.url}}" class="img-fluid">
+            </a>
+            {% endif %}
+            {% endfor %}
     
+     
+      
+      
+     
+   
+
 
 </div>
 <!-- /.container -->
+</div>
+
+<div id="cover" class="tabcontent">
+  <h3>cover</h3>
+  <p>Paris is the capital of France.</p> 
+</div>
+
+<div id="post" class="tabcontent">
+  <h3>post</h3>
+  <p>Tokyo is the capital of Japan.</p>
+</div>
+
+
+
+
 </body>
 
-<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js"></script>
+
+  <script>
+   $(document).ready(function(){
+    $('.gallerys').magnificPopup({
+     type: 'image',
+     delegate: 'a',
+     gallery: {
+      enabled : true
+     }
+    });
+   });
+
+
+//Tab 
+  function openCity(evt, cityName) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+  document.getElementById(cityName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+  </script>
+
 </html>

@@ -5,12 +5,14 @@ from django.conf import settings
 from django.http import JsonResponse
 import random
 from django.core.mail import send_mail
-from django.core.mail import send_mail
-from .models import userRegistration,Friend_Requests,UserPost,Likes
+from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends
 from django.contrib.auth.hashers import make_password,check_password
 import datetime
 import uuid
-
+from django.contrib import messages
+from django.utils.datastructures import MultiValueDictKeyError
+from django.db.models import Q
+from django.core import serializers
 
 def index(request):
 	if request.session.has_key('user'):
@@ -25,16 +27,17 @@ def signup(request):
 	if request.method == "POST":
 		fName = request.POST.get('firstName').title()
 		lName = request.POST.get('lastName').title()
-		# userName = request.POST.get('userName','DefaultValue')
+		userName = request.POST.get('userName','DefaultValue')
 		email = request.POST.get('Email')
 		otp = request.POST.get('OneTimePass')
 		pwd = request.POST.get('Password')
 		mobile = request.POST.get('Mobile')
 		
 		if((otp == request.session["Otp"])):
-			accountSave = userRegistration(userId=email, firstName=fName, lastName=lName, mobile=mobile,
+			accountSave = userRegistration(userId=email, firstName=fName, lastName=lName, userName=userName, mobile=mobile,
 				emailAddress = email, password = make_password(pwd))
 			accountSave.save()
+			AllFriends(userId=email).save()
 			return HttpResponse('Account Created')
 			
 		else:
@@ -48,7 +51,7 @@ def OtpGeneration(request):
 	# print(Email)
 	RandomValue=random.randint(1001,99999)
 	RandomValue="LetsChat"+str(RandomValue)
-	# print(RandomValue)
+	print(RandomValue)
 	message=f"Your Email Address  {Email}  Your OTP is {RandomValue} Do not share your password to anyone."
 	send_mail(
     	'LetsChat',
@@ -85,6 +88,7 @@ def login(request):
 			return HttpResponseRedirect('/')
 			
 		else:
+			messages.warning(request,'Please check your email and password.!!')
 			return render(request,'index.html')
 	else:
 		if request.session.has_key('user'):
@@ -107,28 +111,127 @@ def album(request):
 	else:
 		return HttpResponseRedirect('/')
 
+
 def profile(request):
+	# Checking if profile is of other person or self profile
 	if request.method == 'POST':
-		name = request.POST.get('profile')
-		profileDetail = userRegistration.objects.filter(userId=name)
-		params = {'user':profileDetail}
+		profileId = request.POST.get('profile')
+	else:
+		profileId = request.session['user']
+	
+	ActiveUser = userRegistration.objects.get(userId=request.session['user'])
+	ActiveUserName = ActiveUser.firstName
+	ActiveUserPic = ActiveUser.profilePic
+	profileDetail = userRegistration.objects.filter(userId=profileId)
+	
+	# checking if searched person is req receiver or sender
+	if Friend_Requests.objects.filter(receiverId=profileId,senderId=request.session['user']):
+		isRequest = True
+		isRequested = False
+
+	elif Friend_Requests.objects.filter(receiverId=request.session['user'],senderId=profileId):
+		isRequested = True
+		isRequest = False
+	else:
+		isRequest = False
+		isRequested = False
+
+	# Extracting friend list of searched user
+	friends = AllFriends.objects.get(userId=request.session['user']).Friends
+	# Logic for setting button of Add Friend, Unfriend
+	if profileId in friends:
+		isFriend = True
+	else:
+		isFriend = False
+
+	request.session['Watchprofile'] = profileId
+	params = {'user':profileDetail,'currentUserId':request.session['user'],
+		'isFriend':isFriend,'isRequest':isRequest,'isRequested':isRequested,
+		'ActiveUserName':ActiveUserName,'ActiveUserPic':ActiveUserPic}
 	return render(request,'Profile.html',params)
+
+
+def Userprofile(request):
+	return render(request,'Userprofile.html')
+	
+def userProfileInsert(request):
+	if request.method == "POST":
+		profileUserId=request.POST.get('ProfileUser','DefaultValue')
+		profileImage=request.FILES['profileImage']
+		print(profileImage)
+		loginUser=request.session['user']
+		if profileUserId==loginUser:
+			status=userRegistration.objects.filter(userId=loginUser).update(profilePic=profileImage)
+			return HttpResponseRedirect('/')
+		else:
+			return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
+	else:
+		return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
 
 @csrf_exempt
 def addfriend(request):
 	profileId = request.POST.get('profileId')
-	action = int(request.POST.get('action'))
+	action = request.POST.get('action')
+	request.session['friendProfile'] = profileId
 
-	if action == 1:
+	if action == 'add':
 		sendRequest = Friend_Requests(senderId=request.session['user'],receiverId=profileId,senderName=request.session['name'])
 		sendRequest.save()
 		return JsonResponse({"Result":"Successfully Sent"})
 
-	elif action == 0:
+	elif action == 'cancel':
 		Friend_Requests.objects.filter(senderId=request.session['user'],receiverId=profileId).delete()
 		return JsonResponse({"Result":"Successfully Canceled"})
+	
+	elif action == 'unfriend':
+		friend = AllFriends.objects.get(userId=request.session['user'])
+		friend.Friends.remove(profileId)
+		friendList = friend.Friends
+		AllFriends.objects.filter(userId=request.session['user']).update(userId=request.session['user'],Friends=friendList)
+		
+		friend1 = AllFriends.objects.get(userId=profileId)
+		friend1.Friends.remove(request.session['user'])
+		friendList1 = friend1.Friends
+		AllFriends.objects.filter(userId=profileId).update(userId=profileId,Friends=friendList1)
+
+		return JsonResponse({"Result":"Successfully Removed"})
+	
+	elif action == 'confirm':
+		print('here')
+		return HttpResponseRedirect('/requestConfirm')
+		# return JsonResponse({'Result':'Successfully Confirmed'})
 	else:
 		return JsonResponse({'Result':'Nothing Done'})
+
+@csrf_exempt
+def requestConfirm(request):
+	if request.method == 'POST':
+		friendId = request.POST.get('sender')
+		myId = request.session['user']
+		action = request.POST.get('action')
+	# myId = 'abc@gmail.com'
+	# friendId = 'test@gmail.com'
+	# action = 1
+	else:
+		print('called')
+		friendId = request.session['friendProfile']
+		myId = request.session['user']
+		action = 'add'
+
+	if action == 'add':
+	
+		myList = AllFriends.objects.get(userId=myId)
+		myList.Friends.append(friendId)
+		myNewList = myList.Friends
+		AllFriends.objects.filter(userId=myId).update(userId=myId,Friends=myNewList)
+	
+		friendList = AllFriends.objects.get(userId=friendId)
+		friendList.Friends.append(myId)
+		friendNewList = friendList.Friends
+		AllFriends.objects.filter(userId=friendId).update(userId=friendId,Friends=friendNewList)
+		
+	Friend_Requests.objects.filter(senderId=friendId,receiverId=myId).delete()
+	return JsonResponse({'Result':'Succuss'})
 
 def search(request):
 	if request.method == "POST":
@@ -156,7 +259,88 @@ def PostSubmission(request):
 		return HttpResponseRedirect('/')
 	# return render(request,'DashBoard.Html',{"flag":"Your post has uploaded"})
 
+def logout(request):
+	if request.session.has_key('user'):
+		del request.session['user']
+		return HttpResponseRedirect('/')
+	else:
+		messages.warning(request,'You are already logout. Please login...')
+		return render(request,'index.html')
+
+# def test(request):
+# 	# del request.session['user']
+# 	import uuid
+# 	return HttpResponse(uuid.uuid4().hex)
+
+def userCoverInsert(request):
+	if request.method == "POST":
+		profileUserId=request.POST.get('coverUser','DefaultValue')
+		coverImage=request.FILES['coverImage']
+		loginUser=request.session['user']
+		if profileUserId==loginUser:
+			status=userRegistration.objects.filter(userId=loginUser).update(coverPic=coverImage)
+			return HttpResponseRedirect('/')
+		else:
+			return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
+	else:
+		return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
+
+#Friend Page
+@csrf_exempt
+def friendSearch(request):
+	return render(request,'Friends.html')
+
+@csrf_exempt
+def outgoingRequest(request):
+	if request.method == "POST":
+		liveResult = Friend_Requests.objects.filter(senderId=request.session['user'])
+		reciverId=[]
+		
+		for e in liveResult:
+			reciverId.append(e.receiverId)
+		return JsonResponse({"reciverId":reciverId})
+
+
+@csrf_exempt
+def incomingRequest(request):
+	if request.method == "POST":
+		liveResult = Friend_Requests.objects.filter(receiverId=request.session['user'])
+		senderName = []
+		senderId = []
+		
+		for e in liveResult:
+			senderName.append(e.senderName)
+			senderId.append(e.senderId)
+		
+		return JsonResponse({"senderName":senderName,"senderId":senderId})
+
+@csrf_exempt
+def liveSearchProcess(request):
+	if request.method == "POST":
+		name = request.POST.get('search','DefaultValue')
+		liveResult = userRegistration.objects.filter(Q(firstName__icontains=name) | Q(lastName__icontains=name))
+		name = []
+		pic = []
+		uId = []
+		for e in liveResult:
+			fullName = e.firstName+ ' ' +e.lastName
+			name.append(fullName)
+			uId.append(e.userId)
+			pic.append(e.profilePic.url)
+
+		return JsonResponse({"Username":name,"Id":uId,"picture":pic})
+
+#Shows login user list of all friends
+def myfriends(request):
+	lt = []
+	friendList = AllFriends.objects.get(userId=request.session['user']).Friends
+	for name in friendList:
+		lt.append(userRegistration.objects.filter(userId=name))
+		
+	params = {'myFriends':lt}
+	return render(request,'MyFriends.html',params)
+
 def test(request):
-	del request.session['user']
-	import uuid
-	return HttpResponse(uuid.uuid4().hex)
+	AllFriends(userId='sj27754@gmail.com').save()
+	AllFriends(userId='mohammad.danish2694@gmail.com').save()
+	return HttpResponse('done')

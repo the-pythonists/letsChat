@@ -1,19 +1,113 @@
+<!DOCTYPE html>
 <html>
-    <head>
+<head>
+    <title></title>
+    {%load static%}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="{%static 'css/search.css'%}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css" />
+    
+</head>
+<body>
 
-    </head>
-    <body>
-        <form action="/profile/" method="POST">{% csrf_token %}
-        {% for user in Users %}    
-        <input type="hidden" name="profile" value="{{user.userId}}">
-        <input type="submit" value="{{user}}">
+    <header>
+      <h4 id="brand">LetsChat</h4>
+    </header>
+    <br><br><br><br>
+    
+    <div class="container">
+        <center>
+        <form action="/profile/" method="POST" >{% csrf_token %}
+        <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-10 col-10">
+        <input type="text" name="profile" id="personId" hidden>
+        <input type="text" name="search" placeholder="Search... " id="search" autocomplete="off">
+        </div>
 
-        {% endfor %}
-        {{name}}
-        
-            
+        <div class="col-lg-2 col-md-2 col-sm-2 col-2">
+        <input type="Submit" name="search" id="searchBut">
+        </div>
+        <ul class="list-group" id="result" style="color:#00a087;"></ul>
+        </div>
         </form>
+        </center>
+{% for user in Users %}    
+    <div class="searchItem">
+        <form action="/profile/" method="POST" id="{{user.userId}}">{% csrf_token %}
+
+            <input type="hidden" name="profile" value="{{user.userId}}">
+        <span style="display:flex;cursor:pointer;" onclick="goToProfile('{{user.userId}}')"><h6><img src="{{user.profilePic.url}}" alt="not exist" ><span id="name">{{user}}</span><span id="name" >| {{user.userId}}</span></h6></span>
+        
+        </form>
+    </div>
+{% endfor %}
+
+    </div>
+    
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+</body>
+<script type="text/javascript">
+function goToProfile(v)
+{
+    
+    document.getElementById(v).submit();
+    
+}
 
 
-    </body>
+$('#search').keyup(function(){
+    
+    $("ul").empty()
+
+   var searchField = $('#search').val();
+   console.log(searchField);
+if(searchField.length)
+  $.ajax({
+                method:'POST',
+                url:'/liveSearchProcess/',
+                data:{
+                  search:searchField
+                },
+                success:function(data){
+                  console.log(data);
+                  
+                  for(var i=0;i<(data.Id).length;i++)
+                  {
+                    
+                     $('#result').append('<li class="list-group-item link-class" style="color:#00a087;"><img src="'+data.picture[i]+'" height="40" width="40" class="img-thumbnail" />'+data.Username[i]+' | <span class="text-muted" style="color:#00a087;">'+data.Id[i]+'</span></li>');
+                    }
+              
+            
+                },
+                error:function(data){
+                    console.log('Error!');
+                    
+                }
+
+            });
+else{
+ 
+}
+
+});
+
+  $('#result').on('click', 'li', function() {
+  var click_text = $(this).text().split('|');
+  $('#search').val($.trim(click_text[0]));
+  console.log($('#personId').val($.trim(click_text[1])));
+  $("#result").html('');
+ });
+
+</script>
 </html>

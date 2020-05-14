@@ -5,6 +5,7 @@
 	{%load static%}
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<link rel="StyleSheet" type="text/css" href="{%static 'css/style1.css'%}">
 
 </head>
@@ -12,18 +13,18 @@
 <header class="container-fluid">
 	<h2>let's Chat</h2>
 </header>
-<div class="container">
+<div class="container w-50 bg-dark" style="color: white;">
+		<h2 class="text-center mt-2">Create a new account</h2>
 	<div id="createAccountDiv">
-		<form action="/signup/" method="post">
-			{% csrf_token %}
-			<input type="text" class="form-control" placeholder="First Name" required id="Att1" name="firstName"><br><!--Att1 Stands for Attribute 1-->
-			<input type="text" class="form-control" placeholder="Last Name" required id="Att1" name="lastName"><br><!--Att1 Stands for Attribute 1-->
+		<form action="/signup/" method="post">{% csrf_token %}
+			<input type="text" class="form-control" placeholder="First Name" required id="fname" name="firstName"><br><!--Att1 Stands for Attribute 1-->
+			<input type="text" class="form-control" placeholder="Last Name" required id="lname" name="lastName"><br><!--Att1 Stands for Attribute 1-->
 
-			<input type="text" class="form-control" placeholder="Username" required id="Att1" name="userName"><br><!--Att1 Stands for Attribute 1-->
+			<input type="text" class="form-control" placeholder="Username" required id="userName" name="userName"><br><!--Att1 Stands for Attribute 1-->
 			<input type="email" class="form-control" placeholder="Email" required id="Email" onclick="Form_Validate(1)" name="Email">
 			<p id="EmailMessage" style="color:red;"></p>
 			<br>
-			<p class="btn-block btn-success" onclick="OtpCall()">Send OTP</p><br>
+			<center><p class="btn-block btn-success text-center w-50 py-2 rounded" onclick="OtpCall()">Send OTP</p></center><br>
 			<input type="text" class="form-control" placeholder="OTP" required id="Att1" onclick="Form_Validate(2)" name="OneTimePass">
 			<br>
 			 
@@ -36,13 +37,13 @@
 	<p id="number" class="invalid">A <b>number</b></p>
 	<p id="length" class="invalid">Minimum <b>8 characters</b></p>
 	</div><br>
-	<input type="password" id="psw2" name="confirmPass" class="form-control" placeholder="ReEnter Password"required id="Att1" onclick="Form_Validate(4)">
+	<input type="password" id="psw2" name="confirmPass" class="form-control" placeholder="Re-Enter Password"required id="Att1" onclick="Form_Validate(4)">
 	<br>
 	<input type="number" class="form-control" placeholder="Mobile Number" required id="Att1" onclick="Form_Validate(5)" name="Mobile">
 	
 			<br><br>
 
-	<input type="submit" class="btn-block btn-danger" name="Create Your Account" style='padding:8px;'>
+	<input type="submit" class="btn-block btn-danger rounded" name="Create Your Account" style='padding:8px;'>
 		</form>
 	
 	</div>

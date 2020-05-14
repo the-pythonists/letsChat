@@ -39,6 +39,9 @@
 	<div class="col-sm-6">
 		<div id="landinglogin_div">
 			<h4>SignIn</h4>
+			{% for message in messages %}
+			<strong>Message: </strong><b style="color: red;">{{ message }}</b>
+			{% endfor %}
 			<form action="/login/" method="POST">{% csrf_token %}
 				<label>Email</label>
 				<input type="Email" name="login_Email" placeholder="Email" class="form-control"><br>
