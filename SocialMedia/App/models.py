@@ -54,6 +54,7 @@ class UserPost(models.Model):
     post = models.ImageField(upload_to="profiles",blank=True)
     Message = models.CharField(max_length=5000,default="",blank=True)
     date = models.DateTimeField(default=datetime.now, blank=True)
+    userPic = models.CharField(max_length=50,default='',blank=True)
 
 class Likes(models.Model):
     postId = models.CharField(max_length=100)
