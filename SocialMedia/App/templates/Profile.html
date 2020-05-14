@@ -326,7 +326,7 @@
 
     <!-- Modal  for profile Page Edit-->
     <div class="modal fade-scale" id="ProfileImage1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <form action="{%url 'userProfileInsert'%}" method="POST" enctype="multipart/form-data"> {% csrf_token %}
+    <form action="/userProfileInsert/" method="POST" enctype="multipart/form-data"> {% csrf_token %}
 
     <input type="hidden" name="ProfileUser" value="{{data.userId}}">
       <div class="modal-dialog" role="document">

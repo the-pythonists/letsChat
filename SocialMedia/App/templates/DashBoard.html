@@ -130,11 +130,12 @@
 
       <div style="background:rgba(191, 191, 191, 0.5);padding:2%;width:90%;">
       		<div>
-            {% for query in userData %}
-            {% for data in query %}
-      			<img src="{{data.profilePic.url}}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
+            {% for data in userData %}
+      			<img src="{{data.userPic}}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
       			<span style="font-weight:bold;padding-left:8px;">{{data.userName}} {{data.lastName}}</span>
-            <br><br>
+            <br><span style="margin-left: 7%; font-size: 70%; margin-top: -10px;">
+              <b>{{ data.date|date:"d m Y" }}
+                </b></span><br>
             {% if data.Message %}
             {{data.Message}}
             <input type="hidden" value="{{data.postId}}" id="like">
@@ -154,7 +155,6 @@
       				<input type="text" placeholder="Drop your Comment" style="width:90%;padding:8px;">
             </form>
             <br><br>
-            {% endfor %}
             {% endfor %}
       		</div>
       </div>

@@ -13,6 +13,7 @@ import uuid,json
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db.models import Q
 from django.core import serializers
+from itertools import chain
 
 def index(request):
 	if request.session.has_key('user'):
@@ -21,11 +22,21 @@ def index(request):
 		
 		friends = AllFriends.objects.get(userId=request.session['user']).Friends
 		# print(friends)
-		postList = [userData]
-		for name in friends:
-			friendsPosts = UserPost.objects.filter(userId=name).order_by('-date')
-			postList.append(friendsPosts)
-			print(friendsPosts)
+		postList = []
+		def UserAllPost():
+			for item in userData:
+				yield item
+
+		def FriendPosts():
+			for item in friends:
+				t = UserPost.objects.filter(userId=item).order_by('-date')
+				for i in t:
+					yield i
+
+		AllPost = chain(UserAllPost(), FriendPosts())
+		for item in AllPost:
+			postList.append(item)
+		# print(postList)
 		params = {'userInfo':userInfo,'userData':postList}
 		return render(request,'DashBoard.html',params)
 	else:
@@ -139,7 +150,8 @@ def notifications(request):
 def album(request):
 	if request.session.has_key('user'):
 		photos = UserPost.objects.filter(userId=request.session['user'])
-		params = {'photos':photos}
+		profilePhotos = userRegistration.objects.filter(userId=request.session['user'])
+		params = {'photos':photos,'profilePhotos':profilePhotos}
 		return render(request,'Album.html',params)
 	else:
 		return HttpResponseRedirect('/')
@@ -182,12 +194,17 @@ def Userprofile(request):
 	
 def userProfileInsert(request):
 	if request.method == "POST":
-		profileUserId=request.POST.get('ProfileUser','DefaultValue')
+		profileUserId=request.POST.get('ProfileUser')
 		profileImage=request.FILES['profileImage']
+		print(profileUserId,profileImage)
 		loginUser=request.session['user']
 		if profileUserId==loginUser:
-			status=userRegistration.objects.filter(userId=loginUser).update(profilePic=profileImage)
-			return HttpResponseRedirect('/')
+			status=userRegistration.objects.get(userId=loginUser)
+			status.profilePic = profileImage
+			status.save()
+			UserPost.objects.filter(userId=loginUser).update(userPic='/media/'+str(userRegistration.objects.get(userId=loginUser).profilePic))
+			
+			return HttpResponseRedirect('/profile/')
 		else:
 			return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
 	else:
@@ -328,7 +345,10 @@ def PostSubmission(request):
 		PostMessage = request.POST.get('Post_Title','DefaultValue')
 		PostMedia = request.FILES.get('MediaFile')
 	
-		PostStatus=UserPost(postId=Id,userId=user,userName=request.session['name'],post=PostMedia,Message=PostMessage).save()
+		PostStatus=UserPost(postId=Id,userId=user,userName=request.session['name'],post=PostMedia,
+		Message=PostMessage,userPic='/media/'+str(userRegistration.objects.get(userId=user).profilePic)
+		).save()
+		# print('/media/'+str(userRegistration.objects.get(userId=user).profilePic))
 		likes = Likes(postId=Id).save()
 		return HttpResponseRedirect('/')
 	else:
@@ -344,13 +364,20 @@ def logout(request):
 
 def userCoverInsert(request):
 	if request.method == "POST":
-		profileUserId=request.POST.get('coverUser','DefaultValue')
+		profileUserId=request.POST.get('coverUser')
 		coverImage=request.FILES['coverImage']
 		loginUser=request.session['user']
 		if profileUserId==loginUser:
-			status=userRegistration.objects.filter(userId=loginUser).update(coverPic=coverImage)
-			return HttpResponseRedirect('/')
+			status = userRegistration.objects.get(userId=loginUser)
+			status.coverPic = coverImage
+			status.save()
+			return HttpResponseRedirect('/profile/')
 		else:
 			return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
 	else:
 		return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
+
+def test(request):
+	img = '/media/media/profile.jpeg'
+	'/media/'+ 'media/profile.jpeg'
+	return render(request,'MyFriends.html',{'img':img})
