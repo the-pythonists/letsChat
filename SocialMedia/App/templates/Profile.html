@@ -305,7 +305,7 @@
     <!--Cover Iamge-->
     <!-- Modal  for Cover Page Edit-->
     <div class="modal fade-scale" id="CoverImage1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <form method="Post" action=""  enctype="multipart/form-data">{%csrf_token%}
+        <form method="Post" action="/userCoverInsert/"  enctype="multipart/form-data">{%csrf_token%}
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -328,14 +328,14 @@
 
     <!-- Modal  for profile Page Edit-->
     <div class="modal fade-scale" id="ProfileImage1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <form action="" method="POST" enctype="multipart/form-data"> {% csrf_token %}
+    <form action="/userProfileInsert/" method="POST" enctype="multipart/form-data"> {% csrf_token %}
 
     <input type="hidden" name="ProfileUser" value="{{data.userId}}">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+            <h4 class="modal-title" id="myModalLabel">Upload Photo</h4>
           </div>
           <div class="modal-body">
                         

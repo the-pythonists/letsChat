@@ -1,4 +1,5 @@
 {% load static %}
+{% load humanize %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -131,10 +132,12 @@
 
       <div style="background:rgba(191, 191, 191, 0.5);padding:2%;width:90%;">
       		<div>
-            {% for data in userData %}
-      			<img src="{{userInfo.profilePic.url}}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
-      			<span style="font-weight:bold;padding-left:8px;">{{userInfo.firstName}} {{userInfo.lastName}}</span>
-            <br><br>
+              {% for data in userData %}
+      			<img src="{{data.userPic}}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
+      			<span style="font-weight:bold;padding-left:8px;">{{data.userName}}
+            <div><span style="margin-left: 7%; font-size: 70%; margin-top: -10px;">
+            <b>{{ data.date|naturaltime }}
+            </b></span></div></span><br>
             {% if data.Message %}
             {{data.Message}}
             <input type="hidden" value="{{data.postId}}" id="like">
@@ -161,7 +164,6 @@
     
   </div>
 </div>
-  
 <script>
   function likePost(data){
     Id = data

@@ -13,12 +13,30 @@ from django.contrib import messages
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db.models import Q
 from django.core import serializers
+from itertools import chain
 
 def index(request):
 	if request.session.has_key('user'):
 		userInfo = userRegistration.objects.get(userId=request.session['user'])
 		userData = UserPost.objects.filter(userId=request.session['user']).order_by('-date') # '-' for descending order
-		params = {'userInfo':userInfo,'userData':userData}
+		friends = AllFriends.objects.get(userId=request.session['user']).Friends
+		postList = []
+		def UserAllPost():
+			for item in userData:
+				yield item
+
+		def FriendPosts():
+			for item in friends:
+				t = UserPost.objects.filter(userId=item).order_by('-date')
+				for i in t:
+					yield i
+
+		AllPost = chain(UserAllPost(), FriendPosts())
+		for item in AllPost:
+			postList.append(item)
+			postList.sort(key=lambda x: x.date)      #for reversed :  (reverse = True)
+		newDate = datetime.datetime.now()
+		params = {'userInfo':userInfo,'userData':postList,"newDate":newDate}
 		return render(request,'DashBoard.html',params)
 	else:
 		return render(request,'index.html')
@@ -38,12 +56,20 @@ def signup(request):
 				emailAddress = email, password = make_password(pwd))
 			accountSave.save()
 			AllFriends(userId=email).save()
-			return HttpResponse('Account Created')
+			return HttpResponseRedirect('/')
 			
 		else:
 			return HttpResponse("NotSame")
 	else:
 		return render(request,'CreateAccount.html')
+
+@csrf_exempt
+def uservalidate(request):
+	username = request.POST.get('username')
+	if userRegistration.objects.filter(userName=username):
+		return JsonResponse({'Result':1})
+	else:
+		return JsonResponse({'Result':0})
 
 @csrf_exempt
 def OtpGeneration(request):
@@ -161,8 +187,11 @@ def userProfileInsert(request):
 		print(profileImage)
 		loginUser=request.session['user']
 		if profileUserId==loginUser:
-			status=userRegistration.objects.filter(userId=loginUser).update(profilePic=profileImage)
-			return HttpResponseRedirect('/')
+			status=userRegistration.objects.get(userId=loginUser)
+			status.profilePic = profileImage
+			status.save()
+			UserPost.objects.filter(userId=loginUser).update(userPic='/media/'+str(userRegistration.objects.get(userId=loginUser).profilePic))
+			return HttpResponseRedirect('/profile/')
 		else:
 			return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
 	else:
@@ -247,12 +276,14 @@ def search(request):
 
 def PostSubmission(request):
 	if request.session.has_key('user'):
-		Id = uuid.uuid4().hex		
+		Id = uuid.uuid4().hex	
 		user = request.session['user']
 		PostMessage = request.POST.get('Post_Title','DefaultValue')
 		PostMedia = request.FILES.get('MediaFile')
 	
-		PostStatus=UserPost(postId=Id,userId=user,post=PostMedia,Message=PostMessage).save()
+		PostStatus=UserPost(postId=Id,userId=user,userName=request.session['name'],post=PostMedia,
+		Message=PostMessage,userPic='/media/'+str(userRegistration.objects.get(userId=user).profilePic)
+		).save()
 		likes = Likes(postId=Id).save()
 		return HttpResponseRedirect('/')
 	else:
@@ -267,19 +298,24 @@ def logout(request):
 		messages.warning(request,'You are already logout. Please login...')
 		return render(request,'index.html')
 
-# def test(request):
-# 	# del request.session['user']
-# 	import uuid
-# 	return HttpResponse(uuid.uuid4().hex)
+def test(request):
+	# del request.session['user']
+	img = '/media/cover.jpg'
+	i = img.url
+	print(i)
+	return render(request,'MyFriends.html',{'img':''})
 
 def userCoverInsert(request):
 	if request.method == "POST":
-		profileUserId=request.POST.get('coverUser','DefaultValue')
-		coverImage=request.FILES['coverImage']
-		loginUser=request.session['user']
+		profileUserId = request.POST.get('coverUser','DefaultValue')
+		coverImage = request.FILES['coverImage']
+		print(coverImage)
+		loginUser = request.session['user']
 		if profileUserId==loginUser:
-			status=userRegistration.objects.filter(userId=loginUser).update(coverPic=coverImage)
-			return HttpResponseRedirect('/')
+			status = userRegistration.objects.get(userId=loginUser)
+			status.coverPic = coverImage
+			status.save()
+			return HttpResponseRedirect('/profile/')
 		else:
 			return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
 	else:
@@ -339,8 +375,3 @@ def myfriends(request):
 		
 	params = {'myFriends':lt}
 	return render(request,'MyFriends.html',params)
-
-def test(request):
-	AllFriends(userId='sj27754@gmail.com').save()
-	AllFriends(userId='mohammad.danish2694@gmail.com').save()
-	return HttpResponse('done')

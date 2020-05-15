@@ -75,11 +75,9 @@ function OtpCall(){
                   Email:email
                 },
                 success:function(data){
-                  console.log("Successfully")
                   document.getElementById("EmailMessage").innerHTML="OTP has been delivered on your Email address.";
                 },
                 error:function(data){
-                    console.log('Error!');
                     document.getElementById("EmailMessage").innerHTML="Please Check your Email Address";
                 }
 
