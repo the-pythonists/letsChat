@@ -29,7 +29,7 @@
 
 <!--Header-->
 <div id="navbar">
-  <a href="#default" id="logo">letsChat</a>
+  <a href="/" id="logo">letsChat</a>
   <div id="navbar-right">
     <a class="active" href="#home">Home</a>
     <a href="#contact">Contact</a>
@@ -311,7 +311,7 @@
     <!--Cover Iamge-->
     <!-- Modal  for Cover Page Edit-->
     <div class="modal fade-scale" id="CoverImage1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <form method="Post" action=""  enctype="multipart/form-data">{%csrf_token%}
+        <form method="Post" action="/userCoverInsert/"  enctype="multipart/form-data">{%csrf_token%}
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -334,7 +334,7 @@
 
     <!-- Modal  for profile Page Edit-->
     <div class="modal fade-scale" id="ProfileImage1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <form action="" method="POST" enctype="multipart/form-data"> {% csrf_token %}
+    <form action="/userProfileInsert/" method="POST" enctype="multipart/form-data"> {% csrf_token %}
 
     <input type="hidden" name="ProfileUser" value="{{data.userId}}">
       <div class="modal-dialog" role="document">

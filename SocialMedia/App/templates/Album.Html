@@ -30,13 +30,13 @@
 
 
 
-            {% for img in photos %}
-            {% if img.post %}
-            <a href="{{img.post.url}}" target="_blank">
-            <img src="{{img.post.url}}" class="img-fluid">
-            </a>
-            {% endif %}
-            {% endfor %}
+    {% for img in profilePhotos %}
+    {% if img.profilePic %}
+    <a href="{{img.profilePic.url}}" target="_blank">
+    <img src="{{img.profilePic.url}}" class="img-fluid">
+    </a>
+    {% endif %}
+  {% endfor %}
     
      
       
@@ -51,12 +51,26 @@
 
 <div id="cover" class="tabcontent">
   <h3>cover</h3>
+  {% for img in profilePhotos %}
+    {% if img.coverPic %}
+    <a href="{{img.coverPic.url}}" target="_blank">
+    <img src="{{img.coverPic.url}}" class="img-fluid">
+    </a>
+    {% endif %}
+  {% endfor %}
   <p>Paris is the capital of France.</p> 
 </div>
 
 <div id="post" class="tabcontent">
-  <h3>post</h3>
-  <p>Tokyo is the capital of Japan.</p>
+  <h3>Posts</h3>
+  {% for img in photos %}
+    {% if img.post %}
+    <a href="{{img.post.url}}" target="_blank">
+    <img src="{{img.post.url}}" class="img-fluid">
+    </a>
+    {% endif %}
+  {% endfor %}
+  
 </div>
 
 
