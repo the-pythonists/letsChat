@@ -4,15 +4,9 @@
     </head>
     <body>
         {% for user in Users %}    
-            <form action="/profile/" method="POST">{% csrf_token %}
-        
-            <input type="hidden" name="profile" value="{{user.userId}}">
-            <input type="submit" value="{{user}}">
-
-        
-            
-            </form>
+            <a href="/profile/{{user.userName}}"><input type="button" value="{{user.firstName}} {{user.lastName}}"></a>
         {% endfor %}
+        
         {{name}}
 
 

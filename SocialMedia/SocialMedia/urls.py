@@ -21,6 +21,7 @@ from App import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('changepassword/',views.changepassword,name='changepassword'),
     path('test/',views.test,name='test'),
     path('logout/',views.logout,name='logout'),
     path('',views.index,name='index'),
@@ -32,7 +33,7 @@ urlpatterns = [
     path("PostSubmission/",views.PostSubmission,name="PostSubmission"),
     path("postlike/",views.postlike,name="postlike"),
     path("album/",views.album,name="album"),
-    path("profile/",views.profile,name="profile"),
+    path("profile/<str:user>/",views.profile,name="profile"),
     path("myfriends/",views.myfriends,name="myfriends"),
     path("addfriend/",views.addfriend,name="addfriend"),
     path("requestConfirm/",views.requestConfirm,name="requestConfirm"),
@@ -44,6 +45,7 @@ urlpatterns = [
     path("outgoingRequest/",views.outgoingRequest,name="outgoingRequest"),#incoming Request
     path("Userprofile/",views.Userprofile,name="Userprofile"),#User Profile
     path("userProfileInsert/",views.userProfileInsert,name="userProfileInsert"),#User Profile Store
+    path("userIntroInsert/",views.userIntroInsert,name="userIntroInsert"),#Intro Insert
 
 ]
 

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<title>Login Form</title>
+	<style>
+		#aaa {
+    background-color: steelblue;
+    color: #fff;
+  }
+  
+	</style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-secondary" style="margin-bottom:0px;margin-left:0px;margin-right:0px;">
+      <a class="navbar-brand" href="#" style="color:rgba(0, 150, 136, 1);font-weight: bold;">LetsChat</a>
+    </nav>
+  <div class="col-md-4 offset-md-4">
+                    <span class="anchor" id="formChangePassword"></span>
+                    <hr class="mb-0">
+					<div class="card">
+                        <div class="card-header">
+                          {{message}}
+                            <h3 class="mb-0">Change Password</h3>
+                        </div>
+                        <div class="card-body" style="background-color:rgba(0, 150, 136, 1); color:white;">
+                            <form class="form" role="form" autocomplete="off" action="/changepassword/" method="POST">{% csrf_token %}
+                                <div class="form-group">
+                                    <label for="inputPasswordOld">Current Password</label>
+                                    <input type="password" name="currentPass" class="form-control" id="inputPasswordOld" required="">
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputPasswordNew">New Password</label>
+                                    <input type="password" name="newPass" class="form-control" id="inputPasswordNew" required="">
+                                    <span class="form-text small text-dark">
+                                            The password must be 8-20 characters, and must <em>not</em> contain spaces.
+                                        </span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputPasswordNewVerify">Verify</label>
+                                    <input type="password" name="confirmPass" class="form-control" id="inputPasswordNewVerify" required="">
+                                    <span class="form-text small text-dark">
+                                            To confirm, type the new password again.
+                                        </span>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-success btn-lg float-right">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- /form card change password -->
+
+                </div>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </body>
+</html>

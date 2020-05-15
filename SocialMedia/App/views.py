@@ -21,7 +21,7 @@ def index(request):
 		userData = UserPost.objects.filter(userId=request.session['user']).order_by('-date') # '-' for descending order
 		
 		friends = AllFriends.objects.get(userId=request.session['user']).Friends
-		# print(friends)
+		
 		postList = []
 		def UserAllPost():
 			for item in userData:
@@ -37,7 +37,10 @@ def index(request):
 		for item in AllPost:
 			postList.append(item)
 		# print(postList)
-		params = {'userInfo':userInfo,'userData':postList}
+		postList.sort(key=lambda x: x.date,reverse = True) 
+		# print(postList)
+		
+		params = {'userInfo':userInfo,'userData':postList,'date_now':datetime.datetime.now()}
 		return render(request,'DashBoard.html',params)
 	else:
 		return render(request,'index.html')
@@ -59,14 +62,13 @@ def signup(request):
 				return render(request,'CreateAccount.html',{'message':'Account Already Present with Given Mobile Number'}) 
 			else:
 				accountSave = userRegistration(userId=email, firstName=fName, lastName=lName, userName=username, 
-				mobile=mobile,emailAddress = email, password = make_password(pwd))
+				mobile=mobile,emailAddress = email, password = makemake_password(pwd))
 				accountSave.save()
+				# Creating Blank Frined List
 				AllFriends(userId=email).save()
-				return HttpResponseRedirect('/')
-			# return HttpResponse('Account Created')
-			
+				return HttpResponseRedirect('/')	
 		else:
-			return HttpResponse("NotSame")
+			return render(request,'CreateAccount.html',{'message':'Incorrect OTP'})
 	else:
 		return render(request,'CreateAccount.html')
 
@@ -82,10 +84,8 @@ def uservalidate(request):
 @csrf_exempt
 def OtpGeneration(request):
 	Email=request.POST.get('Email','DefaultValue')
-	# print(Email)
-	RandomValue=random.randint(1001,99999)
-	RandomValue="LetsChat"+str(RandomValue)
-	print(RandomValue)
+	RandomValue="LetsChat"+str(random.randint(1001,99999))
+	# print(RandomValue)
 	message=f"Your Email Address  {Email}  Your OTP is {RandomValue} Do not share your password to anyone."
 	send_mail(
     	'LetsChat',
@@ -98,16 +98,17 @@ def OtpGeneration(request):
 	return JsonResponse({'Result':"Successfully"})
 
 def myfriends(request):
-	lt = []
+	fList = []
 	friendList = AllFriends.objects.get(userId=request.session['user']).Friends
 	for name in friendList:
-		lt.append(userRegistration.objects.filter(userId=name))
+		fList.append(userRegistration.objects.filter(userId=name))
 		
-	params = {'myFriends':lt}
+	params = {'myFriends':fList}
 	return render(request,'MyFriends.html',params)
 
 @csrf_exempt
 def postlike(request):
+	# INCOMPLETE AS OF NOW
 	Id = request.POST.get('postID')
 	likes = Likes.objects.get(postId=Id)
 	postLikedBy = request.session['user']
@@ -127,13 +128,10 @@ def login(request):
 			request.session['user'] = str(loginValidate.userId)
 			name = request.session['user']
 			request.session['name'] = str(loginValidate.firstName) + ' ' + str(loginValidate.lastName)
-			request.session['pic'] = str(loginValidate.profilePic)
+			request.session['pic'] = str(loginValidate.profilePic) # THIS LINE IS CURRENTLY NOT IN USE 
 			return HttpResponseRedirect('/')
-			
 		else:
-			return HttpResponse('Error')
-			
-			# return render(request,'index.html')
+			return render(request,'index.html',{'message':'Please Check Your Email and Password'})
 	else:
 		if request.session.has_key('user'):
 			return HttpResponseRedirect('/')
@@ -141,6 +139,7 @@ def login(request):
 			return render(request,'index.html')
 		
 def notifications(request):
+	# IT IS INCOMPLETE ONLY DIPLAYS FRIEND REQUESTS
 	fRequests = Friend_Requests.objects.filter(receiverId=request.session['user'])
 	# for i in fRequests:
 		
@@ -156,12 +155,8 @@ def album(request):
 	else:
 		return HttpResponseRedirect('/')
 
-def profile(request):
-	# Checking if profile is of other person or self profile
-	if request.method == 'POST':
-		profileId = request.POST.get('profile')
-	else:
-		profileId = request.session['user']
+def profile(request,user):
+	profileId = userRegistration.objects.get(userName=user).userId
 	profileDetail = userRegistration.objects.filter(userId=profileId)
 	
 	# checking if searched person is req receiver or sender
@@ -262,7 +257,7 @@ def liveSearchProcess(request):
 def addfriend(request):
 	profileId = request.POST.get('profileId')
 	action = request.POST.get('action')
-	request.session['friendProfile'] = profileId
+	request.session['friendProfile'] = profileId # USED IN NEXT FUNCTION FOR REQUEST CONFIRM
 
 	if action == 'add':
 		sendRequest = Friend_Requests(senderId=request.session['user'],receiverId=profileId,senderName=request.session['name'])
@@ -287,9 +282,7 @@ def addfriend(request):
 		return JsonResponse({"Result":"Successfully Removed"})
 	
 	elif action == 'confirm':
-		print('here')
 		return HttpResponseRedirect('/requestConfirm')
-		# return JsonResponse({'Result':'Successfully Confirmed'})
 	else:
 		return JsonResponse({'Result':'Nothing Done'})
 
@@ -303,11 +296,9 @@ def requestConfirm(request):
 	# friendId = 'test@gmail.com'
 	# action = 1
 	else:
-		print('called')
-		friendId = request.session['friendProfile']
+		friendId = request.session['friendProfile'] # GETTING VALUE FROM PREVIOUS FUNCTION ADD FRIEND
 		myId = request.session['user']
 		action = 'add'
-
 	if action == 'add':
 	
 		myList = AllFriends.objects.get(userId=myId)
@@ -320,8 +311,6 @@ def requestConfirm(request):
 		friendNewList = friendList.Friends
 		AllFriends.objects.filter(userId=friendId).update(userId=friendId,Friends=friendNewList)
 		
-
-
 	Friend_Requests.objects.filter(senderId=friendId,receiverId=myId).delete()
 
 	return JsonResponse({'Result':'Succuss'})
@@ -348,7 +337,7 @@ def PostSubmission(request):
 		PostStatus=UserPost(postId=Id,userId=user,userName=request.session['name'],post=PostMedia,
 		Message=PostMessage,userPic='/media/'+str(userRegistration.objects.get(userId=user).profilePic)
 		).save()
-		# print('/media/'+str(userRegistration.objects.get(userId=user).profilePic))
+		
 		likes = Likes(postId=Id).save()
 		return HttpResponseRedirect('/')
 	else:
@@ -380,4 +369,52 @@ def userCoverInsert(request):
 def test(request):
 	img = '/media/media/profile.jpeg'
 	'/media/'+ 'media/profile.jpeg'
-	return render(request,'MyFriends.html',{'img':img})
+	return render(request,'changepwd.html',{'img':img})
+
+@csrf_exempt
+def userIntroInsert(request):
+	if request.method == "POST":
+		v1 = request.session['Watchprofile']
+		v2 = request.session['user']
+		if  v1 == v2:
+			quote = request.POST.get('quote','DefaultValue')
+			dOB = request.POST.get('dOB','DefaultValue')
+			gender = request.POST.get('gender','DefaultValue')
+			if(gender == "Gender"):
+				gender = ""
+			mobileNumber = request.POST.get('mobileNumber','DefaultValue')
+			countryName = request.POST.get('countryName','DefaultValue')
+			cityName = request.POST.get('cityName','DefaultValue')
+			currentEducation = request.POST.get('currentEducation','DefaultValue')
+			educationStartYear = request.POST.get('educationStartYear','DefaultValue')
+			educationEndYear = request.POST.get('educationEndYear','DefaultValue')
+			companyName = request.POST.get('companyName','DefaultValue')
+			companyPosition = request.POST.get('companyPosition','DefaultValue')
+			companyCity = request.POST.get('companyCity','DefaultValue')
+			companyDescription = request.POST.get('companyDescription','DefaultValue')
+			status=userRegistration.objects.filter(userId=v2).update(quote=quote,dOB=dOB,gender=gender,mobile=mobileNumber,countryName=countryName,
+				cityName=cityName,currentEducation=currentEducation,educationStartYear=educationStartYear,educationEndYear=educationEndYear,companyName=companyName,companyPosition=companyPosition,companyCity=companyCity,companyDescription=companyDescription)
+
+			return HttpResponse("<h1>Done</h1>")
+
+def changepassword(request):
+	if request.method == 'POST':
+		currentPass = request.POST.get('currentPass')
+		newPass = request.POST.get('newPass')
+		confirmPass = request.POST.get('confirmPass')
+		if newPass != confirmPass:
+			message = "Password Do not match"
+			return render(request,'changepwd.html',{'message':message})
+		else:
+			encryptCurrentPass = userRegistration.objects.get(userId=request.session['user']).password
+
+			if check_password(currentPass,encryptCurrentPass) == True:
+				userRegistration.objects.filter(userId=request.session['user']).update(password=make_password(newPass))
+				# return render(request,'changepwd.html',{'message':'Password Changed Successfully.Please Login Again'})
+				
+				del request.session['user']
+				return HttpResponseRedirect('/')
+			else:
+				return HttpResponse('pasword not match')
+	else:
+		return render(request,'changepwd.html')
