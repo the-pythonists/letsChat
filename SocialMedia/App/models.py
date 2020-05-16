@@ -39,13 +39,26 @@ class Friend_Requests(models.Model):
 class AllFriends(models.Model):
     userId = models.CharField(max_length=50)
     Friends = ListCharField(
-        base_field=models.CharField(max_length=50),
+        base_field=models.CharField(max_length=50,blank=True),
         max_length=(100 * 100)
     )
 
-
     def __str__(self):
         return self.userId
+
+class Notifications(models.Model):
+    userId = models.CharField(max_length=55, blank=True)
+    userName = models.CharField(max_length=55, blank=True)
+    fullName = models.CharField(max_length=55, blank=True)
+    sender = models.CharField(max_length=55, blank=True)
+    receiver = models.CharField(max_length=55, blank=True)
+    notification = models.CharField(max_length=100, blank=True)
+    viewed = models.BooleanField()
+    userId = models.CharField(max_length=55, blank=True)
+    date = models.DateTimeField(default=datetime.now, blank=True)
+
+    def __str__(self):
+        return self.userId    
 
 class UserPost(models.Model):
     postId = models.CharField(max_length=100,default='') 

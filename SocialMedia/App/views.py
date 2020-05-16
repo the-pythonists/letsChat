@@ -6,7 +6,7 @@ from django.http import JsonResponse
 import random
 from django.core.mail import send_mail
 from django.core.mail import send_mail
-from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends
+from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications
 from django.contrib.auth.hashers import make_password,check_password
 import datetime
 import uuid,json
@@ -31,8 +31,10 @@ def index(request):
 			for item in friends:
 				t = UserPost.objects.filter(userId=item).order_by('-date')
 				for i in t:
+					# Id = i.postId
+					# print(Id)
 					yield i
-
+		# FriendPosts()
 		AllPost = chain(UserAllPost(), FriendPosts())
 		for item in AllPost:
 			postList.append(item)
@@ -141,9 +143,14 @@ def login(request):
 def notifications(request):
 	# IT IS INCOMPLETE ONLY DIPLAYS FRIEND REQUESTS
 	fRequests = Friend_Requests.objects.filter(receiverId=request.session['user'])
-	# for i in fRequests:
+	picsList = []
+	for Id in fRequests:
+		senderPic = userRegistration.objects.filter(userId=Id.senderId)
+		for pic in senderPic:
+			picUrl = pic.profilePic
+			picsList.append(picUrl.url)
 		
-	params = {'request':fRequests}
+	params = {'request':zip(fRequests,picsList)}
 	return render(request,'Notifications.html',params)
 
 def album(request):
@@ -256,7 +263,7 @@ def liveSearchProcess(request):
 			uId.append(e.userId)
 			pic.append(e.profilePic.url)
 			uname.append(e.userName)
-		print(pic)
+		# print(pic)
 		return JsonResponse({"Username":name,"Id":uId,"picture":pic,"uname":uname})
 		
 
@@ -300,28 +307,40 @@ def requestConfirm(request):
 		friendId = request.POST.get('sender')
 		myId = request.session['user']
 		action = request.POST.get('action')
-	# myId = 'abc@gmail.com'
-	# friendId = 'test@gmail.com'
-	# action = 1
+	
 	else:
+		# myId = 'mohammad.danish2694@gmail.com'
+		# friendId = 'sj27754@gmail.com'
+		# action = 1
+
 		friendId = request.session['friendProfile'] # GETTING VALUE FROM PREVIOUS FUNCTION ADD FRIEND
 		myId = request.session['user']
 		action = 'add'
 	if action == 'add':
-	
+		# Friend Add in Logged user List
 		myList = AllFriends.objects.get(userId=myId)
-		myList.Friends.append(friendId)
-		myNewList = myList.Friends
-		AllFriends.objects.filter(userId=myId).update(userId=myId,Friends=myNewList)
-	
+		if friendId in myList.Friends: # Checking if friend is already added 
+			pass
+		else:
+			myList.Friends.append(friendId)
+			myNewList = myList.Friends
+			AllFriends.objects.filter(userId=myId).update(userId=myId,Friends=myNewList)
+
+		# Friend Add in Sender user List
 		friendList = AllFriends.objects.get(userId=friendId)
-		friendList.Friends.append(myId)
-		friendNewList = friendList.Friends
-		AllFriends.objects.filter(userId=friendId).update(userId=friendId,Friends=friendNewList)
+		if myId in friendList.Friends: # Checking if friend is already added 
+			pass
+		else:
+			friendList.Friends.append(myId)
+			friendNewList = friendList.Friends
+			AllFriends.objects.filter(userId=friendId).update(userId=friendId,Friends=friendNewList)
 		
+
+		senderName = Friend_Requests.objects.get(senderId=friendId).senderName
+	
 	Friend_Requests.objects.filter(senderId=friendId,receiverId=myId).delete()
 
-	return JsonResponse({'Result':'Succuss'})
+	return JsonResponse({'Result':'Succuss','name':senderName})
 
 def search(request):
 	if request.method == "POST":
@@ -375,10 +394,18 @@ def userCoverInsert(request):
 		return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
 
 def test(request):
-	img = '/media/media/profile.jpeg'
-	'/media/'+ 'media/profile.jpeg'
-	return render(request,'changepwd.html',{'img':img})
-
+	myId = 'mohammad.danish2694@gmail.com'
+	friendId = 'sj27754@gmail.com'
+	myList = AllFriends.objects.get(userId=myId)
+	if friendId in myList.Friends:
+		print('found')
+	print(myList.Friends)
+	
+	myList.Friends.append(friendId)
+	myNewList = myList.Friends
+	AllFriends.objects.filter(userId=myId).update(userId=myId,Friends=myNewList)
+	# return render(request,'changepwd.html',{'img':img})
+	return HttpResponse('done')
 @csrf_exempt
 def userIntroInsert(request):
 	if request.method == "POST":
