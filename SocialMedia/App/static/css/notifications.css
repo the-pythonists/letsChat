@@ -1,0 +1,104 @@
+*{
+	margin:0;
+	padding:0;
+	box-sizing: border-box;
+}
+header{
+	
+	position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 100%;
+  
+  background-color:#E9ECEF;
+
+}
+
+
+#brand{
+		padding:16px;
+		color:#00a087;
+		margin-left:5%;
+		font-weight:bold;
+		padding:16px;
+		cursor:pointer;
+		
+
+	}
+
+
+
+#pageTitle{
+	color:#00a087;
+	border-bottom:5px solid #E9ECEF;
+	padding:5px;
+}
+
+
+#wrapper{
+	padding:2%;
+	margin:2%;
+	 box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  border-radius: 5px;
+}
+/* Style the tab */
+.tab {
+  overflow: hidden;
+  
+  height:100%;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  
+  border-top: none;
+}
+
+.tablinks{
+	color:#00a087;
+	font-weight:bold;
+}
+.notificationSect{
+
+}
+
+.profilePic{
+	
+	vertical-align: middle;
+	width:55px;
+	height:55px;
+	border-radius:50%;
+	padding:2px;
+	border:2px solid rgba(0, 150, 136, 1);
+  	box-shadow: 0 0 10px rgba(0, 400, 400, 0.8);
+}
+
+.NotificationNotes{
+	padding-left:2%;
+	color:black;
+}

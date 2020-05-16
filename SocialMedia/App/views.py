@@ -155,7 +155,13 @@ def album(request):
 	else:
 		return HttpResponseRedirect('/')
 
+def searchProfile(request):
+	profile = request.POST.get('profile')
+	username = userRegistration.objects.get(userId=profile).userName
+	return HttpResponseRedirect('/profile/'+username+'/')
+
 def profile(request,user):
+	
 	profileId = userRegistration.objects.get(userName=user).userId
 	profileDetail = userRegistration.objects.filter(userId=profileId)
 	
@@ -243,13 +249,15 @@ def liveSearchProcess(request):
 		name=[]
 		pic=[]
 		uId=[]
+		uname = []
 		for e in liveResult:
 			fullName = e.firstName+ ' ' +e.lastName
 			name.append(fullName)
 			uId.append(e.userId)
 			pic.append(e.profilePic.url)
+			uname.append(e.userName)
 		print(pic)
-		return JsonResponse({"Username":name,"Id":uId,"picture":pic})
+		return JsonResponse({"Username":name,"Id":uId,"picture":pic,"uname":uname})
 		
 
 
