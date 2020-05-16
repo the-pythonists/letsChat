@@ -24,7 +24,7 @@ $(document).ready(function() {
                     for(var i=0;i<(data.Id).length;i++)
                     {
                       
-                       $('#result').append('<li class="list-group-item link-class" ><img src="'+data.picture[i]+'" height="40" width="40" class="img-thumbnail" />'+data.Username[i]+' | <span class="text-muted">'+data.Id[i]+'</span></li>');
+                       $('#result').append('<li class="list-group-item link-class" ><img src="'+data.picture[i]+'" height="40" width="40" class="img-thumbnail" />'+data.Username[i]+' | <span class="text-muted">'+data.uname[i]+'</span></li>');
                       }
                    incomingRequest();
                    outgoingRequest();

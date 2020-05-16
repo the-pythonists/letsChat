@@ -1,50 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
 <html>
-    <head>
-        <title>
-            Notifications
-        </title>
-        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    </head>
-    <body>
-        <div id="req">
-        {% for r in request %}
-        
-        <div id="{{r.senderId}}">
-            {{r.senderName}}
-        
-        <input type="button" onclick="addrequest('{{r.senderId}}');" name="" value="Confirm" id="add">
-        <input type="button" onclick="addrequest();" name="" value="Ignore" id="ignore">
-        {% endfor %}
-    </div>
-    </div>
-<script>
-    function addrequest(Id){
+<head>
+	<title>Show all Notifications</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="{%static 'css/notifications.css'%}">
+</head>
+<body>
+<header>
+	<h2 id="brand">LetsChat</h2>
+</header>
+<br><br><br><br>
+<div class="container">
+<h4><strong id="pageTitle">Notifications</strong></h4>
+<section id="wrapper">
 
-        // btnValue = document.getElementById("add").value;
-        alert(Id);
+<div class="tab">
 
-    sender = Id
-    console.log(sender);
-    $.ajax({
-      method:'POST',
-      url:'/requestConfirm/',
-      data:{
-        sender : sender,
-        action:'add'
-      },
-      success:function(e){
-        // msg = e['Result']
-        console.log(e['Result'])
-        document.getElementById(Id).style.display="none";
-      },
-      error:function(data){
-        console.log('Failed');
-      }
-    })
-  }
+  <button class="tablinks" onclick="openCity(event, 'All')">All</button>
+  <button class="tablinks" onclick="openCity(event, 'friendRequests')">Friend Requests</button>
+  <button class="tablinks" onclick="openCity(event, 'likeComment')">Like and Comments</button>
+  
+</div>
 
-    
-</script>
+<div id="friendRequests" class="tabcontent">
+  <h3>Friend Requests</h3>
 
-    </body>
+  <div class="notificationSect">
+  	<p ><img src="{%static 'images/Logo.png'%}" class="profilePic">
+  	<span class="NotificationNotes">x and y person likesyour post</span></p><hr>
+  </div>
+
+</div>
+
+<div id="likeComment" class="tabcontent">
+  <h4>Like and Comment</h4>
+  <div class="notificationSect">
+  	<p ><img src="{%static 'images/Logo.png'%}" class="profilePic">
+  	<span class="NotificationNotes">x and y person likesyour post</span></p><hr>
+  </div>
+
+</div>
+
+<div id="All" class="tabcontent">
+  <h3>All</h3>
+  <div class="notificationSect">
+  	<p ><img src="{%static 'images/Logo.png'%}" class="profilePic">
+  	<span class="NotificationNotes">x and y person likesyour post</span></p><hr>
+  </div>
+</div>
+
+
+</section>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script type="text/javascript" src="{%static 'js/notifications.js' %}"></script>
+</body>
 </html>

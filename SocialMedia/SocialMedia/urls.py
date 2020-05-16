@@ -33,6 +33,7 @@ urlpatterns = [
     path("PostSubmission/",views.PostSubmission,name="PostSubmission"),
     path("postlike/",views.postlike,name="postlike"),
     path("album/",views.album,name="album"),
+    path("profile/",views.searchProfile,name="searchProfile"),
     path("profile/<str:user>/",views.profile,name="profile"),
     path("myfriends/",views.myfriends,name="myfriends"),
     path("addfriend/",views.addfriend,name="addfriend"),
