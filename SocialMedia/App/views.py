@@ -34,9 +34,9 @@ def index(request):
 		AllPost = chain(UserAllPost(), FriendPosts())
 		for item in AllPost:
 			postList.append(item)
-			postList.sort(key=lambda x: x.date)      #for reversed :  (reverse = True)
-		newDate = datetime.datetime.now()
-		params = {'userInfo':userInfo,'userData':postList,"newDate":newDate}
+		postList.sort(key=lambda x: x.date)      #for reversed :  (reverse = True)
+		date_now = datetime.datetime.now()
+		params = {'userInfo':userInfo,'userData':postList,"date_now":date_now}
 		return render(request,'DashBoard.html',params)
 	else:
 		return render(request,'index.html')
@@ -89,6 +89,28 @@ def OtpGeneration(request):
 	# request.session["Email"]=Email
 	return JsonResponse({'Result':"Successfully"})
 
+def changepassword(request):
+	if request.method == 'POST':
+		currentPass = request.POST.get('currentPass')
+		newPass = request.POST.get('newPass')
+		confirmPass = request.POST.get('confirmPass')
+		if newPass != confirmPass:
+			message = "Password Do not match"
+			return render(request,'changepwd.html',{'message':message})
+		else:
+			encryptCurrentPass = userRegistration.objects.get(userId=request.session['user']).password
+
+			if check_password(currentPass,encryptCurrentPass) == True:
+				userRegistration.objects.filter(userId=request.session['user']).update(password=make_password(newPass))
+				# return render(request,'changepwd.html',{'message':'Password Changed Successfully.Please Login Again'})
+				
+				del request.session['user']
+				return HttpResponseRedirect('/')
+			else:
+				return HttpResponse('pasword not match')
+	else:
+		return render(request,'changepwd.html')
+
 @csrf_exempt
 def postlike(request):
 	Id = request.POST.get('postID')
@@ -137,17 +159,11 @@ def album(request):
 	else:
 		return HttpResponseRedirect('/')
 
-
-def profile(request):
-	# Checking if profile is of other person or self profile
-	if request.method == 'POST':
-		profileId = request.POST.get('profile')
-	else:
-		profileId = request.session['user']
-	
+def profile(request,user):
 	ActiveUser = userRegistration.objects.get(userId=request.session['user'])
 	ActiveUserName = ActiveUser.firstName
 	ActiveUserPic = ActiveUser.profilePic
+	profileId = userRegistration.objects.get(userName=user).userId
 	profileDetail = userRegistration.objects.filter(userId=profileId)
 	
 	# checking if searched person is req receiver or sender
@@ -175,7 +191,6 @@ def profile(request):
 		'isFriend':isFriend,'isRequest':isRequest,'isRequested':isRequested,
 		'ActiveUserName':ActiveUserName,'ActiveUserPic':ActiveUserPic}
 	return render(request,'Profile.html',params)
-
 
 def Userprofile(request):
 	return render(request,'Userprofile.html')
@@ -335,7 +350,6 @@ def outgoingRequest(request):
 		for e in liveResult:
 			reciverId.append(e.receiverId)
 		return JsonResponse({"reciverId":reciverId})
-
 
 @csrf_exempt
 def incomingRequest(request):

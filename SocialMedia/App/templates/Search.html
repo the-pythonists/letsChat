@@ -18,7 +18,7 @@
     
     <div class="container">
         <center>
-        <form action="/profile/" method="POST" >{% csrf_token %}
+        <form action="/profile/{{user.userName}}" method="POST" >{% csrf_token %}
         <div class="row">
         <div class="col-lg-10 col-md-10 col-sm-10 col-10">
         <input type="text" name="profile" id="personId" hidden>

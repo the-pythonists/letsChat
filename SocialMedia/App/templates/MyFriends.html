@@ -6,8 +6,9 @@
         {% for query in myFriends %}
         {% for name in query %}
         <img src="{{name.profilePic.url}}">
-        <a href="{{name.userId}}">{{name.firstName}} {{name.lastName}}</a><br>
+        <a href="/profile/{{name.userName}}">{{name.firstName}} {{name.lastName}}</a><br>
         {% endfor %}
         {% endfor %}
+
     </body>
 </html>

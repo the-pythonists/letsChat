@@ -1,0 +1,35 @@
+#navbar {
+    overflow: hidden;
+    background-color: #f1f1f1;
+    padding: 20px 10px;
+    transition: 0.4s;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 99;
+  }
+  
+  #navbar a {
+    float: left;
+    color:rgba(0, 150, 136, 0.8);
+    text-align: center;
+    padding: 12px;
+    text-decoration: none;
+    font-size: 18px; 
+    line-height: 25px;
+    border-radius: 4px;
+  }
+  
+  #navbar #logo {
+    font-size: 30px;
+    font-weight: bold;
+    transition: 0.4s;
+    color:rgba(0, 150, 136, 0.8);
+    font-weight:bolder;
+  }
+  
+  #navbar a:hover {
+    background-color: #ddd;
+    color: black;
+  }
+  

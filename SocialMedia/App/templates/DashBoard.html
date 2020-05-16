@@ -40,7 +40,7 @@
   <div class="overlay-content-logOut">
     
     <div id="logOutDiv">
-      <p>Change Password</p>
+        <p><a href="/changepassword/" style="color: rgba(0, 150, 136, 1);"> Change Password</a></p>
       <br><hr>
       <p>Notifications</p><br><hr>
       <p onclick="nightMode()">Night Mode</p><br><hr>
@@ -85,7 +85,7 @@
   
   <div class="sidebar">
       <ul>
-      	<li><a href="profile/">
+          <li><a href="/profile/{{userInfo.userName}}">
           <span class="icon"><i class=""><img src="{{userInfo.profilePic.url}}" style="width:45px;height:45px;border-radius:50%;vertical-align:middle;"></i></span>
           <span class="title" style="font-weight:bold">{{userInfo.firstName}} {{userInfo.lastName}}</span></a>
       	</li>
@@ -136,7 +136,14 @@
       			<img src="{{data.userPic}}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
       			<span style="font-weight:bold;padding-left:8px;">{{data.userName}}
             <div><span style="margin-left: 7%; font-size: 70%; margin-top: -10px;">
-            <b>{{ data.date|naturaltime }}
+            <b>
+                {% if data.date|date:"YmdHi" == date_now|date:"YmdHi" %}
+                Just Now
+                {% elif data.date|date:"Ymd" == date_now|date:"Ymd" %}
+                {{ data.date|naturaltime }}
+                {% else %}
+                {{data.date|date:"M d"}} at {{data.date|date:"h:i A"}}
+                {% endif %}
             </b></span></div></span><br>
             {% if data.Message %}
             {{data.Message}}
