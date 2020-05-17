@@ -31,7 +31,7 @@
 
 
     {% for img in profilePhotos %}
-    {% if img.profilePic %}
+    {% if img.profilePic != 'media/profile.jpeg' %}
     <a href="{{img.profilePic.url}}" target="_blank">
     <img src="{{img.profilePic.url}}" class="img-fluid">
     </a>

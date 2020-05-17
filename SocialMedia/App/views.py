@@ -6,7 +6,7 @@ from django.http import JsonResponse
 import random
 from django.core.mail import send_mail
 from django.core.mail import send_mail
-from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications
+from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story
 from django.contrib.auth.hashers import make_password,check_password
 import datetime
 import uuid,json
@@ -58,16 +58,16 @@ def signup(request):
 		mobile = request.POST.get('Mobile')
 		
 		if((otp == request.session["Otp"])):
-			if userRegistration.objects.filter(userId=email):
+			if userRegistration.objects.filter(emailAddress=email):
 				return render(request,'CreateAccount.html',{'message':'Account Already Present with Given Email'})
 			elif userRegistration.objects.filter(mobile=mobile):
 				return render(request,'CreateAccount.html',{'message':'Account Already Present with Given Mobile Number'}) 
 			else:
-				accountSave = userRegistration(userId=email, firstName=fName, lastName=lName, userName=username, 
-				mobile=mobile,emailAddress = email, password = makemake_password(pwd))
+				accountSave = userRegistration(userId=username, firstName=fName, lastName=lName, userName=username, 
+				mobile=mobile,emailAddress = email, password = make_password(pwd))
 				accountSave.save()
 				# Creating Blank Frined List
-				AllFriends(userId=email).save()
+				AllFriends(userId=username).save()
 				return HttpResponseRedirect('/')	
 		else:
 			return render(request,'CreateAccount.html',{'message':'Incorrect OTP'})
@@ -87,7 +87,7 @@ def uservalidate(request):
 def OtpGeneration(request):
 	Email=request.POST.get('Email','DefaultValue')
 	RandomValue="LetsChat"+str(random.randint(1001,99999))
-	# print(RandomValue)
+	print(RandomValue)
 	message=f"Your Email Address  {Email}  Your OTP is {RandomValue} Do not share your password to anyone."
 	send_mail(
     	'LetsChat',
@@ -98,6 +98,26 @@ def OtpGeneration(request):
 	request.session["Otp"]=RandomValue
 	# request.session["Email"]=Email
 	return JsonResponse({'Result':"Successfully"})
+
+def story(request):
+	
+	if request.method == 'POST':
+		userStory = request.FILES['story']
+
+		Story(userId=request.session['user'],media=userStory).save()
+		return HttpResponseRedirect('/')
+	else:
+		return render(request,'Story.html')
+
+@csrf_exempt
+def storydelete(request):
+	from datetime import timedelta 
+	
+	tm1 = (datetime.datetime.now() - timedelta(minutes=5)   )
+	
+	s = Story.objects.filter(uploadTime__lte= tm1 ).delete()
+	
+	return JsonResponse({'Result':'Deleted'})
 
 def myfriends(request):
 	fList = []
@@ -123,14 +143,14 @@ def login(request):
 	if request.method == 'POST':
 		email = request.POST.get("login_Email")
 		password = request.POST.get("password")
-		loginValidate = userRegistration.objects.get(userId=email)
+		loginValidate = userRegistration.objects.get(emailAddress=email)
 		encryptPass = loginValidate.password
 
 		if check_password(password,encryptPass) == True:
 			request.session['user'] = str(loginValidate.userId)
-			name = request.session['user']
+			# name = request.session['user']
 			request.session['name'] = str(loginValidate.firstName) + ' ' + str(loginValidate.lastName)
-			request.session['pic'] = str(loginValidate.profilePic) # THIS LINE IS CURRENTLY NOT IN USE 
+			# request.session['pic'] = str(loginValidate.profilePic) # THIS LINE IS CURRENTLY NOT IN USE 
 			return HttpResponseRedirect('/')
 		else:
 			return render(request,'index.html',{'message':'Please Check Your Email and Password'})
@@ -141,16 +161,27 @@ def login(request):
 			return render(request,'index.html')
 		
 def notifications(request):
-	# IT IS INCOMPLETE ONLY DIPLAYS FRIEND REQUESTS
-	fRequests = Friend_Requests.objects.filter(receiverId=request.session['user'])
+	# IT IS INCOMPLETE ONLY DIPLAYS FRIEND REQUESTS AND ACCEPT NOTIFICATIONS
+	fRequests = Friend_Requests.objects.filter(receiver=request.session['user']).order_by('-date')
 	picsList = []
 	for Id in fRequests:
-		senderPic = userRegistration.objects.filter(userId=Id.senderId)
+		senderPic = userRegistration.objects.filter(userId=Id.sender)
 		for pic in senderPic:
 			picUrl = pic.profilePic
 			picsList.append(picUrl.url)
-		
-	params = {'request':zip(fRequests,picsList)}
+	
+	notification = Notifications.objects.filter(receiver=request.session['user']).order_by('-date')
+	picsList1 = []
+	uname = ''   # IF USER HAS NO NOTIFICATION
+	for Id in notification:
+		senderDetail = userRegistration.objects.filter(userId=Id.sender)
+		for detail in senderDetail:
+			
+			uname = detail.userName
+			picUrl = detail.profilePic
+			picsList1.append(picUrl.url)
+
+	params = {'request':zip(fRequests,picsList),'notification':zip(notification,picsList1),'UserName':uname}
 	return render(request,'Notifications.html',params)
 
 def album(request):
@@ -168,16 +199,16 @@ def searchProfile(request):
 	return HttpResponseRedirect('/profile/'+username+'/')
 
 def profile(request,user):
-	
-	profileId = userRegistration.objects.get(userName=user).userId
-	profileDetail = userRegistration.objects.filter(userId=profileId)
+	profileId = user
+	# profileId = userRegistration.objects.get(userId=user)
+	profileDetail = userRegistration.objects.filter(userId=user)
 	
 	# checking if searched person is req receiver or sender
-	if Friend_Requests.objects.filter(receiverId=profileId,senderId=request.session['user']):
+	if Friend_Requests.objects.filter(receiver=profileId,sender=request.session['user']):
 		isRequest = True
 		isRequested = False
 
-	elif Friend_Requests.objects.filter(receiverId=request.session['user'],senderId=profileId):
+	elif Friend_Requests.objects.filter(receiver=request.session['user'],sender=profileId):
 		isRequested = True
 		isRequest = False
 	else:
@@ -212,7 +243,7 @@ def userProfileInsert(request):
 			status.save()
 			UserPost.objects.filter(userId=loginUser).update(userPic='/media/'+str(userRegistration.objects.get(userId=loginUser).profilePic))
 			
-			return HttpResponseRedirect('/profile/')
+			return HttpResponseRedirect('/profile/'+loginUser+'/')
 		else:
 			return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
 	else:
@@ -224,7 +255,7 @@ def friendSearch(request):
 @csrf_exempt
 def outgoingRequest(request):
 	if request.method == "POST":
-		liveResult = Friend_Requests.objects.filter(senderId=request.session['user'])
+		liveResult = Friend_Requests.objects.filter(sender=request.session['user'])
 		reciverId=[]
 		
 		for e in liveResult:
@@ -235,7 +266,7 @@ def outgoingRequest(request):
 @csrf_exempt
 def incomingRequest(request):
 	if request.method == "POST":
-		liveResult = Friend_Requests.objects.filter(receiverId=request.session['user'])
+		liveResult = Friend_Requests.objects.filter(receiver=request.session['user'])
 		senderName=[]
 		senderId=[]
 		
@@ -275,12 +306,12 @@ def addfriend(request):
 	request.session['friendProfile'] = profileId # USED IN NEXT FUNCTION FOR REQUEST CONFIRM
 
 	if action == 'add':
-		sendRequest = Friend_Requests(senderId=request.session['user'],receiverId=profileId,senderName=request.session['name'])
+		sendRequest = Friend_Requests(sender=request.session['user'],receiver=profileId,senderName=request.session['name'])
 		sendRequest.save()
 		return JsonResponse({"Result":"Successfully Sent"})
 
 	elif action == 'cancel':
-		Friend_Requests.objects.filter(senderId=request.session['user'],receiverId=profileId).delete()
+		Friend_Requests.objects.filter(sender=request.session['user'],receiver=profileId).delete()
 		return JsonResponse({"Result":"Successfully Canceled"})
 	
 	elif action == 'unfriend':
@@ -336,9 +367,12 @@ def requestConfirm(request):
 			AllFriends.objects.filter(userId=friendId).update(userId=friendId,Friends=friendNewList)
 		
 
-		senderName = Friend_Requests.objects.get(senderId=friendId).senderName
-	
-	Friend_Requests.objects.filter(senderId=friendId,receiverId=myId).delete()
+		senderName = Friend_Requests.objects.get(sender=friendId).senderName
+	notify = request.session['name'] + ' accepted your Friend Request.'
+	Notifications(sender=myId,receiver=friendId,fullName=request.session['name'],
+	notification=notify,viewed=False).save()
+
+	Friend_Requests.objects.filter(sender=friendId,receiver=myId).delete()
 
 	return JsonResponse({'Result':'Succuss','name':senderName})
 
@@ -387,23 +421,25 @@ def userCoverInsert(request):
 			status = userRegistration.objects.get(userId=loginUser)
 			status.coverPic = coverImage
 			status.save()
-			return HttpResponseRedirect('/profile/')
+			return HttpResponseRedirect('/profile/'+loginUser+'/')
 		else:
 			return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
 	else:
 		return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
 
 def test(request):
-	myId = 'mohammad.danish2694@gmail.com'
-	friendId = 'sj27754@gmail.com'
-	myList = AllFriends.objects.get(userId=myId)
-	if friendId in myList.Friends:
-		print('found')
-	print(myList.Friends)
+	myId = 'danish26'
+	friendId = 'shubham31'
+	AllFriends(userId=myId).save()
+	AllFriends(userId=friendId).save()
+	# myList = AllFriends.objects.get(userId=myId)
+	# if friendId in myList.Friends:
+	# 	print('found')
+	# print(myList.Friends)
 	
-	myList.Friends.append(friendId)
-	myNewList = myList.Friends
-	AllFriends.objects.filter(userId=myId).update(userId=myId,Friends=myNewList)
+	# myList.Friends.append(friendId)
+	# myNewList = myList.Friends
+	# AllFriends.objects.filter(userId=myId).update(userId=myId,Friends=myNewList)
 	# return render(request,'changepwd.html',{'img':img})
 	return HttpResponse('done')
 @csrf_exempt

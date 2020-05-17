@@ -30,6 +30,8 @@ urlpatterns = [
     path('login/',views.login,name='login'),
     path("uservalidate/", views.uservalidate,name="uservalidate"),
     path("OtpGeneration/", views.OtpGeneration,name="OtpGeneration"),#Otp Generation
+    path("story/",views.story,name="story"),
+    path("storydelete/",views.storydelete,name="storydelete"),
     path("PostSubmission/",views.PostSubmission,name="PostSubmission"),
     path("postlike/",views.postlike,name="postlike"),
     path("album/",views.album,name="album"),
@@ -44,7 +46,7 @@ urlpatterns = [
     path("liveSearchProcess/",views.liveSearchProcess,name="liveSearchProcess"),#live Search Process
     path("incomingRequest/",views.incomingRequest,name="incomingRequest"),#incoming Request
     path("outgoingRequest/",views.outgoingRequest,name="outgoingRequest"),#incoming Request
-    path("Userprofile/",views.Userprofile,name="Userprofile"),#User Profile
+    # path("Userprofile/",views.Userprofile,name="Userprofile"),#User Profile
     path("userProfileInsert/",views.userProfileInsert,name="userProfileInsert"),#User Profile Store
     path("userIntroInsert/",views.userIntroInsert,name="userIntroInsert"),#Intro Insert
 

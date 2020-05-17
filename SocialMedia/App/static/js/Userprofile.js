@@ -124,6 +124,8 @@ function request(){
             },
             success:function(e){
                 document.getElementById('addbtn').value="Cancel Request";
+                document.getElementById('addbtn').style.background="grey";
+
             }
         })
         }
@@ -163,6 +165,8 @@ function request(){
         },
         success:function(e){
             document.getElementById('addbtn').value="Unfriend";
+            document.getElementById('addbtn').style.background="red";
+            document.getElementById('addbtn').style.border="2px solid red";
         }
     })
     }

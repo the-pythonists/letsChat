@@ -89,6 +89,10 @@
           <span class="title" style="font-weight:bold">{{userInfo.firstName}} {{userInfo.lastName}}</span></a>
       	</li>
 
+        <li><a href="/story/">
+          <span class="icon"><i class="fas fa-user-friends"></i></span>
+          <span class="title">Story</span></a></li>
+
         <li><a href="/myfriends/">
           <span class="icon"><i class="fas fa-user-friends"></i></span>
           <span class="title">Friends</span></a></li>
@@ -132,9 +136,10 @@
       <div style="background:rgba(191, 191, 191, 0.5);padding:2%;width:90%;">
       		<div>
             {% for data in userData %}
+            <a href="/profile/{{data.userId}}">
       			<img src="{{data.userPic}}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
-      			<span style="font-weight:bold;padding-left:8px;">{{data.userName}} {{data.userId}} </span>
-            
+      			<span style="font-weight:bold;padding-left:8px;">{{data.userName}} </span>
+          </a>
             <br><span style="margin-left: 7%; font-size: 70%; margin-top: -10px;">
               <b>
                 {% if data.date|date:"YmdHi" == date_now|date:"YmdHi" %}

@@ -29,9 +29,10 @@ class userRegistration(models.Model):
         return self.firstName + ' ' + self.lastName
 
 class Friend_Requests(models.Model):
-    senderId = models.CharField(max_length=50,default='')
-    receiverId = models.CharField(max_length=50,default='')
+    sender = models.CharField(max_length=50,default='')
+    receiver = models.CharField(max_length=50,default='')
     senderName=models.CharField(max_length=75,default='')
+    date = models.DateTimeField(default=datetime.now, blank=True)
 
     def __str__(self):
         return self.senderName
@@ -47,18 +48,15 @@ class AllFriends(models.Model):
         return self.userId
 
 class Notifications(models.Model):
-    userId = models.CharField(max_length=55, blank=True)
-    userName = models.CharField(max_length=55, blank=True)
     fullName = models.CharField(max_length=55, blank=True)
     sender = models.CharField(max_length=55, blank=True)
     receiver = models.CharField(max_length=55, blank=True)
     notification = models.CharField(max_length=100, blank=True)
     viewed = models.BooleanField()
-    userId = models.CharField(max_length=55, blank=True)
     date = models.DateTimeField(default=datetime.now, blank=True)
 
     def __str__(self):
-        return self.userId    
+        return self.fullName    
 
 class UserPost(models.Model):
     postId = models.CharField(max_length=100,default='') 
@@ -68,6 +66,14 @@ class UserPost(models.Model):
     Message = models.CharField(max_length=5000,default="",blank=True)
     date = models.DateTimeField(default=datetime.now, blank=True)
     userPic = models.CharField(max_length=100,default='',blank=True)
+
+class Story(models.Model):
+    userId = models.CharField(max_length=50,default='')
+    media = models.ImageField(upload_to="profiles",blank=True)
+    uploadTime = models.DateTimeField(default=datetime.now, blank=True)
+
+    def __str__(self):
+        return self.userId
 
 class Likes(models.Model):
     postId = models.CharField(max_length=100)

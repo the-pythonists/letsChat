@@ -32,6 +32,8 @@ function addrequest(Id){
         // document.getElementById(Id).style.display="none";
         // Need timer to remove this line after 2 seconds
         document.getElementById(Id).innerHTML="You and " + name + " are now Friends.";
+        // time.sleep(3)
+        // document.getElementById(Id).style='none';
         // setTimeout(doMoreStuff, 1000);
         
       },
@@ -40,3 +42,5 @@ function addrequest(Id){
       }
     })
   };
+
+  

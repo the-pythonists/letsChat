@@ -56,3 +56,22 @@ $(":file").on("change", function(e) {
   
   })
   
+  
+ 
+  setInterval(function()
+  {
+    console.log('Running');
+  $.ajax({
+    
+        method:'POST',
+        url:'/storydelete/',
+        
+        success:function(e){
+          console.log('Deleted');
+          }
+        ,
+        error:function(e){
+          console.log('Failed');
+        }
+      });
+  }, 5000); 

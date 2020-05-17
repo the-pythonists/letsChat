@@ -32,11 +32,11 @@
   <div class="notificationSect">
     {% for data,data2 in request %}
     
-    <div id="{{data.senderId}}">
+    <div id="{{data.sender}}">
       <p ><img src="{{data2}}" class="profilePic">
       <span class="NotificationNotes"><b>{{data.senderName}}</b> Sent you Friend Request</span></p>
       <div style="margin-left: 8%; margin-top: -20px;">
-      <input type="button" onclick="addrequest('{{data.senderId}}');" name="" value="Confirm" id="add">
+      <input type="button" onclick="addrequest('{{data.sender}}');" name="" value="Confirm" id="add">
           <input type="button" onclick="addrequest();" name="" value="Ignore" id="ignore">
       </div>
         <hr>
@@ -61,8 +61,27 @@
 <div id="All" class="tabcontent">
   <h3>All</h3>
   <div class="notificationSect">
-  	<p ><img src="{%static 'images/Logo.png'%}" class="profilePic">
-  	<span class="NotificationNotes">x and y person likesyour post</span></p><hr>
+    {{UserName}}
+    {% for data3,data4 in notification %}
+    <!-- {{data2}} -->
+    <div id="{{data.sender}}">
+      <a href="/profile/{{data3.sender}}/">
+      <img src="{{data4}}" class="profilePic">
+        <button class="btn btn-primary">
+          {{data3.notification}}
+        </button>
+      <!-- <span class="NotificationNotes"><b></b></span></p> -->
+      </a>
+      <div style="margin-left: 8%; margin-top: -20px;">
+      </div>
+        <hr>
+    </div>
+    <!-- <div id="{{data.senderId}}">
+      You and {{data.senderName}} are now Friends.
+    </div> -->
+    {% endfor %}
+  	<!-- <p ><img src="{%static 'images/Logo.png'%}" class="profilePic"> -->
+  	<!-- <span class="NotificationNotes">x and y person likesyour post</span></p><hr> -->
   </div>
 </div>
 
