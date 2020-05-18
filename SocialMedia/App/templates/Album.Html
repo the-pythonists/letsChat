@@ -17,7 +17,17 @@
 
 <!-- Page Content -->
 
+
 <br><br><br><br>
+
+Add New Album
+<form action="/album/" method="POST">{% csrf_token %}
+  <input type="text" name="album" placeholder="Enter Album Name">
+  <input type="submit" value="Add Album">
+</form>
+
+
+
 <div class="tab">
   <button class="tablinks" onclick="openCity(event, 'profle')">Profile</button>
   <button class="tablinks" onclick="openCity(event, 'cover')">Cover</button>
@@ -31,9 +41,9 @@
 
 
     {% for img in profilePhotos %}
-    {% if img.profilePic != 'media/profile.jpeg' %}
-    <a href="{{img.profilePic.url}}" target="_blank">
-    <img src="{{img.profilePic.url}}" class="img-fluid">
+    {% if img.Image != 'media/profile.jpeg' %}
+    <a href="{{img.Image.url}}" target="_blank">
+    <img src="{{img.Image.url}}" class="img-fluid">
     </a>
     {% endif %}
   {% endfor %}
@@ -51,14 +61,13 @@
 
 <div id="cover" class="tabcontent">
   <h3>cover</h3>
-  {% for img in profilePhotos %}
-    {% if img.coverPic %}
-    <a href="{{img.coverPic.url}}" target="_blank">
-    <img src="{{img.coverPic.url}}" class="img-fluid">
+  {% for img in coverPhotos %}
+    <a href="{{img.Image.url}}" target="_blank">
+    <img src="{{img.Image.url}}" class="img-fluid">
     </a>
-    {% endif %}
+
   {% endfor %}
-  <p>Paris is the capital of France.</p> 
+  
 </div>
 
 <div id="post" class="tabcontent">

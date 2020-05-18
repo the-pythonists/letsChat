@@ -75,6 +75,21 @@ class Story(models.Model):
     def __str__(self):
         return self.userId
 
+class Album(models.Model):
+    AlbumID = models.CharField(max_length=50,default='',blank=True)
+    Name = models.CharField(max_length=50,default='',blank=True)
+    date = models.DateTimeField(default=datetime.now, blank=True)
+
+    def __str__(self):
+        return self.Name
+
+class Photos(models.Model):
+    Album = models.CharField(max_length=50,default='',blank=True)
+    PhotoID = models.CharField(max_length=50,default='',blank=True)
+    Image = models.ImageField(upload_to='media',blank=True)
+    date = models.DateTimeField(default=datetime.now, blank=True)
+
+
 class Likes(models.Model):
     postId = models.CharField(max_length=100)
     postLikes = models.IntegerField(default=0)

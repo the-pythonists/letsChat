@@ -9,9 +9,13 @@
         <input type="file" name="story">
         <input type="submit" value="Submit">
     </form>
+    <br>
+    {% for s in story %}
+    <img src="{{s.media.url}}" alt="">
+    {% endfor %}
     </body>
     <script type="text/javascript" src="{%static 'js/script1.js'%}"></script>
-    <script>
+    <!-- <script>
         setInterval(function()
   {
     console.log('Running');
@@ -29,6 +33,6 @@
         }
       });
   }, 5000); 
-    </script>
+    </script> -->
 
 </html>

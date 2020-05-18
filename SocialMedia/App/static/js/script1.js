@@ -74,4 +74,4 @@ $(":file").on("change", function(e) {
           console.log('Failed');
         }
       });
-  }, 5000); 
+  }, 500000); 

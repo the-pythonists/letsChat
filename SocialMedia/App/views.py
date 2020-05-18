@@ -6,7 +6,7 @@ from django.http import JsonResponse
 import random
 from django.core.mail import send_mail
 from django.core.mail import send_mail
-from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story
+from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story,Album,Photos
 from django.contrib.auth.hashers import make_password,check_password
 import datetime
 import uuid,json
@@ -30,17 +30,16 @@ def index(request):
 		def FriendPosts():
 			for item in friends:
 				t = UserPost.objects.filter(userId=item).order_by('-date')
+				u = Photos.objects.filter(Album='Profile Pictures',PhotoID=item).order_by('-date')
+				print(item)
+				print(u)
 				for i in t:
-					# Id = i.postId
-					# print(Id)
 					yield i
-		# FriendPosts()
+		FriendPosts()
 		AllPost = chain(UserAllPost(), FriendPosts())
 		for item in AllPost:
 			postList.append(item)
-		# print(postList)
 		postList.sort(key=lambda x: x.date,reverse = True) 
-		# print(postList)
 		
 		params = {'userInfo':userInfo,'userData':postList,'date_now':datetime.datetime.now()}
 		return render(request,'DashBoard.html',params)
@@ -107,13 +106,14 @@ def story(request):
 		Story(userId=request.session['user'],media=userStory).save()
 		return HttpResponseRedirect('/')
 	else:
-		return render(request,'Story.html')
+		stories = Story.objects.all()
+		return render(request,'Story.html',{'story':stories})
 
 @csrf_exempt
 def storydelete(request):
 	from datetime import timedelta 
 	
-	tm1 = (datetime.datetime.now() - timedelta(minutes=5)   )
+	tm1 = (datetime.datetime.now() - timedelta(minutes=1)   )
 	
 	s = Story.objects.filter(uploadTime__lte= tm1 ).delete()
 	
@@ -187,9 +187,17 @@ def notifications(request):
 def album(request):
 	if request.session.has_key('user'):
 		photos = UserPost.objects.filter(userId=request.session['user'])
-		profilePhotos = userRegistration.objects.filter(userId=request.session['user'])
-		params = {'photos':photos,'profilePhotos':profilePhotos}
-		return render(request,'Album.html',params)
+		profilePhotos = Photos.objects.filter(Album='Profile Pictures',PhotoID=request.session['user'])
+		coverPhotos = Photos.objects.filter(Album='Cover Photos',PhotoID=request.session['user'])
+		params = {'photos':photos,'profilePhotos':profilePhotos,'coverPhotos':coverPhotos}
+		
+		if request.method == 'POST':
+			name = request.POST.get('album').title()
+			if not Album.objects.filter(AlbumID=request.session['user'],Name=name):
+				Album(AlbumID=request.session['user'],Name=name).save()
+			return render(request,'Album.html',params)
+		else:
+			return render(request,'Album.html',params)
 	else:
 		return HttpResponseRedirect('/')
 
@@ -243,6 +251,11 @@ def userProfileInsert(request):
 			status.save()
 			UserPost.objects.filter(userId=loginUser).update(userPic='/media/'+str(userRegistration.objects.get(userId=loginUser).profilePic))
 			
+			if not Album.objects.filter(AlbumID=request.session['user']):
+				Album(AlbumID=request.session['user'],Name='Profile Pictures').save()
+			
+			Photos(Album='Profile Pictures',PhotoID=request.session['user'],Image=profileImage).save()
+
 			return HttpResponseRedirect('/profile/'+loginUser+'/')
 		else:
 			return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
@@ -421,6 +434,12 @@ def userCoverInsert(request):
 			status = userRegistration.objects.get(userId=loginUser)
 			status.coverPic = coverImage
 			status.save()
+
+			if not Album.objects.filter(AlbumID=request.session['user'],Name='Cover Photos'):
+				Album(AlbumID=request.session['user'],Name='Cover Photos').save()
+			
+			Photos(Album='Cover Photos',PhotoID=request.session['user'],Image=coverImage).save()
+
 			return HttpResponseRedirect('/profile/'+loginUser+'/')
 		else:
 			return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
@@ -430,18 +449,21 @@ def userCoverInsert(request):
 def test(request):
 	myId = 'danish26'
 	friendId = 'shubham31'
-	AllFriends(userId=myId).save()
-	AllFriends(userId=friendId).save()
-	# myList = AllFriends.objects.get(userId=myId)
-	# if friendId in myList.Friends:
-	# 	print('found')
-	# print(myList.Friends)
-	
-	# myList.Friends.append(friendId)
-	# myNewList = myList.Friends
-	# AllFriends.objects.filter(userId=myId).update(userId=myId,Friends=myNewList)
-	# return render(request,'changepwd.html',{'img':img})
-	return HttpResponse('done')
+	# AllFriends(userId=myId).save()
+	# AllFriends(userId=friendId).save()
+	# Album(id=3).save()
+
+	alb = Album.objects.all()
+	for i in alb:
+		a = i.AlbumID
+		b = i.Name
+		print(a,b)
+		pic = Photos.objects.filter(PhotoID=a)
+		for p in pic:
+			c = p.Image
+			print(c)
+		
+	return HttpResponse(a)
 @csrf_exempt
 def userIntroInsert(request):
 	if request.method == "POST":
