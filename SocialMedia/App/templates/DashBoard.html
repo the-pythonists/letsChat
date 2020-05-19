@@ -18,15 +18,15 @@
 		});
 	</script>
 </head>
-<body id="body">
+<body>
   {% for message in messages %}
   <strong>Message: </strong>{{ message }}
   {% endfor %}
 
 <!--Search bar-->
 <div id="myOverlay" class="overlay">
-  <span class="closebtn" onclick="closeSearch()" title="Close Overlay">×</span>
   <div class="overlay-content">
+      <span class="closebtn" onclick="closeSearch()" title="Close Overlay">×</span>
     <form action="/search/" method="POST">{% csrf_token %}
       <input type="text" placeholder="Search.." name="search">
       <button type="submit"><i class="fa fa-search"></i></button>
@@ -40,12 +40,12 @@
   <div class="overlay-content-logOut">
     
     <div id="logOutDiv">
-        <p><a href="/changepassword/" style="color: rgba(0, 150, 136, 1);"> Change Password</a></p>
+      <p><a href="/changepassword/" style="color: rgba(0, 150, 136, 1);"> Change Password</a></p>
       <br><hr>
       <p>Notifications</p><br><hr>
       <p onclick="nightMode()">Night Mode</p><br><hr>
       <p ><a href="/logout/" style="color: rgba(0, 150, 136, 1);"> LogOut</a></p><br><hr>
-      <p style="padding-bottom:2%;" onclick="closeLogOut()">Cancel</p>
+      <p style="padding-bottom:2%;" onclick="closeLogOut()">Cancel</p>      
     </div>
   </div>
 </div>
@@ -59,6 +59,19 @@
     </div>
     <div class="top_menu">
       <div class="logo">LetsChat</div>
+      <div id="wrapper1">
+        <li class="input-button">
+          <div class="input-wrapper1" style="float:left;">
+            <input type="text" id="KUNDE" placeholder="Search by name or ID." value="" />
+            <div id="loader" style="display:none;">
+              <img src="loader.gif" />
+            </div>
+          </div>
+          <div style="float:left;margin-left:10px;">
+            <button id="buton" type="button" class="btn-style" value="search" onclick="find();">Hent</button>
+          </div>
+        </li>
+      </div>
       <ul>
         <li><form action="#" method="POST">{% csrf_token %}
           <a><i class="fas fa-search" class="openBtn" onclick="openSearch()" style="margin-top:8px;"></i>
@@ -85,10 +98,14 @@
   
   <div class="sidebar">
       <ul>
-          <li><a href="/profile/{{userInfo.userName}}">
+      	<li><a href="/profile/{{userInfo.userName}}">
           <span class="icon"><i class=""><img src="{{userInfo.profilePic.url}}" style="width:45px;height:45px;border-radius:50%;vertical-align:middle;"></i></span>
           <span class="title" style="font-weight:bold">{{userInfo.firstName}} {{userInfo.lastName}}</span></a>
       	</li>
+
+        <li><a href="/story/">
+          <span class="icon"><i class="fas fa-user-friends"></i></span>
+          <span class="title">Story</span></a></li>
 
         <li><a href="{%url 'friendSearch'%}">
           <span class="icon"><i class="fas fa-user-friends"></i></span>
@@ -101,7 +118,7 @@
           <span class="icon"><i class="far fa-comment-alt"></i></span>
           <span class="title">Messages</span>
           </a></li>
-        <li><a href="/notifications/">
+        <li><a href="/notifications/" class="active">
           <span class="icon"><i class="fas fa-bell"></i></span>
           <span class="title">Notification</span>
           </a></li>
@@ -116,7 +133,7 @@
       <form method="Post" action="{% url 'PostSubmission' %}" id="PostWrapper"  enctype="multipart/form-data">
         {% csrf_token %}
           <h4>Create Post</h4>
-          <textarea name="Post_Title" placeholder="what's on your mind?" style="width:90%;height:15vh;padding:2%;resize:none;" oninput="visibleButton()" id="TextPost"></textarea>
+          <textarea name="Post_Title" placeholder="what's on your mind?" style="width:90%;height:15vh;padding:2%;resize: none;" oninput="visibleButton()" id="TextPost"></textarea>
           <div id="PostOpt">
             <a href="#" class="icon"><i class="fas fa-map-marker-alt" id="Post_Icon_Cusomize"></i></a>
             <!-- <a href="#" class="icon"><i class="fas fa-photo-video" id="Post_Icon_Cusomize"> -->
@@ -132,11 +149,13 @@
 
       <div style="background:rgba(191, 191, 191, 0.5);padding:2%;width:90%;">
       		<div>
-              {% for data in userData %}
+            {% for data in userData %}
+            <a href="/profile/{{data.userId}}">
       			<img src="{{data.userPic}}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
-      			<span style="font-weight:bold;padding-left:8px;">{{data.userName}}
-            <div><span style="margin-left: 7%; font-size: 70%; margin-top: -10px;">
-            <b>
+      			<span style="font-weight:bold;padding-left:8px;">{{data.userName}} </span>
+          </a>
+            <br><span style="margin-left: 7%; font-size: 70%; margin-top: -10px;">
+              <b>
                 {% if data.date|date:"YmdHi" == date_now|date:"YmdHi" %}
                 Just Now
                 {% elif data.date|date:"Ymd" == date_now|date:"Ymd" %}
@@ -144,14 +163,16 @@
                 {% else %}
                 {{data.date|date:"M d"}} at {{data.date|date:"h:i A"}}
                 {% endif %}
-            </b></span></div></span><br>
-            {% if data.Message %}
+                 
+            </b></span><br>
+            
+                {% if data.Message %}
             {{data.Message}}
             <input type="hidden" value="{{data.postId}}" id="like">
             {% endif %}
             <br><br>
             {% if data.post %}
-            <img src="{{data.post.url}}" style="max-width:100%;height:auto;">
+            <img src="{{data.post.url}}" style="width:100%;">
             <br>
             {% endif %}
             <p id="{{data.postId}}"></p>
@@ -171,6 +192,7 @@
     
   </div>
 </div>
+  
 <script>
   function likePost(data){
     Id = data
@@ -194,6 +216,5 @@
   }
 </script>
 </body>
-
 <script type="text/javascript" src="{%static 'js/script1.js'%}"></script>
 </html>

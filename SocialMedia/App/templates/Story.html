@@ -1,0 +1,34 @@
+{%load static%}
+
+<html>
+    <head>
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    </head>
+    <body>
+        <form action="/story/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+        <input type="file" name="story">
+        <input type="submit" value="Submit">
+    </form>
+    </body>
+    <script type="text/javascript" src="{%static 'js/script1.js'%}"></script>
+    <script>
+        setInterval(function()
+  {
+    console.log('Running');
+  $.ajax({
+    
+        method:'POST',
+        url:'/storydelete/',
+        
+        success:function(e){
+          console.log('Deleted');
+          }
+        ,
+        error:function(e){
+          console.log('Failed');
+        }
+      });
+  }, 5000); 
+    </script>
+
+</html>

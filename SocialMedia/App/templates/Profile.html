@@ -26,19 +26,20 @@
 
 </head>
 <body>
+
 <!--Header-->
 <div id="navbar">
-  <a href="/" id="logo">letsChat</a>
-  <div id="navbar-right">
-    <a class="active" href="/profile/"><img src="{{ActiveUserPic.url}}" class="img-circle" width="25px" height="25px" alt="profilePic"><span class="ml-1">{{ActiveUserName}}</span></a>
-    <a href="/">Home</a>
-    <a href="#about">About</a>
+    <a href="/" id="logo">letsChat</a>
+    <div id="navbar-right">
+      <a class="active" href="/profile/{{ActiveUser}}"><img src="{{ActiveUserPic.url}}" class="img-circle" width="25px" height="25px" alt="profilePic"><span class="ml-1">{{ActiveUserName}}</span></a>
+      <a href="/">Home</a>
+      <a href="#about">About</a>
+    </div>
   </div>
-</div>
 <!--Main Body-->
 <div>
-  {% for data in user %}
-    <input type="hidden" id="profile" name="profileId" value="{{data.userId}}">
+{% for data in user %}
+    <input type="hidden" id="profile" name="profileId" value="{{data.userName}}">
 
     <div class="container jumbotron">
         <div class="fb-profile">
@@ -189,6 +190,11 @@
 
             <div id="Intro" class="tabcontent1">
 
+
+
+
+
+
             <table class="table-responsive table table-hover" style="font-size:1.5em;color:rgba(0, 150, 136, 0.8);">
               
               <tbody>
@@ -335,7 +341,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Upload Photo</h4>
+            <h4 class="modal-title" id="myModalLabel">Modal title</h4>
           </div>
           <div class="modal-body">
                         

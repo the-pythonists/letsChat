@@ -4,6 +4,7 @@
   <title></title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css" />
   {%load static%}
@@ -17,11 +18,23 @@
 
 <!-- Page Content -->
 
+
 <br><br><br><br>
+
+<!-- Add New Album
+<form action="/album/" method="POST">{% csrf_token %}
+  <input type="text" name="album" placeholder="Enter Album Name">
+  <input type="submit" value="Add Album">
+</form> -->
+
 <div class="tab">
   <button class="tablinks" onclick="openCity(event, 'profle')">Profile</button>
   <button class="tablinks" onclick="openCity(event, 'cover')">Cover</button>
   <button class="tablinks" onclick="openCity(event, 'post')">Post</button>
+  <form action="/album/" method="POST">{% csrf_token %}
+  <button class="tablinks float-right mr-4" type="submit"><i class="fa fa-plus mr-2" aria-hidden="true"></i>New Album</button>
+  <input class="form-control float-right w-25 mt-2" type="text" type="text" name="album" placeholder="Enter Album Name">
+  </form>
 </div>
 
 <div id="profle" class="tabcontent" style="display:block;">
@@ -30,20 +43,14 @@
 
 
 
-            {% for img in photos %}
-            {% if img.post %}
-            <a href="{{img.post.url}}" target="_blank">
-            <img src="{{img.post.url}}" class="img-fluid">
-            </a>
-            {% endif %}
-            {% endfor %}
+    {% for img in profilePhotos %}
+    {% if img.Image != 'media/profile.jpeg' %}
+    <a href="{{img.Image.url}}" target="_blank">
+    <img src="{{img.Image.url}}" class="img-fluid">
+    </a>
+    {% endif %}
+  {% endfor %}
     
-     
-      
-      
-     
-   
-
 
 </div>
 <!-- /.container -->
@@ -51,14 +58,35 @@
 
 <div id="cover" class="tabcontent">
   <h3>cover</h3>
-  <p>Paris is the capital of France.</p> 
+  {% for img in coverPhotos %}
+    <a href="{{img.Image.url}}" target="_blank">
+    <img src="{{img.Image.url}}" class="img-fluid">
+    </a>
+
+  {% endfor %}
+  
 </div>
 
 <div id="post" class="tabcontent">
-  <h3>post</h3>
-  <p>Tokyo is the capital of Japan.</p>
+  <h3>Posts</h3>
+  {% for img in photos %}
+    {% if img.post %}
+    <a href="{{img.post.url}}" target="_blank">
+    <img src="{{img.post.url}}" class="img-fluid">
+    </a>
+    {% endif %}
+  {% endfor %}
+  
 </div>
 
+<div id="newalbum" class="tabcontent">
+  <h3>New Album</h3>
+  
+    <a href="{{img.post.url}}" target="_blank">
+    <img src="{{img.post.url}}" class="img-fluid">
+    </a>
+    
+</div>
 
 
 
