@@ -49,6 +49,8 @@ urlpatterns = [
     path("Userprofile/",views.Userprofile,name="Userprofile"),#User Profile
     path("userProfileInsert/",views.userProfileInsert,name="userProfileInsert"),#User Profile Store
     path("myfriends/",views.myfriends,name="myfriends"), #User All Friends
+    path("myFriendsProcess/",views.myFriendsProcess,name="myFriendsProcess"), #User All Friends Process
+    path("automaticallylike/",views.automaticallylike,name="automaticallylike"), #Automatically Check the Like Count
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

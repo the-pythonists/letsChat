@@ -37,8 +37,16 @@ def index(request):
 		for item in AllPost:
 			postList.append(item)
 		postList.sort(key=lambda x: x.date,reverse = True)      #for reversed :  (reverse = True)
+		like=[]; colorPost = []
+		for i in postList:
+			likes = Likes.objects.get(postId=i.postId)
+			like.append(len(likes.postLikedBy))
+			if request.session['user'] in likes.postLikedBy:
+				colorPost.append("rgba(0, 150, 136,1)")
+			else:
+				colorPost.append("grey")
 		date_now = datetime.datetime.now()
-		params = {'userInfo':userInfo,'userData':postList,"date_now":date_now}
+		params = {'userInfo':userInfo,'userData':zip(postList, like,colorPost),"date_now":date_now}
 		return render(request,'DashBoard.html',params)
 	else:
 		return render(request,'index.html')
@@ -82,7 +90,6 @@ def uservalidate(request):
 @csrf_exempt
 def OtpGeneration(request):
 	Email=request.POST.get('Email','DefaultValue')
-	# print(Email)
 	RandomValue=random.randint(1001,99999)
 	RandomValue="LetsChat"+str(RandomValue)
 	print(RandomValue)
@@ -140,11 +147,62 @@ def changepassword(request):
 def postlike(request):
 	Id = request.POST.get('postID')
 	likes = Likes.objects.get(postId=Id)
-	postLikedBy = request.session['user']
-	postLikedOf = "To be Written"
-	print(Id)
-	# return HttpResponse(likes.postLikes)
-	return JsonResponse({'Result':likes.postLikes})
+	isLiked=True
+	count=0
+	for i in (likes.postLikedBy):
+		count=count+1
+		if(i==request.session['user']):
+			isLiked=False
+			
+	if isLiked:
+		if likes.postId==Id:
+			postLikedBy = request.session['user']
+			postLikedOf = "To be Written"
+			likes.postLikedBy.append(request.session['user'])
+			likeList=[]
+			likeList=likes.postLikedBy
+			Likes.objects.filter(postId=Id).update(postLikedBy=likeList)
+			return JsonResponse({'Result':(count+1),'color':"rgba(0, 150, 136,1)"})
+	else:
+		if likes.postId==Id:
+			postLikedBy = request.session['user']
+			postLikedOf = "To be Written"
+			likes.postLikedBy.remove(request.session['user'])
+			likeList=[]
+			likeList=likes.postLikedBy
+			Likes.objects.filter(postId=Id).update(postLikedBy=likeList)
+			return JsonResponse({'Result':(count-1),'color':"grey"})
+
+@csrf_exempt
+def automaticallylike(request):
+	userInfo = userRegistration.objects.get(userId=request.session['user'])
+	userData = UserPost.objects.filter(userId=request.session['user']).order_by('-date') # '-' for descending order
+	friends = AllFriends.objects.get(userId=request.session['user']).Friends
+	postList = []
+	def UserAllPost():
+		for item in userData:
+			yield item
+	def FriendPosts():
+		for item in friends:
+			t = UserPost.objects.filter(userId=item)
+			for i in t:
+				Id = i.postId
+				yield i
+	FriendPosts()
+	AllPost = chain(UserAllPost(), FriendPosts())
+	postsId = []
+	for item in AllPost:
+		postsId.append(item.postId)
+		postList.append(item)
+	postList.sort(key=lambda x: x.date,reverse = True)      #for reversed :  (reverse = True)
+		
+	like=[]
+	for i in postsId:
+		likes = Likes.objects.get(postId=i)
+		like.append(len(likes.postLikedBy))
+	date_now = datetime.datetime.now()
+	params = {'userData':postsId,"date_now":date_now,'like':like}
+	return JsonResponse(params)
 
 def login(request):
 	if request.method == 'POST':
@@ -202,7 +260,6 @@ def album(request):
 		
 		if request.method == 'POST':
 			name = request.POST.get('album').title()
-			print(name)
 			if not Album.objects.filter(AlbumID=request.session['user'],Name=name):
 				Album(AlbumID=request.session['user'],Name=name).save()
 			return render(request,'Album.html',params)
@@ -392,14 +449,12 @@ def test(request):
 	# del request.session['user']
 	img = '/media/cover.jpg'
 	i = img.url
-	print(i)
 	return render(request,'MyFriends.html',{'img':''})
 
 def userCoverInsert(request):
 	if request.method == "POST":
 		profileUserId = request.POST.get('coverUser','DefaultValue')
 		coverImage = request.FILES['coverImage']
-		print(coverImage)
 		loginUser = request.session['user']
 		if profileUserId==loginUser:
 			status = userRegistration.objects.get(userId=loginUser)
@@ -489,10 +544,37 @@ def userIntroInsert(request):
 
 #Shows login user list of all friends
 def myfriends(request):
-	fList = []
-	friendList = AllFriends.objects.get(userId=request.session['user']).Friends
-	for name in friendList:
-		fList.append(userRegistration.objects.filter(userId=name))
-		
-	params = {'myFriends':fList}
-	return render(request,'MyFriends.html',params)
+	return render(request,'MyFriends.html')
+
+
+@csrf_exempt
+def myFriendsProcess(request):
+	if request.method == 'POST':
+		sortBY=request.POST.get("sortBy",'DefaultValue')
+		lt = []
+		friendList = AllFriends.objects.get(userId=request.session['user']).Friends
+		for name in friendList:
+			lt.append(userRegistration.objects.get(userId=name))
+		firstName=[]
+		lastName=[]
+		prfilePic=[]
+		Id=[]
+		quote=[]
+		sortList = []
+		if sortBY=="firstName":
+			for j in lt:
+				sortList.append(j)
+				sortList.sort(key=lambda x: x.firstName)
+		else :
+			for j in lt:
+				sortList.append(j)
+				sortList.sort(key=lambda x: x.lastName)
+		for j in sortList:
+			firstName.append(j.firstName)
+			lastName.append(j.lastName)
+			prfilePic.append(j.profilePic.url)
+			Id.append(j.userId)
+			quote.append(j.quote)
+		return JsonResponse({"FName":firstName,"lName":lastName,"pPic":prfilePic,"EmailId":Id,"quote":quote})
+	else :
+		return HttpResponse("<center><h1>You did something wrong</h1></center>")
