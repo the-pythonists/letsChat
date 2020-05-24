@@ -1,14 +1,146 @@
-<html>
-    <head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {%load static%}
+    <title>My Friends</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{%static 'css/myFriends.css'%}">   
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
-    </head>
-    <body>
-        {% for query in myFriends %}
-        {% for name in query %}
-        <img src="{{name.profilePic.url}}">
-        <a href="/profile/{{name.userName}}">{{name.firstName}} {{name.lastName}}</a><br>
-        {% endfor %}
-        {% endfor %}
 
-    </body>
+    <script>
+        $(document).ready(function(){
+            $(".hamburger .fas").click(function(){
+                $(".wrapper").addClass("active")
+            })
+
+            $(".wrapper .sidebar .close").click(function(){
+                $(".wrapper").removeClass("active")
+            })
+        })
+    </script>
+</head>
+<body>
+
+<div class="container-fluid">
+<div class="wrapper" style=" "style=" ">
+    <div class="sidebar" style=" ">
+      <div class="bg_shadow" style=" "></div>
+        <div class="sidebar__inner" style=" overflow-y:scroll;
+    overflow-x:hidden;">
+           <div class="close" >
+          <i class="fas fa-times"></i>
+        </div>
+        
+        <ul class="siderbar_menu" style=" overflow-y:scroll;
+    overflow-x:hidden;margin-bottom:15%;">
+          <h4 class="sidebar_Heading">Online Friends</h4>
+          <li><img src="profile.png" class="onlineUserImage"><a href="#" class="onlineUserName">Online Person name</a>
+            <span class="pull-right" style="padding-right: 8px;"><i class="fas fa-dot-circle "></i></span>
+          </li><hr>
+          
+         
+          
+        </ul>
+      </div>
+    </div>
+    <div class="main_container">
+
+    <header>
+      <h4 id="brand">LetsChat</h4>
+
+       <div class="hamburger">
+              <div class="hamburger__inner">
+                  <i class="fas fa-bars" style="position:fixed;top:25px;right:3%;color:rgba(0, 150, 136, 1); " ></i>  
+              </div>  
+          </div>
+    </header>
+
+      
+      
+      
+    </div>
+
+    
+</div>
+    
+<br><br>
+<div class="container">
+
+  <div class="all_Friends">
+    <center>
+        <form action="#" method="POST" >{% csrf_token %}
+        <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-10 col-10">
+        <input type="text" name="search" placeholder="Search... " id="search" autocomplete="off" oninput="serachFriend()">
+        </div>
+
+        <div class="col-lg-2 col-md-2 col-sm-2 col-2">
+        <input type="Submit" name="search" id="searchBut">
+        </div>
+        </div>
+        </form>
+      </center>
+
+      <div class="details_Div">
+      <p><strong id="totalConnection"></strong> Connections</p>
+  <div class="dropdown">
+          <button class="dropdown-toggle"  id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="float:left;">
+            Sort By:
+          </button>
+          <p id="sortByDisplay" >First name</p>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            
+            <a class="dropdown-item" href="#" onclick="sortDisplay('firstName')">First name</a>
+            <a class="dropdown-item" href="#" onclick="sortDisplay('lastName')">Last name</a>
+          </div>
+
+        </div>
+        
+      
+        
+        <br>
+<div id="showFriendSection" style="clear:both;">
+  <a class="btn btn-info" onclick="toastr.info('Hi! I am info message.');">Info message</a>      
+
+</div>
+</div>
+
+  </div>
+
+</div>
+</div>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script type="text/javascript" src="{%static 'js/myFriends.js'%}"></script>
+</body>
 </html>

@@ -8,7 +8,10 @@
 	
 	<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 	<script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
-	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="{%static 'css/emojionearea.min.css'%}">
+  <script src="{%static 'js/emojionearea.min.js'%}"></script>
 	<script>
 		$(document).ready(function(){
 			$(".hamburger").click(function(){
@@ -126,7 +129,7 @@
               <label id="upfile1" style="cursor:pointer" class="fas fa-photo-video">
                 <input type="file" name="MediaFile"  class="fas fa-photo-video" id="file1" style="display:none;">
               </label></i></a>
-            <a href="#" class="icon"><i class="far fa-grin" id="Post_Icon_Cusomize"></i></a>
+            <a href="#" class="icon"><i class="far fa-grin" id="Post_Icon_Cusomize" onclick="emojiCreater()"></i></a>
             <input type="submit" name="Post" id="SubmitPost" style="display:none;" value="Post">
           </div>
         </form>
@@ -135,7 +138,7 @@
 
       <div style="background:rgba(191, 191, 191, 0.5);padding:2%;width:90%;">
       		<div>
-            {% for data in userData %}
+            {% for data,data2,data4 in userData %}
             <a href="/profile/{{data.userId}}">
       			<img src="{{data.userPic}}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
       			<span style="font-weight:bold;padding-left:8px;">{{data.userName}} </span>
@@ -161,16 +164,17 @@
             <img src="{{data.post.url}}" style="width:100%;">
             <br>
             {% endif %}
-            <p id="{{data.postId}}"></p>
-      			<a><i class="fas fa-thumbs-up" id="PostResponse" name="{{data.postId}}" onclick="likePost('{{data.postId}}')"></i></a>
+            <strong><p id="{{data.postId}}" style="padding:8px 0px 0px 8px;">{{data2}} Likes</p></strong>
+      			<a><i class="fas fa-thumbs-up" id="PostResponse" name="{{data.postId}}" style="color:{{data4}};" onclick="likePost('{{data.postId}}')"></i></a>
       			<a href="#"><i class="far fa-comment-alt" id="PostResponse"></i></a>
       			<hr>
       			<br>
       			<form method="post" action="#">
       				<img src="{{userInfo.profilePic.url}}" style="width:50px;height:50px;border-radius:50%;vertical-align: middle;">
-      				<input type="text" placeholder="Drop your Comment" style="width:90%;padding:8px;">
-            </form>
-            <br><br>
+              <input type="text" placeholder="Drop your Comment" style="width:90%;padding:8px;">
+              </form>
+      			<br><br>
+    
             {% endfor %}
       		</div>
       </div>
@@ -180,9 +184,21 @@
 </div>
   
 <script>
+  function emojiCreater(){
+    $("#TextPost").emojioneArea({
+            pickerPosition: "bottom",
+            tonesStyle: "bullet",
+            
+    });
+    
+document.getElementById("SubmitPost").style.display="block";
+
+  }
+  
   function likePost(data){
+    
     Id = data
-    console.log(data);
+    
     $.ajax({
       method:'POST',
       url:'/postlike/',
@@ -191,15 +207,38 @@
       },
       success:function(e){
         likeCount = e['Result']
-        console.log(e['Result'])
-        document.getElementsByName(Id)[0].style.color="blue";
-        document.getElementById(Id).innerHTML=likeCount;
+        
+        document.getElementsByName(Id)[0].style.color=e['color'];
+        document.getElementById(Id).innerHTML=likeCount+" Likes";
       },
       error:function(data){
         console.log('Failed');
       }
     })
   }
+
+
+
+//Automatically Check Like Request
+setInterval(function()
+{
+$.ajax({
+      method:'POST',
+      url:'/automaticallylike/',
+      
+      success:function(e){
+        
+        
+        for(i=0;i<((e.like).length);i++){
+          
+          document.getElementById(e.userData[i]).innerHTML=e.like[i]+" Likes";
+        }
+      },
+      error:function(data){
+        console.log('Failed');
+      }
+    });
+}, 5000); 
 </script>
 </body>
 <script type="text/javascript" src="{%static 'js/script1.js'%}"></script>

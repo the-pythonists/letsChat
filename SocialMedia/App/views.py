@@ -28,20 +28,27 @@ def index(request):
 				yield item
 
 		def FriendPosts():
-			for item in friends:
-				t = UserPost.objects.filter(userId=item).order_by('-date')
+			for friend in friends:
+				friendPost = UserPost.objects.filter(userId=friend).order_by('-date')
 				u = Photos.objects.filter(Album='Profile Pictures',PhotoID=item).order_by('-date')
 				print(item)
 				print(u)
-				for i in t:
-					yield i
+				for post in friendPost:
+					yield post
 		FriendPosts()
 		AllPost = chain(UserAllPost(), FriendPosts())
 		for item in AllPost:
 			postList.append(item)
 		postList.sort(key=lambda x: x.date,reverse = True) 
-		
-		params = {'userInfo':userInfo,'userData':postList,'date_now':datetime.datetime.now()}
+		like=[]; colorPost = []
+		for i in postList:
+			likes = Likes.objects.get(postId=i.postId)
+			like.append(len(likes.postLikedBy))
+			if request.session['user'] in likes.postLikedBy:
+				colorPost.append("rgba(0, 150, 136,1)")
+			else:
+				colorPost.append("grey")
+		params = {'userInfo':userInfo,'userData':zip(postList, like,colorPost),'date_now':datetime.datetime.now()}
 		return render(request,'DashBoard.html',params)
 	else:
 		return render(request,'index.html')
@@ -120,24 +127,102 @@ def storydelete(request):
 	return JsonResponse({'Result':'Deleted'})
 
 def myfriends(request):
-	fList = []
-	friendList = AllFriends.objects.get(userId=request.session['user']).Friends
-	for name in friendList:
-		fList.append(userRegistration.objects.filter(userId=name))
-		
-	params = {'myFriends':fList}
-	return render(request,'MyFriends.html',params)
+	return render(request,'MyFriends.html')
+
+@csrf_exempt
+def myFriendsProcess(request):
+	if request.method == 'POST':
+		sortBY=request.POST.get("sortBy",'DefaultValue')
+		lt = []
+		friendList = AllFriends.objects.get(userId=request.session['user']).Friends
+		for name in friendList:
+			lt.append(userRegistration.objects.get(userId=name))
+		firstName=[]
+		lastName=[]
+		prfilePic=[]
+		Id=[]
+		quote=[]
+		sortList = []
+		if sortBY=="firstName":
+			for j in lt:
+				sortList.append(j)
+				sortList.sort(key=lambda x: x.firstName)
+		else :
+			for j in lt:
+				sortList.append(j)
+				sortList.sort(key=lambda x: x.lastName)
+		for j in sortList:
+			firstName.append(j.firstName)
+			lastName.append(j.lastName)
+			prfilePic.append(j.profilePic.url)
+			Id.append(j.userId)
+			quote.append(j.quote)
+		return JsonResponse({"FName":firstName,"lName":lastName,"pPic":prfilePic,"EmailId":Id,"quote":quote})
+	else :
+		return HttpResponse("<center><h1>You did something wrong</h1></center>")
 
 @csrf_exempt
 def postlike(request):
-	# INCOMPLETE AS OF NOW
 	Id = request.POST.get('postID')
 	likes = Likes.objects.get(postId=Id)
-	postLikedBy = request.session['user']
-	postLikedOf = "To be Written"
-	print(Id)
-	# return HttpResponse(likes.postLikes)
-	return JsonResponse({'Result':likes.postLikes})
+	isLiked=True
+	count=0
+	print(len(likes.postLikedBy))
+	count = len(likes.postLikedBy)
+	for i in (likes.postLikedBy):
+		count=count+1
+		if(i==request.session['user']):
+			isLiked=False
+			
+	if isLiked:
+		if likes.postId==Id:
+			postLikedBy = request.session['user']
+			postLikedOf = "To be Written"
+			likes.postLikedBy.append(request.session['user'])
+			likeList=[]
+			likeList=likes.postLikedBy
+			Likes.objects.filter(postId=Id).update(postLikedBy=likeList)
+			return JsonResponse({'Result':(count+1),'color':"rgba(0, 150, 136,1)"})
+	else:
+		if likes.postId==Id:
+			postLikedBy = request.session['user']
+			postLikedOf = "To be Written"
+			likes.postLikedBy.remove(request.session['user'])
+			likeList=[]
+			likeList=likes.postLikedBy
+			Likes.objects.filter(postId=Id).update(postLikedBy=likeList)
+			return JsonResponse({'Result':(count-1),'color':"grey"})
+
+@csrf_exempt
+def automaticallylike(request):
+	userInfo = userRegistration.objects.get(userId=request.session['user'])
+	userData = UserPost.objects.filter(userId=request.session['user']).order_by('-date') # '-' for descending order
+	friends = AllFriends.objects.get(userId=request.session['user']).Friends
+	postList = []
+	def UserAllPost():
+		for item in userData:
+			yield item
+	def FriendPosts():
+		for item in friends:
+			t = UserPost.objects.filter(userId=item)
+			for i in t:
+				Id = i.postId
+				yield i
+	FriendPosts()
+	AllPost = chain(UserAllPost(), FriendPosts())
+	postsId = []
+	for item in AllPost:
+		postsId.append(item.postId)
+		postList.append(item)
+	postList.sort(key=lambda x: x.date,reverse = True)      #for reversed :  (reverse = True)
+		
+	like=[]
+	for i in postsId:
+		likes = Likes.objects.get(postId=i)
+		like.append(len(likes.postLikedBy))
+	date_now = datetime.datetime.now()
+	params = {'userData':postsId,"date_now":date_now,'like':like}
+	return JsonResponse(params)
 
 def login(request):
 	if request.method == 'POST':
@@ -337,6 +422,9 @@ def addfriend(request):
 		friend1.Friends.remove(request.session['user'])
 		friendList1 = friend1.Friends
 		AllFriends.objects.filter(userId=profileId).update(userId=profileId,Friends=friendList1)
+# Deleting Notifications 
+		Notifications.objects.filter(notificationType='friend',sender=request.session['user'],receiver=profileId).delete()
+		Notifications.objects.filter(notificationType='friend',sender=profileId,receiver=request.session['user']).delete()
 
 		return JsonResponse({"Result":"Successfully Removed"})
 	
@@ -382,7 +470,8 @@ def requestConfirm(request):
 
 		senderName = Friend_Requests.objects.get(sender=friendId).senderName
 	notify = request.session['name'] + ' accepted your Friend Request.'
-	Notifications(sender=myId,receiver=friendId,fullName=request.session['name'],
+
+	Notifications(notificationType='friend',sender=myId,receiver=friendId,fullName=request.session['name'],
 	notification=notify,viewed=False).save()
 
 	Friend_Requests.objects.filter(sender=friendId,receiver=myId).delete()
@@ -453,17 +542,8 @@ def test(request):
 	# AllFriends(userId=friendId).save()
 	# Album(id=3).save()
 
-	alb = Album.objects.all()
-	for i in alb:
-		a = i.AlbumID
-		b = i.Name
-		print(a,b)
-		pic = Photos.objects.filter(PhotoID=a)
-		for p in pic:
-			c = p.Image
-			print(c)
-		
-	return HttpResponse(a)
+	return render(request,'test.html')
+
 @csrf_exempt
 def userIntroInsert(request):
 	if request.method == "POST":

@@ -108,13 +108,15 @@ function edit(){
 	
 
 
-function request(){
-  // alert("Done");
-        userProfile = document.getElementById("profile").value;
-        btnvalue = document.getElementById("addbtn").value;
-        console.log(btnvalue);
-        
-        if(btnvalue === 'Add Friend'){
+function request(action,user1,user2){
+
+  // user1 == myself // user2 = friend
+      
+      myself = user1;     // Not in use currentlly
+      userProfile = user2;
+      btnvalue = action;
+      
+        if(btnvalue === 'add'){
             $.ajax({
             method:'POST',
             url:'/addfriend/',
@@ -129,7 +131,7 @@ function request(){
             }
         })
         }
-        else if(btnvalue === 'Cancel Request'){
+        else if(btnvalue === 'cancel'){
             $.ajax({
             method:'POST',
             url:'/addfriend/',
@@ -142,7 +144,7 @@ function request(){
             }
         })
         }
-        else if(btnvalue === 'Unfriend'){
+        else if(btnvalue === 'unfriend'){
           $.ajax({
           method:'POST',
           url:'/addfriend/',
@@ -155,7 +157,7 @@ function request(){
           }
       })
       }
-      else if(btnvalue === 'Confirm Request'){
+      else if(btnvalue === 'confirm'){
         $.ajax({
         method:'POST',
         url:'/addfriend/',

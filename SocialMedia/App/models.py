@@ -48,6 +48,7 @@ class AllFriends(models.Model):
         return self.userId
 
 class Notifications(models.Model):
+    notificationType = models.CharField(max_length=50,default='',blank=True)    # 'friend' for Friend Request 'like' for Like 'comment' for Comment and so on
     fullName = models.CharField(max_length=55, blank=True)
     sender = models.CharField(max_length=55, blank=True)
     receiver = models.CharField(max_length=55, blank=True)
@@ -93,7 +94,10 @@ class Photos(models.Model):
 class Likes(models.Model):
     postId = models.CharField(max_length=100)
     postLikes = models.IntegerField(default=0)
-    postLikedBy = models.CharField(max_length=50,default='')
+    postLikedBy = ListCharField(
+        base_field=models.CharField(max_length=50),
+        max_length=(100 * 100)
+    )
     postLikedOf = models.CharField(max_length=50,default='')
 
     def __str__(self):
