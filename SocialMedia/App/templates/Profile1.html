@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+  {%load static%}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="StyleSheet" type="text/css" href="{%static 'css/Userprofile.css'%}">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+<style type="text/css">
+    
+</style>
+
+</head>
+<body>
+
+<!--Header-->
+<div id="navbar">
+  <a href="/" id="logo">letsChat</a>
+  <div id="navbar-right">
+    <a class="active" href="#home">Home</a>
+    <a href="#contact">Contact</a>
+    <a href="#about">About</a>
+  </div>
+</div>
+<!--Main Body-->
+<div>
+{% for data in user %}
+
+    <input type="hidden" id="profile" name="profileId" value="{{data.userName}}">
+
+    <div class="container jumbotron">
+        <div class="fb-profile">
+            <img align="left" class="fb-image-lg" src="{{data.coverPic.url}}" alt="Profile image example" />
+            <img align="left" class="fb-image-profile thumbnail" src="{{data.profilePic.url}}" alt="Profile image example" id="avtar" style="border:6px solid rgba(0, 150, 136, 0.8)";/>
+            <div class="fb-profile-text">
+                <h2 hidden id="currentUserId">{{currentUserId}}</h2>
+                <button type="button" class="btn btn-primary btn-lg pull-right" data-toggle="modal" data-target="#myModal" style="display:none;" id="EditProfileButton">
+                  Edit Profile
+                </button>
+                {% if isFriend %}
+                <input type="button" onclick="request();" name="" value="Unfriend" id="addbtn" class="btn btn-danger pull-right"  style="display:block;">
+                {% elif isRequest %}
+                <input type="button"  name="" value="Cancel Request" id="addbtn" class="btn btn-secondary pull-right"  style="display:block;">
+                {% elif isRequested %}
+                <input type="button" onclick="request();" name="" value="Confirm Request" id="addbtn" class="btn btn-success pull-right"  style="display:block;">
+                {% else %}
+                
+                <input type="button" name="" value="Add Friend" id="addbtn" class="btn btn-danger pull-right"  style="display:none;" >
+                {% endif %}
+                
+                <script>
+          //         user = document.getElementById('profile').value;
+          //         myself = document.getElementById('currentUserId').innerHTML;
+          // // THIS IS GLOBAL CHATSOCKET AVAILABLE EVERYWHERE THROUGH SERVER
+          //         const chatSocket = new WebSocket(
+          //           'ws://'
+          //           + window.location.host
+          //           + '/ws/chat/'
+          //           + 'path'
+          //           + '/'
+          //       );
+          // // THIS FUNCTION RECEIVES DATA FROM consumers.py FILE AND PROCESSES ACCORDINGLY
+          //       chatSocket.onmessage = function(e) {
+          //           const data = JSON.parse(e.data);
+                  
+          //           if (data.action === 'add'){
+          //               if (data.receiver === myself){
+          //               document.querySelector('#addbtn').value = 'Confirm Request';
+          //               }
+          //             }
+          //           else if (data.action === 'cancel'){
+          //             if (data.receiver === myself){
+          //             document.querySelector('#addbtn').value = 'Add Friend';
+          //             }
+          //           }
+          //           else if (data.action === 'confirm'){
+          //             if (data.receiver === myself){
+          //             document.querySelector('#addbtn').value = 'Unfriend';
+          //             }
+          //           }
+          //           else if (data.action === 'unfriend'){
+          //             if (data.receiver === myself){
+          //             document.querySelector('#addbtn').value = 'Add Friend';
+          //             }
+          //           }
+          //       };
+                    
+
+          //       chatSocket.onclose = function(e) {
+          //           console.error('Chat socket closed unexpectedly');
+          //       };
+          // // THIS FUNCTION IS STARTING POINT, IT RECEIVES BUTTON VALUE AND PROCESSES ACCORDINGLY
+          //         document.querySelector('#addbtn').onclick = function(e) {
+          //           const btn = document.querySelector('#addbtn');
+          //           const btnValue = btn.value;
+          //           // console.log(btnValue);
+          //         if (btnValue === 'Add Friend'){
+          //             chatSocket.send(JSON.stringify({
+          //             'action':'add',
+          //             'sender': myself,
+          //             'receiver':user
+          //             }));
+          //             request('add', myself, user);
+          //         }
+          //         else if (btnValue === 'Cancel Request'){
+          //           chatSocket.send(JSON.stringify({
+          //             'action':'cancel',
+          //             'sender': myself,
+          //             'receiver':user
+          //             }));
+          //             request('cancel', myself, user);
+          //         }
+          //         else if (btnValue === 'Confirm Request'){
+          //           chatSocket.send(JSON.stringify({
+          //             'action':'confirm',
+          //             'sender': myself,
+          //             'receiver':user
+          //             }));
+          //             request('confirm', myself, user);
+          //         }
+          //         else if (btnValue === 'Unfriend'){
+          //           chatSocket.send(JSON.stringify({
+          //             'action':'unfriend',
+          //             'sender': myself,
+          //             'receiver':user
+          //             }));
+          //             request('unfriend', myself, user);
+          //         }
+          //         else{console.log('Else Part');}
+                              
+          //                     // console.log(message);
+          //                 };
+          //        ;
+                </script>
+                
+                <h2 id="headerName">{{data.firstName}} {{data.lastName}}</h2>
+                <h4 id="headerQuote">{{data.quote}}</h4>
+
+
+            </div>
+            <hr>
+
+            <!--Tab Section-->
+            <div class="tab">
+              <button class="tablinks" onclick="openCity(event, 'Timeline')">Timeline</button>
+              <button class="tablinks" onclick="openCity(event, 'About')">About</button>
+              <button class="tablinks" onclick="openCity(event, 'Friends')">Friends</button>
+              <button class="tablinks" onclick="openCity(event, 'Photos')">Photos</button>
+            </div>
+
+            <div id="Timeline" class="tabcontent">
+              <h3>Timeline</h3>
+              
+            </div>
+
+            <div id="About" class="tabcontent">
+              <h3>About</h3>
+              
+
+              <!--Vertical Tab-->
+              <div class="tab5">
+                  <button class="tablinks5" onclick="openAboutOpt(event, 'verticalIntroOpt')">Contact and basic Info</button>
+                  <button class="tablinks5" onclick="openAboutOpt(event, 'verticalEducatOpt')">Education</button>
+                  <button class="tablinks5" onclick="openAboutOpt(event, 'verticalWorkOpt')">Workplace</button>
+                </div>
+                <br>
+                <div id="verticalIntroOpt" class="tabcontent5" style="display:none;">
+                  <h3>Contact and basic Info</h3><br>
+                  <h2 style="color:grey;" ><i class="fas fa-birthday-cake" ></i><span id="tableDOB">{{data.dOB}}</span></h2><br>
+
+                  <h2 style="color:grey;"><i class="fas fa-phone-alt" ></i><span id="tableMobile">{{data.mobile}}</span></h2><br>
+
+
+                  <h2 style="color:grey;"><i class="fas fa-male" ></i><span id="tableGender">{{data.gender}}</span></h2><br>
+
+                <h2 style="color:grey;"><i class="fas fa-flag-usa" ></i><span id="tableCountryName">{{data.countryName}}</span></h2><br>
+
+                 <h2 style="color:grey;"><i class="fas fa-city" ></i><span id="tableCityName">{{data.cityName}}</span></h2>
+
+                
+                  
+                </div>
+
+                <div id="verticalEducatOpt" class="tabcontent5" style="display:none;">
+                  <h3>Education</h3>
+                  <br>
+                  <h2 style="color:grey;"><i class="fas fa-university"></i><span id="{{data.currentEducation}}">{{data.currentEducation}}</span></h2><br>
+                  
+                  <h2 style="color:grey;"><i class="fas fa-clock"></i><span id="tableEducationStartYear"><span>from</span>{{data.educationStartYear}}</span></h2><br>
+
+                  <h2 style="color:grey;"><i class="fas fa-clock"></i><span id="tableEducationEndYear"><span>to</span>{{data.educationEndYear}}</span></h2><br>
+                </div>
+
+                <div id="verticalWorkOpt" class="tabcontent5" style="display:none;">
+                  <h3>Workplace</h3>
+                  <br>
+                  <h2 style="color:grey;"><i class="fas fa-building"></i><span id="tableCompanyName">{{data.companyName}}</span></h2><br>
+
+                  <h2 style="color:grey;"><span class="glyphicon glyphicon-briefcase"></span><span id="tableCompanyPosition">{{data.companyPosition}}</span></h2><br>
+
+                  <h2 style="color:grey;"><i class="fas fa-map-marker-alt"></i><span id="tableCompanyCity">{{data.companyCity}}</span></h2><br>
+
+                  <h2 style="color:grey;"><i class="far fa-address-card"></i><span id="tableCompanyDescription">{{data.companyDescription}}</span></h2><br>
+                </div>
+
+
+
+            </div>
+
+            <div id="Friends" class="tabcontent">
+              <h3>Friends</h3>
+              
+            </div>
+
+            <div id="Photos" class="tabcontent">
+              <h3>Photos</h3>
+              
+            </div>
+
+    <!--Edit Model-->
+
+    <!-- Modal -->
+    <div class="modal fade-scale" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <br>
+            
+            <h4 class="modal-title" id="myModalLabel" >Modal title</h4>
+            
+          </div>
+          <div class="modal-body">
+            
+
+            <!--Model Content-->
+
+            <div class="tab1">
+              <button class="tablinks1" onclick="editOpen(event, 'CoverImage')">Cover Image</button>
+              <button class="tablinks1" onclick="editOpen(event, 'ProfileImage')">ProfileImage</button>
+              <button class="tablinks1" onclick="editOpen(event, 'Intro')">Intro</button>
+              
+            </div>
+            <br><br><br><br>
+            <div id="CoverImage" class="tabcontent1">
+                      
+                      <div class="coverPicture">
+                        <img src="{{data.coverPic.url}}" class="coverImage">
+                        </div>
+                        
+            </div>
+
+           
+
+            <div id="ProfileImage" class="tabcontent1">
+              
+              <div>
+                <h4>Profile Image</h4>
+                <img src="{{data.profilePic.url}}" class="profilePicture">
+              </div>
+
+              
+            </div>
+
+            <div id="Intro" class="tabcontent1">
+
+
+
+
+
+
+            <table class="table-responsive table table-hover" style="font-size:1.5em;color:rgba(0, 150, 136, 0.8);">
+              
+              <tbody>
+                <tr>
+                  <th scope="row"></th>
+                  <td>First name :</td>
+                  <td>{{data.firstName}}</td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>Last name :</td>
+                  <td>{{data.lastName}}</td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>Email Id :</td>
+                  <td>{{data.userId}}</td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>Mobile No. :</td>
+                  <td ><span id="tableMobile">{{data.mobile}}</span></td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>Gender :</td>
+                  <td><span id="tableGender">{{data.gender}}</span></td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>Date of Birth :</td>
+                  <td><span id="tableDOB">{{data.dOB}}</span></td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>Quote :</td>
+                  <td><span id="tableQuote">{{data.quote}}</span></td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>Country name :</td>
+                  <td><span id="tableCountryName">{{data.countryName}}</span></td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>City name :</td>
+                  <td><span id="tableCityName">{{data.cityName}}</span></td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>Current Education :</td>
+                  <td><span id="tablecurrentEducation">{{data.currentEducation}}</span></td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>Education start year :</td>
+                  <td><span id="tableEducationStartYear">{{data.educationStartYear}}</span></td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>Education end year :</td>
+                  <td><span id="tableEducationEndYear">{{data.educationEndYear}}</span></td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>Company name :</td>
+                  <td><span id="tableCompanyName">{{data.companyName}}</span></td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>Company position :</td>
+                  <td><span id="tableCompanyPosition">{{data.companyPosition}}</span></td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>Company city/town</td>
+                  <td><span id="tableCompanyCity">{{data.companyCity}}</span></td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>Company description :</td>
+                  <td><span id="tableCompanyDescription">{{data.companyDescription}}</span></td>
+                </tr>
+                
+              </tbody>
+            </table>
+
+            
+           
+
+
+         </div>
+
+
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="edit()" id="noneOpt" data-toggle="modal" data-target="#myProfile">Edit</button>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+                    
+                
+          </div>
+
+
+
+
+    <!--Cover Iamge-->
+    <!-- Modal  for Cover Page Edit-->
+    <div class="modal fade-scale" id="CoverImage1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <form method="Post" action="/userCoverInsert/"  enctype="multipart/form-data">{%csrf_token%}
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Cover Image</h4>
+          </div>
+          <div class="modal-body">
+                <input type="hidden" name="coverUser" value="{{data.userId}}">
+                <input type="file"  name="coverImage">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </form>
+    </div>
+
+
+    <!-- Modal  for profile Page Edit-->
+    <div class="modal fade-scale" id="ProfileImage1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <form action="/userProfileInsert/" method="POST" enctype="multipart/form-data"> {% csrf_token %}
+
+    <input type="hidden" name="ProfileUser" value="{{data.userId}}">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+          </div>
+          <div class="modal-body">
+                        
+                <input type="file"  name="profileImage">
+                
+    
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <input type="submit" class="btn btn-danger" name="Submit">
+          </div>
+        </div>
+      </div>
+    </form>
+    </div>
+
+    <!-- Modal  for Intro Page Edit-->
+    <div class="modal fade-scale" id="Intro1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Intro</h4>
+          </div>
+          <div class="modal-body">
+             <div class="" role="alert" id="introAlertMessage">
+                  <strong>LetsChat</strong> 
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close" >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+            </div>
+            <h1 id="profileUser" hidden>{{data.userId}}</h1>
+            <h4>Personal Details</h4>
+            <br>
+            <p>Quote</p>
+            <textarea class="form-control" name="quote" id="quote" value=>{{data.quote}}</textarea>
+            <p>Date of Birth</p>
+            <input type="date" name="dOB" class="form-control" placeholder="DOB" id="dOB" value="{{data.dOB}}">
+            <p>Gender</p>
+            <select name="gender" class="form-control" id="gender" >
+                    <option>{{data.gender}}</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Others</option>
+            </select>
+            <p>Mobile number</p>
+            <input type="number" name="mobileNumber" placeholder="mobile"class="form-control" id="mobileNumber" value="{{data.mobile}}">
+            <p>Country</p>
+            <input type="text" name="countryName" placeholder="Country" class="form-control" id="countryName" value="{{data.countryName}}">
+            <p>City</p>
+            <input type="text" name="cityName" placeholder="City" class="form-control" id="cityName" value="{{data.cityName}}">
+            <br>
+            <h4>Education details</h4>
+            <br>
+            <p>Current education</p>
+            <input type="text" name="currentEducation" placeholder="Current Education" class="form-control" id="currentEducation" value="{{data.currentEducation}}">
+            <br>
+            <div class="row">
+                <div class="col-sm-6">
+                    <p>Start Year</p>
+                    <input type="number" name="educationStartYear" placeholder="Start Year" class="form-control" id="educationStartYear" value="{{data.educationStartYear}}">
+                </div>
+                <div class="col-sm-6">
+                    <p>End Year</p>
+                    <input type="number" name="educationEndYear" placeholder="End Year" class="form-control" id="educationEndYear" value="{{data.educationEndYear}}">
+                </div>
+            </div>
+
+            <h4>Workplace</h4>
+            <p>Company</p>
+            <input type="text" name="companyName" placeholder="Company Name" class="form-control" id="companyName" value="{{data.companyName}}">
+            <p>Position</p>
+            <input type="text" name="companyPosition" placeholder="Position" class="form-control" id="companyPosition" value="{{data.companyPosition}}">
+            <p>City/Town</p>
+            <input type="text" name="companyCity" placeholder="City/Town" class="form-control" id="companyCity" value="{{data.companyCity}}">
+            <p>Description</p>
+            <textarea name="companyDescription" class="form-control" id="companyDescription" >{{data.companyDescription}}</textarea>
+
+           
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="loader" style=""></span>
+
+            <button type="button" class="btn btn-primary" onclick="introSubmission()" id="IntroButt">
+
+            Save changes</button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+{% endfor %}
+</div>      
+</body>
+
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="{%static 'js/Userprofile.js'%}"></script>
+<script type="text/javascript" src="{%static 'js/RequestSocket.js'%}"></script>
+
+
+<script type="text/javascript">
+
+
+   
+</script>
+
+</html>

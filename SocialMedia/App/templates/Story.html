@@ -9,9 +9,19 @@
         <input type="file" name="story">
         <input type="submit" value="Submit">
     </form>
+<<<<<<< HEAD
     </body>
     <script type="text/javascript" src="{%static 'js/script1.js'%}"></script>
     <script>
+=======
+    <br>
+    {% for s in story %}
+    <img src="{{s.media.url}}" alt="">
+    {% endfor %}
+    </body>
+    <script type="text/javascript" src="{%static 'js/script1.js'%}"></script>
+    <!-- <script>
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
         setInterval(function()
   {
     console.log('Running');
@@ -29,6 +39,12 @@
         }
       });
   }, 5000); 
+<<<<<<< HEAD
     </script>
 
 </html>
+=======
+    </script> -->
+
+</html>
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345

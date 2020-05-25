@@ -52,6 +52,33 @@
   </div>
 </div>
 
+<!--Search bar-->
+<div id="myOverlay" class="overlay">
+  <span class="closebtn" onclick="closeSearch()" title="Close Overlay">×</span>
+  <div class="overlay-content">
+    <form action="/search/" method="POST">{% csrf_token %}
+      <input type="text" placeholder="Search.." name="search">
+      <button type="submit"><i class="fa fa-search"></i></button>
+    </form>
+  </div>
+</div>
+
+<!--logOut Section-->
+<div id="myOverlayLogOut" class="overlay">
+  <span class="closebtn" onclick="closeLogOut()" title="Close Overlay">×</span>
+  <div class="overlay-content-logOut">
+    
+    <div id="logOutDiv">
+      <p><a href="/changepassword/" style="color: rgba(0, 150, 136, 1);"> Change Password</a></p>
+      <br><hr>
+      <p>Notifications</p><br><hr>
+      <p onclick="nightMode()">Night Mode</p><br><hr>
+      <p ><a href="/logout/" style="color: rgba(0, 150, 136, 1);"> LogOut</a></p><br><hr>
+      <p style="padding-bottom:2%;" onclick="closeLogOut()">Cancel</p>      
+    </div>
+  </div>
+</div>
+
 <div class="wrapper">
   <div class="top_navbar">
     <div class="hamburger" id="hamBurgerId">
@@ -78,6 +105,7 @@
         <li><form action="#" method="POST">{% csrf_token %}
           <a><i class="fas fa-search" class="openBtn" onclick="openSearch()" style="margin-top:8px;"></i>
           </form></a></li>
+<<<<<<< HEAD
         <li id="noti_Container">
           <div id="noti_Counter"></div>   <!--SHOW NOTIFICATIONS COUNT.-->
                 
@@ -91,6 +119,11 @@
                     <div class="seeAll" id="seeAll" ><i >See All</i></div>
                 </div>
           </li>
+=======
+        <li><a href="#">
+          <i class="fas fa-bell"></i>
+          </a></li>
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
         <li><a href="#">
           <i class="fas fa-user" class="openBtn" onclick="openLogOut()"></i>
           </a></li>
@@ -109,7 +142,11 @@
           <span class="icon"><i class="fas fa-user-friends"></i></span>
           <span class="title">Story</span></a></li>
 
+<<<<<<< HEAD
         <li><a href="{%url 'friendSearch'%}">
+=======
+        <li><a href="/myfriends/">
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
           <span class="icon"><i class="fas fa-user-friends"></i></span>
           <span class="title">Friends</span></a></li>
         <li><a href="/album/">
@@ -177,7 +214,10 @@
             <img src="{{data.post.url}}" style="width:100%;">
             <br>
             {% endif %}
+<<<<<<< HEAD
            
+=======
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
             <strong><p id="{{data.postId}}" style="padding:8px 0px 0px 8px;">{{data2}} Likes</p></strong>
       			<a><i class="fas fa-thumbs-up" id="PostResponse" name="{{data.postId}}" style="color:{{data4}};" onclick="likePost('{{data.postId}}')"></i></a>
       			<a href="#"><i class="far fa-comment-alt" id="PostResponse"></i></a>
@@ -185,9 +225,10 @@
       			<br>
       			<form method="post" action="#">
       				<img src="{{userInfo.profilePic.url}}" style="width:50px;height:50px;border-radius:50%;vertical-align: middle;">
-      				<input type="text" placeholder="Drop your Comment" style="width:90%;padding:8px;">
-            </form>
-            <br><br>
+              <input type="text" placeholder="Drop your Comment" style="width:90%;padding:8px;">
+              </form>
+      			<br><br>
+    
             {% endfor %}
       		</div>
       </div>
@@ -204,11 +245,18 @@
             
     });
     
+<<<<<<< HEAD
     document.getElementById("SubmitPost").style.display="block";
     Mode();
   }
   
     
+=======
+document.getElementById("SubmitPost").style.display="block";
+
+  }
+  
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
   function likePost(data){
     
     Id = data
@@ -253,7 +301,10 @@ $.ajax({
       }
     });
 }, 5000); 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 </script>
 </body>
 <script type="text/javascript" src="{%static 'js/script1.js'%}"></script>

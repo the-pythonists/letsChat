@@ -21,30 +21,46 @@ from App import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('changepassword/',views.changepassword,name='changepassword'),
     path('test/',views.test,name='test'),
+    path('logout/',views.logout,name='logout'),
     path('',views.index,name='index'),
     path("search/",views.search,name="search"),
     path('signup/',views.signup,name='signup'),
     path("uservalidate/", views.uservalidate,name="uservalidate"), #Check Username
     path('login/',views.login,name='login'),
+    path("uservalidate/", views.uservalidate,name="uservalidate"),
     path("OtpGeneration/", views.OtpGeneration,name="OtpGeneration"),#Otp Generation
     path("story/",views.story,name="story"),
     path("storydelete/",views.storydelete,name="storydelete"),
+<<<<<<< HEAD
     path("changepassword/",views.changepassword,name="changepassword"),
+=======
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
     path("PostSubmission/",views.PostSubmission,name="PostSubmission"),
     path("postlike/",views.postlike,name="postlike"),
+    path("automaticallylike/",views.automaticallylike,name="automaticallylike"), #Automatically Check the Like Count
     path("album/",views.album,name="album"),
     path("profile/",views.searchProfile,name="searchProfile"),
     path("profile/<str:user>/",views.profile,name="profile"),
+<<<<<<< HEAD
     path("addfriend/",views.addfriend,name="addfriend"),
     path("requestConfirm/",views.requestConfirm,name="requestConfirm"),
     path("notifications/",views.notifications,name="notifications"),
     path("logout/",views.logout,name="logout"),
+=======
+    path("myfriends/",views.myfriends,name="myfriends"),
+    path("myFriendsProcess/",views.myFriendsProcess,name="myFriendsProcess"), #User All Friends Process
+    path("addfriend/",views.addfriend,name="addfriend"),
+    path("requestConfirm/",views.requestConfirm,name="requestConfirm"),
+    path("notifications/",views.notifications,name="notifications"),
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
     path("userCoverInsert/",views.userCoverInsert,name="userCoverInsert"),#User Cover Pic Store
     path("friendSearch/", views.friendSearch,name="friendSearch"),#friend Search
     path("liveSearchProcess/",views.liveSearchProcess,name="liveSearchProcess"),#live Search Process
     path("incomingRequest/",views.incomingRequest,name="incomingRequest"),#incoming Request
     path("outgoingRequest/",views.outgoingRequest,name="outgoingRequest"),#incoming Request
+<<<<<<< HEAD
     path("userIntroInsert/",views.userIntroInsert,name="userIntroInsert"),
     # path("Userprofile/",views.Userprofile,name="Userprofile"),#User Profile
     path("userProfileInsert/",views.userProfileInsert,name="userProfileInsert"),#User Profile Store
@@ -55,6 +71,12 @@ urlpatterns = [
     path("forgetPasswordProcess/",views.forgetPasswordProcess,name="forgetPasswordProcess"), #Forget Password Process
     path("forgetPasswordOTP/",views.forgetPasswordOTP,name="forgetPasswordOTP"), #Forget Password OTP
     path("changeForgetPasword/",views.changeForgetPasword,name="changeForgetPasword"), #Forget change Forget Pasword Password OTP
+=======
+    # path("Userprofile/",views.Userprofile,name="Userprofile"),#User Profile
+    path("userProfileInsert/",views.userProfileInsert,name="userProfileInsert"),#User Profile Store
+    path("userIntroInsert/",views.userIntroInsert,name="userIntroInsert"),#Intro Insert
+
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

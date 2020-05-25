@@ -35,10 +35,18 @@ function openLogOut() {
 	document.getElementById("myOverlayLogOut").style.display = "block";
   }
   
+<<<<<<< HEAD
+=======
+  $(document).on('click', '.alink', function () {
+    var url = $("#Url").attr("data-url");
+});  
+
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
   function closeLogOut() {
 	document.getElementById("myOverlayLogOut").style.display = "none";
   }
   
+<<<<<<< HEAD
   
   function Mode(){
 
@@ -167,6 +175,14 @@ $('#notifications').click(function () {
 });
 
 //Validation for Post Image
+=======
+  function nightMode(){
+	  alert("Night Mode Code to be Written.....");
+	  
+  }
+  
+  //Validation for Post Image
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 $(":file").on("change", function(e) {
 
 	console.log(this.files[0].type);
@@ -193,6 +209,7 @@ $(":file").on("change", function(e) {
         }
       });
   }, 500000); 
+<<<<<<< HEAD
 
   //All Deshboard Contents
 //Post Alert Close
@@ -227,3 +244,5 @@ function getCookie(){
 	}
 	
 	autoMode();
+=======
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345

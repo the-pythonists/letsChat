@@ -119,4 +119,8 @@ class ChatConsumer(WebsocketConsumer):
                 'action':action,
                 'sender': sender,
                 'receiver':receiver
+<<<<<<< HEAD
             }))
+=======
+            }))
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345

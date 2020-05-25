@@ -5,11 +5,19 @@ from django.conf import settings
 from django.http import JsonResponse
 import random
 from django.core.mail import send_mail
+<<<<<<< HEAD
 from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story,Album,Photos
 from django.contrib.auth.hashers import make_password,check_password
 import datetime
 import uuid
 from django.contrib import messages
+=======
+from django.core.mail import send_mail
+from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story,Album,Photos
+from django.contrib.auth.hashers import make_password,check_password
+import datetime
+import uuid,json
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db.models import Q
 from django.core import serializers
@@ -19,13 +27,20 @@ def index(request):
 	if request.session.has_key('user'):
 		userInfo = userRegistration.objects.get(userId=request.session['user'])
 		userData = UserPost.objects.filter(userId=request.session['user']).order_by('-date') # '-' for descending order
+<<<<<<< HEAD
 		friends = AllFriends.objects.get(userId=request.session['user']).Friends
+=======
+		
+		friends = AllFriends.objects.get(userId=request.session['user']).Friends
+		
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 		postList = []
 		def UserAllPost():
 			for item in userData:
 				yield item
 
 		def FriendPosts():
+<<<<<<< HEAD
 			for item in friends:
 				t = UserPost.objects.filter(userId=item).order_by('-date')
 				u = Photos.objects.filter(Album='Profile Pictures',PhotoID=item).order_by('-date')
@@ -37,6 +52,20 @@ def index(request):
 		for item in AllPost:
 			postList.append(item)
 		postList.sort(key=lambda x: x.date,reverse = True)      #for reversed :  (reverse = True)
+=======
+			for friend in friends:
+				friendPost = UserPost.objects.filter(userId=friend).order_by('-date')
+				u = Photos.objects.filter(Album='Profile Pictures',PhotoID=item).order_by('-date')
+				print(item)
+				print(u)
+				for post in friendPost:
+					yield post
+		FriendPosts()
+		AllPost = chain(UserAllPost(), FriendPosts())
+		for item in AllPost:
+			postList.append(item)
+		postList.sort(key=lambda x: x.date,reverse = True) 
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 		like=[]; colorPost = []
 		for i in postList:
 			likes = Likes.objects.get(postId=i.postId)
@@ -45,8 +74,12 @@ def index(request):
 				colorPost.append("rgba(0, 150, 136,1)")
 			else:
 				colorPost.append("grey")
+<<<<<<< HEAD
 		date_now = datetime.datetime.now()
 		params = {'userInfo':userInfo,'userData':zip(postList, like,colorPost),"date_now":date_now}
+=======
+		params = {'userInfo':userInfo,'userData':zip(postList, like,colorPost),'date_now':datetime.datetime.now()}
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 		return render(request,'DashBoard.html',params)
 	else:
 		return render(request,'index.html')
@@ -72,8 +105,12 @@ def signup(request):
 				accountSave.save()
 				# Creating Blank Frined List
 				AllFriends(userId=username).save()
+<<<<<<< HEAD
 				return HttpResponseRedirect('/')
 			
+=======
+				return HttpResponseRedirect('/')	
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 		else:
 			return render(request,'CreateAccount.html',{'message':'Incorrect OTP'})
 	else:
@@ -86,12 +123,20 @@ def uservalidate(request):
 		return JsonResponse({'Result':1})
 	else:
 		return JsonResponse({'Result':0})
+<<<<<<< HEAD
+=======
+	
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 
 @csrf_exempt
 def OtpGeneration(request):
 	Email=request.POST.get('Email','DefaultValue')
+<<<<<<< HEAD
 	RandomValue=random.randint(1001,99999)
 	RandomValue="LetsChat"+str(RandomValue)
+=======
+	RandomValue="LetsChat"+str(random.randint(1001,99999))
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 	print(RandomValue)
 	message=f"Your Email Address  {Email}  Your OTP is {RandomValue} Do not share your password to anyone."
 	send_mail(
@@ -112,11 +157,17 @@ def story(request):
 		Story(userId=request.session['user'],media=userStory).save()
 		return HttpResponseRedirect('/')
 	else:
+<<<<<<< HEAD
 		return render(request,'Story.html')
+=======
+		stories = Story.objects.all()
+		return render(request,'Story.html',{'story':stories})
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 
 @csrf_exempt
 def storydelete(request):
 	from datetime import timedelta 
+<<<<<<< HEAD
 	tm1 = (datetime.datetime.now() - timedelta(minutes=5)   )
 	s = Story.objects.filter(uploadTime__lte= tm1 ).delete()	
 	return JsonResponse({'Result':'Deleted'})
@@ -142,6 +193,49 @@ def changepassword(request):
 				return HttpResponse('pasword not match')
 	else:
 		return render(request,'changepwd.html')
+=======
+	
+	tm1 = (datetime.datetime.now() - timedelta(minutes=1)   )
+	
+	s = Story.objects.filter(uploadTime__lte= tm1 ).delete()
+	
+	return JsonResponse({'Result':'Deleted'})
+
+def myfriends(request):
+	return render(request,'MyFriends.html')
+
+@csrf_exempt
+def myFriendsProcess(request):
+	if request.method == 'POST':
+		sortBY=request.POST.get("sortBy",'DefaultValue')
+		lt = []
+		friendList = AllFriends.objects.get(userId=request.session['user']).Friends
+		for name in friendList:
+			lt.append(userRegistration.objects.get(userId=name))
+		firstName=[]
+		lastName=[]
+		prfilePic=[]
+		Id=[]
+		quote=[]
+		sortList = []
+		if sortBY=="firstName":
+			for j in lt:
+				sortList.append(j)
+				sortList.sort(key=lambda x: x.firstName)
+		else :
+			for j in lt:
+				sortList.append(j)
+				sortList.sort(key=lambda x: x.lastName)
+		for j in sortList:
+			firstName.append(j.firstName)
+			lastName.append(j.lastName)
+			prfilePic.append(j.profilePic.url)
+			Id.append(j.userId)
+			quote.append(j.quote)
+		return JsonResponse({"FName":firstName,"lName":lastName,"pPic":prfilePic,"EmailId":Id,"quote":quote})
+	else :
+		return HttpResponse("<center><h1>You did something wrong</h1></center>")
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 
 @csrf_exempt
 def postlike(request):
@@ -149,6 +243,11 @@ def postlike(request):
 	likes = Likes.objects.get(postId=Id)
 	isLiked=True
 	count=0
+<<<<<<< HEAD
+=======
+	print(len(likes.postLikedBy))
+	count = len(likes.postLikedBy)
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 	for i in (likes.postLikedBy):
 		count=count+1
 		if(i==request.session['user']):
@@ -213,13 +312,22 @@ def login(request):
 
 		if check_password(password,encryptPass) == True:
 			request.session['user'] = str(loginValidate.userId)
+<<<<<<< HEAD
 			request.session['name'] = str(loginValidate.firstName) + ' ' + str(loginValidate.lastName)
 			# request.session['pic'] = str(loginValidate.profilePic)
+=======
+			# name = request.session['user']
+			request.session['name'] = str(loginValidate.firstName) + ' ' + str(loginValidate.lastName)
+			# request.session['pic'] = str(loginValidate.profilePic) # THIS LINE IS CURRENTLY NOT IN USE 
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 			return HttpResponseRedirect('/')
-			
 		else:
+<<<<<<< HEAD
 			messages.warning(request,'Please Check Your Email and Password.!!')
 			return render(request,'index.html')
+=======
+			return render(request,'index.html',{'message':'Please Check Your Email and Password'})
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 	else:
 		if request.session.has_key('user'):
 			return HttpResponseRedirect('/')
@@ -246,7 +354,11 @@ def notifications(request):
 			uname = detail.userName
 			picUrl = detail.profilePic
 			picsList1.append(picUrl.url)
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 	params = {'request':zip(fRequests,picsList),'notification':zip(notification,picsList1),'UserName':uname}
 	return render(request,'Notifications.html',params)
 
@@ -268,17 +380,25 @@ def album(request):
 	else:
 		return HttpResponseRedirect('/')
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 def searchProfile(request):
 	profile = request.POST.get('profile')
 	username = userRegistration.objects.get(userId=profile).userName
 	return HttpResponseRedirect('/profile/'+username+'/')
 
 def profile(request,user):
+<<<<<<< HEAD
 	ActiveUser = userRegistration.objects.get(userId=request.session['user'])
 	ActiveUserName = ActiveUser.firstName
 	ActiveUserPic = ActiveUser.profilePic
 	profileId = user
+=======
+	profileId = user
+	# profileId = userRegistration.objects.get(userId=user)
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 	profileDetail = userRegistration.objects.filter(userId=user)
 	
 	# checking if searched person is req receiver or sender
@@ -303,9 +423,90 @@ def profile(request,user):
 
 	request.session['Watchprofile'] = profileId
 	params = {'user':profileDetail,'currentUserId':request.session['user'],
+<<<<<<< HEAD
 		'isFriend':isFriend,'isRequest':isRequest,'isRequested':isRequested,
 		'ActiveUserName':ActiveUserName,'ActiveUserPic':ActiveUserPic,'ActiveUser':ActiveUser.userName}
 	return render(request,'Profile.html',params)
+=======
+		'isFriend':isFriend,'isRequest':isRequest,'isRequested':isRequested}
+	return render(request,'Profile1.html',params)
+
+def Userprofile(request):
+	return render(request,'Profile1.html')
+	
+def userProfileInsert(request):
+	if request.method == "POST":
+		profileUserId=request.POST.get('ProfileUser')
+		profileImage=request.FILES['profileImage']
+		print(profileUserId,profileImage)
+		loginUser=request.session['user']
+		if profileUserId==loginUser:
+			status=userRegistration.objects.get(userId=loginUser)
+			status.profilePic = profileImage
+			status.save()
+			UserPost.objects.filter(userId=loginUser).update(userPic='/media/'+str(userRegistration.objects.get(userId=loginUser).profilePic))
+			
+			if not Album.objects.filter(AlbumID=request.session['user']):
+				Album(AlbumID=request.session['user'],Name='Profile Pictures').save()
+			
+			Photos(Album='Profile Pictures',PhotoID=request.session['user'],Image=profileImage).save()
+
+			return HttpResponseRedirect('/profile/'+loginUser+'/')
+		else:
+			return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
+	else:
+		return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
+
+def friendSearch(request):
+	return render(request,'Friends.html')
+
+@csrf_exempt
+def outgoingRequest(request):
+	if request.method == "POST":
+		liveResult = Friend_Requests.objects.filter(sender=request.session['user'])
+		reciverId=[]
+		
+		for e in liveResult:
+			reciverId.append(e.receiverId)
+		return JsonResponse({"reciverId":reciverId})
+
+
+@csrf_exempt
+def incomingRequest(request):
+	if request.method == "POST":
+		liveResult = Friend_Requests.objects.filter(receiver=request.session['user'])
+		senderName=[]
+		senderId=[]
+		
+		for e in liveResult:
+			senderName.append(e.senderName)
+			senderId.append(e.senderId)
+		return JsonResponse({"senderName":senderName,"senderId":senderId})
+		
+
+@csrf_exempt
+def liveSearchProcess(request):
+	from django.core import serializers
+	from django.http import JsonResponse
+	if request.method == "POST":
+		name=request.POST.get('search','DefaultValue')
+		liveResult = userRegistration.objects.filter(Q(firstName__icontains=name) | Q(lastName__icontains=name))
+		print(liveResult)
+		name=[]
+		pic=[]
+		uId=[]
+		uname = []
+		for e in liveResult:
+			fullName = e.firstName+ ' ' +e.lastName
+			name.append(fullName)
+			uId.append(e.userId)
+			pic.append(e.profilePic.url)
+			uname.append(e.userName)
+		# print(pic)
+		return JsonResponse({"Username":name,"Id":uId,"picture":pic,"uname":uname})
+		
+
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 
 def Userprofile(request):
 	return render(request,'Userprofile.html')
@@ -355,8 +556,12 @@ def addfriend(request):
 		friend1.Friends.remove(request.session['user'])
 		friendList1 = friend1.Friends
 		AllFriends.objects.filter(userId=profileId).update(userId=profileId,Friends=friendList1)
+<<<<<<< HEAD
 
 		# Deleting Notifications 
+=======
+# Deleting Notifications 
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 		Notifications.objects.filter(notificationType='friend',sender=request.session['user'],receiver=profileId).delete()
 		Notifications.objects.filter(notificationType='friend',sender=profileId,receiver=request.session['user']).delete()
 
@@ -367,7 +572,10 @@ def addfriend(request):
 	else:
 		return JsonResponse({'Result':'Nothing Done'})
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 @csrf_exempt
 def requestConfirm(request):
 	if request.method == 'POST':
@@ -405,6 +613,10 @@ def requestConfirm(request):
 
 		senderName = Friend_Requests.objects.get(sender=friendId).senderName
 	notify = request.session['name'] + ' accepted your Friend Request.'
+<<<<<<< HEAD
+=======
+
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 	Notifications(notificationType='friend',sender=myId,receiver=friendId,fullName=request.session['name'],
 	notification=notify,viewed=False).save()
 
@@ -412,7 +624,10 @@ def requestConfirm(request):
 
 	return JsonResponse({'Result':'Succuss','name':senderName})
 
+<<<<<<< HEAD
 @csrf_exempt
+=======
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 def search(request):
 	if request.method == "POST":
 		query = request.POST.get('search').title()
@@ -435,6 +650,10 @@ def PostSubmission(request):
 		PostStatus=UserPost(postId=Id,userId=user,userName=request.session['name'],post=PostMedia,
 		Message=PostMessage,userPic='/media/'+str(userRegistration.objects.get(userId=user).profilePic)
 		).save()
+<<<<<<< HEAD
+=======
+		
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 		likes = Likes(postId=Id).save()
 		return HttpResponseRedirect('/')
 	else:
@@ -446,6 +665,7 @@ def logout(request):
 		del request.session['user']
 		return HttpResponseRedirect('/')
 	else:
+<<<<<<< HEAD
 		messages.warning(request,'You are already logout. Please login...')
 		return render(request,'index.html')
 
@@ -519,6 +739,39 @@ def liveSearchProcess(request):
 			uname.append(e.userName)
 
 		return JsonResponse({"Username":name,"Id":uId,"picture":pic,"uname":uname})
+=======
+		return HttpResponseRedirect('/')
+
+def userCoverInsert(request):
+	if request.method == "POST":
+		profileUserId=request.POST.get('coverUser')
+		coverImage=request.FILES['coverImage']
+		loginUser=request.session['user']
+		if profileUserId==loginUser:
+			status = userRegistration.objects.get(userId=loginUser)
+			status.coverPic = coverImage
+			status.save()
+
+			if not Album.objects.filter(AlbumID=request.session['user'],Name='Cover Photos'):
+				Album(AlbumID=request.session['user'],Name='Cover Photos').save()
+			
+			Photos(Album='Cover Photos',PhotoID=request.session['user'],Image=coverImage).save()
+
+			return HttpResponseRedirect('/profile/'+loginUser+'/')
+		else:
+			return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
+	else:
+		return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
+
+def test(request):
+	myId = 'danish26'
+	friendId = 'shubham31'
+	# AllFriends(userId=myId).save()
+	# AllFriends(userId=friendId).save()
+	# Album(id=3).save()
+
+	return render(request,'test.html')
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 
 @csrf_exempt
 def userIntroInsert(request):
@@ -546,6 +799,7 @@ def userIntroInsert(request):
 
 			return HttpResponse("<h1>Done</h1>")
 
+<<<<<<< HEAD
 #Shows login user list of all friends
 def myfriends(request):
 	return render(request,'MyFriends.html')
@@ -639,3 +893,26 @@ def changeForgetPasword(request):
 			return JsonResponse({"Status":"UnSuccessfully"})
 	else:
 		return HttpResponseRedirect("/")
+=======
+def changepassword(request):
+	if request.method == 'POST':
+		currentPass = request.POST.get('currentPass')
+		newPass = request.POST.get('newPass')
+		confirmPass = request.POST.get('confirmPass')
+		if newPass != confirmPass:
+			message = "Password Do not match"
+			return render(request,'changepwd.html',{'message':message})
+		else:
+			encryptCurrentPass = userRegistration.objects.get(userId=request.session['user']).password
+
+			if check_password(currentPass,encryptCurrentPass) == True:
+				userRegistration.objects.filter(userId=request.session['user']).update(password=make_password(newPass))
+				# return render(request,'changepwd.html',{'message':'Password Changed Successfully.Please Login Again'})
+				
+				del request.session['user']
+				return HttpResponseRedirect('/')
+			else:
+				return HttpResponse('pasword not match')
+	else:
+		return render(request,'changepwd.html')
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345

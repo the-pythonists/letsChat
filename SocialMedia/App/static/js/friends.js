@@ -24,7 +24,11 @@ $(document).ready(function() {
                     for(var i=0;i<(data.Id).length;i++)
                     {
                       
+<<<<<<< HEAD
                        $('#result').append('<li class="list-group-item link-class" ><img src="'+data.picture[i]+'" height="40" width="40" class="img-thumbnail" />'+data.Username[i]+' | <span class="text-muted">'+data.Id[i]+'</span></li>');
+=======
+                       $('#result').append('<li class="list-group-item link-class" ><img src="'+data.picture[i]+'" height="40" width="40" class="img-thumbnail" />'+data.Username[i]+' | <span class="text-muted">'+data.uname[i]+'</span></li>');
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
                       }
                    incomingRequest();
                    outgoingRequest();
@@ -46,7 +50,11 @@ $(document).ready(function() {
     $('#result').on('click', 'li', function() {
     var click_text = $(this).text().split('|');
     $('#search').val($.trim(click_text[0]));
+<<<<<<< HEAD
     $('#personId').val($.trim(click_text[1]));
+=======
+    console.log($('#personId').val($.trim(click_text[1])));
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
     $("#result").html('');
    });
   });

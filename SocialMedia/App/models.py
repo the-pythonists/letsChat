@@ -65,6 +65,32 @@ class UserPost(models.Model):
     userName = models.CharField(max_length=50,default='')
     post = models.ImageField(upload_to="profiles",blank=True)
     Message = models.CharField(max_length=5000,default="",blank=True)
+<<<<<<< HEAD
+    date = models.DateTimeField(default=datetime.now, blank=True)
+    userPic = models.CharField(max_length=100,default='',blank=True)
+
+class Story(models.Model):
+    userId = models.CharField(max_length=50,default='')
+    media = models.ImageField(upload_to="profiles",blank=True)
+    uploadTime = models.DateTimeField(default=datetime.now, blank=True)
+
+    def __str__(self):
+        return self.userId
+
+class Album(models.Model):
+    AlbumID = models.CharField(max_length=50,default='',blank=True)
+    Name = models.CharField(max_length=50,default='',blank=True)
+    date = models.DateTimeField(default=datetime.now, blank=True)
+
+    def __str__(self):
+        return self.Name
+
+class Photos(models.Model):
+    Album = models.CharField(max_length=50,default='',blank=True)
+    PhotoID = models.CharField(max_length=50,default='',blank=True)
+    Image = models.ImageField(upload_to='media',blank=True)
+=======
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
     date = models.DateTimeField(default=datetime.now, blank=True)
     userPic = models.CharField(max_length=100,default='',blank=True)
 
@@ -89,6 +115,7 @@ class Photos(models.Model):
     PhotoID = models.CharField(max_length=50,default='',blank=True)
     Image = models.ImageField(upload_to='media',blank=True)
     date = models.DateTimeField(default=datetime.now, blank=True)
+
 
 class Likes(models.Model):
     postId = models.CharField(max_length=100)
@@ -115,4 +142,8 @@ class Likes(models.Model):
 #     Friends = models.ManyToManyField(AllFriends,default='',blank=True,null=True)
 
 #     def __str__(self):
+<<<<<<< HEAD
 #         return self.loggedUser
+=======
+#         return self.loggedUser
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345

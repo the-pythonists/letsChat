@@ -4,7 +4,10 @@
   <title></title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+<<<<<<< HEAD
   <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
+=======
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css" />
   {%load static%}
@@ -21,20 +24,33 @@
 
 <br><br><br><br>
 
+<<<<<<< HEAD
 <!-- Add New Album
 <form action="/album/" method="POST">{% csrf_token %}
   <input type="text" name="album" placeholder="Enter Album Name">
   <input type="submit" value="Add Album">
 </form> -->
+=======
+Add New Album
+<form action="/album/" method="POST">{% csrf_token %}
+  <input type="text" name="album" placeholder="Enter Album Name">
+  <input type="submit" value="Add Album">
+</form>
+
+
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 
 <div class="tab">
   <button class="tablinks" onclick="openCity(event, 'profle')">Profile</button>
   <button class="tablinks" onclick="openCity(event, 'cover')">Cover</button>
   <button class="tablinks" onclick="openCity(event, 'post')">Post</button>
+<<<<<<< HEAD
   <form action="/album/" method="POST">{% csrf_token %}
   <button class="tablinks float-right mr-4" type="submit"><i class="fa fa-plus mr-2" aria-hidden="true"></i>New Album</button>
   <input class="form-control float-right w-25 mt-2" type="text" type="text" name="album" placeholder="Enter Album Name">
   </form>
+=======
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 </div>
 
 <div id="profle" class="tabcontent" style="display:block;">
@@ -51,6 +67,12 @@
     {% endif %}
   {% endfor %}
     
+     
+      
+      
+     
+   
+
 
 </div>
 <!-- /.container -->
@@ -79,6 +101,7 @@
   
 </div>
 
+<<<<<<< HEAD
 <div id="newalbum" class="tabcontent">
   <h3>New Album</h3>
   
@@ -87,6 +110,8 @@
     </a>
     
 </div>
+=======
+>>>>>>> 867c183c51dd50eb208de57cc750e37545f65345
 
 
 
