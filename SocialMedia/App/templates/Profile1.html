@@ -41,6 +41,8 @@
 {% for data in user %}
 
     <input type="hidden" id="profile" name="profileId" value="{{data.userName}}">
+    <input type="hidden" id="currentUserFullName" name="currentUserFullName" value="{{currentUserFullName}}">
+    <input type="hidden" id="currentUserPic" name="currentUserPic" value="{{currentUserPic}}">
 
     <div class="container jumbotron">
         <div class="fb-profile">

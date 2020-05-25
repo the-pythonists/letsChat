@@ -30,6 +30,8 @@ class ChatConsumer(WebsocketConsumer):
         if action == 'add':
             sender = text_data_json['sender']
             receiver = text_data_json['receiver']
+            userFullName = text_data_json['userFullName']
+            userPic = text_data_json['userPic']
         # Send message to room group
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
@@ -37,7 +39,9 @@ class ChatConsumer(WebsocketConsumer):
                     'type': 'chat_message',
                     'action':'add',
                     'sender': sender,
-                    'receiver':receiver
+                    'receiver':receiver,
+                    'userFullName':userFullName,
+                    'userPic':userPic
                 })
         elif action == 'cancel':
             sender = text_data_json['sender']
@@ -80,13 +84,17 @@ class ChatConsumer(WebsocketConsumer):
         action = event['action']
         if action == 'add':
             sender = event['sender']
-            receiver = event['receiver']
+            receiver = event['receiver'],
+            userFullName = event['userFullName']
+            userPic = event['userPic']
 
         # Send message to WebSocket
             self.send(text_data=json.dumps({
                 'action':action,
                 'sender': sender,
-                'receiver':receiver
+                'receiver':receiver,
+                'userFullName':userFullName,
+                'userPic':userPic
             }))
 
         elif action == 'cancel':

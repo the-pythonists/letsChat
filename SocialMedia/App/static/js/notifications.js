@@ -13,7 +13,7 @@ function openCity(evt, cityName) {
 }
 
 function addrequest(Id){
-
+  console.log(Id);
     // btnValue = document.getElementById("add").value;
     // alert(Id);
 

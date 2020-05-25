@@ -14,6 +14,10 @@
 	<h2 id="brand">LetsChat</h2>
 </header>
 <br><br><br><br>
+{{userProfile}}
+<input type="hidden" value="{{userProfile}}" id="profile">
+<input type="hidden" value="{{userProfile}}" id="currentUserId">
+<input type="hidden" value="Add Friend" id="addbtn">
 <div class="container">
 <h4><strong id="pageTitle">Notifications</strong></h4>
 <section id="wrapper">
@@ -30,20 +34,21 @@
   <h3>Friend Requests</h3>
 
   <div class="notificationSect">
+    
+  <span class="NotificationNotes" id="NotificationNotes"></span></p>
+
     {% for data,data2 in request %}
     
     <div id="{{data.sender}}">
       <p ><img src="{{data2}}" class="profilePic">
-      <span class="NotificationNotes"><b>{{data.senderName}}</b> Sent you Friend Request</span></p>
+      <span class="NotificationNotes" id="NotificationNotes"><b>{{data.senderName}}</b> Sent you Friend Request</span></p>
       <div style="margin-left: 8%; margin-top: -20px;">
       <input type="button" onclick="addrequest('{{data.sender}}');" name="" value="Confirm" id="add">
           <input type="button" onclick="addrequest();" name="" value="Ignore" id="ignore">
       </div>
         <hr>
     </div>
-    <!-- <div id="{{data.senderId}}">
-      You and {{data.senderName}} are now Friends.
-    </div> -->
+   
     {% endfor %}
   </div>
 
@@ -53,7 +58,7 @@
   <h4>Like and Comment</h4>
   <div class="notificationSect">
   	<p ><img src="{%static 'images/Logo.png'%}" class="profilePic">
-  	<span class="NotificationNotes">x and y person likesyour post</span></p><hr>
+  	<span class="NotificationNotes" id="notification">x and y person likesyour post</span></p><hr>
   </div>
 
 </div>

@@ -235,7 +235,7 @@ def login(request):
 			request.session['user'] = str(loginValidate.userId)
 			# name = request.session['user']
 			request.session['name'] = str(loginValidate.firstName) + ' ' + str(loginValidate.lastName)
-			# request.session['pic'] = str(loginValidate.profilePic) # THIS LINE IS CURRENTLY NOT IN USE 
+			request.session['pic'] = str(loginValidate.profilePic) # THIS LINE IS CURRENTLY NOT IN USE 
 			return HttpResponseRedirect('/')
 		else:
 			return render(request,'index.html',{'message':'Please Check Your Email and Password'})
@@ -266,7 +266,7 @@ def notifications(request):
 			picUrl = detail.profilePic
 			picsList1.append(picUrl.url)
 
-	params = {'request':zip(fRequests,picsList),'notification':zip(notification,picsList1),'UserName':uname}
+	params = {'request':zip(fRequests,picsList),'notification':zip(notification,picsList1),'UserName':uname,'userProfile':request.session['user']}
 	return render(request,'Notifications.html',params)
 
 def album(request):
@@ -292,10 +292,12 @@ def searchProfile(request):
 	return HttpResponseRedirect('/profile/'+username+'/')
 
 def profile(request,user):
+	
 	profileId = user
 	# profileId = userRegistration.objects.get(userId=user)
 	profileDetail = userRegistration.objects.filter(userId=user)
-	
+	userPic = userRegistration.objects.get(userId=request.session['user']).profilePic
+	# print(userPic.url)
 	# checking if searched person is req receiver or sender
 	if Friend_Requests.objects.filter(receiver=profileId,sender=request.session['user']):
 		isRequest = True
@@ -317,8 +319,8 @@ def profile(request,user):
 		isFriend = False
 
 	request.session['Watchprofile'] = profileId
-	params = {'user':profileDetail,'currentUserId':request.session['user'],
-		'isFriend':isFriend,'isRequest':isRequest,'isRequested':isRequested}
+	params = {'user':profileDetail,'currentUserId':request.session['user'],'currentUserFullName':request.session['name'],
+		'currentUserPic':userPic.url,'isFriend':isFriend,'isRequest':isRequest,'isRequested':isRequested}
 	return render(request,'Profile1.html',params)
 
 def Userprofile(request):
@@ -425,6 +427,8 @@ def addfriend(request):
 # Deleting Notifications 
 		Notifications.objects.filter(notificationType='friend',sender=request.session['user'],receiver=profileId).delete()
 		Notifications.objects.filter(notificationType='friend',sender=profileId,receiver=request.session['user']).delete()
+		return JsonResponse({"Result":"Successfully Removed"})
+	elif 'changeHTML':
 
 		return JsonResponse({"Result":"Successfully Removed"})
 	
