@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="en">
   <head>
@@ -9,22 +10,17 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
      <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<title>Login Form</title>
-	<style>
-		#aaa {
-    background-color: steelblue;
-    color: #fff;
-  }
-  
-	</style>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <title>Change Password</title>
+  <link rel="StyleSheet" type="text/css" href="{%static 'css/changepwd.css'%}">
+	
   </head>
+  <div id="navbar">
+        <a href="/" id="logo">letsChat</a>
+ </div>    
   <body>
-    <nav class="navbar navbar-expand-lg navbar-secondary" style="margin-bottom:0px;margin-left:0px;margin-right:0px;">
-      <a class="navbar-brand" href="#" style="color:rgba(0, 150, 136, 1);font-weight: bold;">LetsChat</a>
-    </nav>
-  <div class="col-md-4 offset-md-4">
+  <div class="col-md-4 offset-md-4 " style="margin-top: 110px;">
                     <span class="anchor" id="formChangePassword"></span>
                     <hr class="mb-0">
 					<div class="card">
@@ -53,7 +49,7 @@
                                         </span>
                                 </div>
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-success btn-lg float-right">Save</button>
+                                    <button type="submit" class="btn btn-dark btn-sm float-right">Change Password</button>
                                 </div>
                             </form>
                         </div>
