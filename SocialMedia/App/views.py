@@ -246,7 +246,7 @@ def notifications(request):
 			uname = detail.userName
 			picUrl = detail.profilePic
 			picsList1.append(picUrl.url)
-
+	
 	params = {'request':zip(fRequests,picsList),'notification':zip(notification,picsList1),'UserName':uname}
 	return render(request,'Notifications.html',params)
 
@@ -356,6 +356,10 @@ def addfriend(request):
 		friendList1 = friend1.Friends
 		AllFriends.objects.filter(userId=profileId).update(userId=profileId,Friends=friendList1)
 
+		# Deleting Notifications 
+		Notifications.objects.filter(notificationType='friend',sender=request.session['user'],receiver=profileId).delete()
+		Notifications.objects.filter(notificationType='friend',sender=profileId,receiver=request.session['user']).delete()
+
 		return JsonResponse({"Result":"Successfully Removed"})
 	
 	elif action == 'confirm':
@@ -401,14 +405,14 @@ def requestConfirm(request):
 
 		senderName = Friend_Requests.objects.get(sender=friendId).senderName
 	notify = request.session['name'] + ' accepted your Friend Request.'
-	Notifications(sender=myId,receiver=friendId,fullName=request.session['name'],
+	Notifications(notificationType='friend',sender=myId,receiver=friendId,fullName=request.session['name'],
 	notification=notify,viewed=False).save()
 
 	Friend_Requests.objects.filter(sender=friendId,receiver=myId).delete()
 
 	return JsonResponse({'Result':'Succuss','name':senderName})
 
-
+@csrf_exempt
 def search(request):
 	if request.method == "POST":
 		query = request.POST.get('search').title()
@@ -578,3 +582,60 @@ def myFriendsProcess(request):
 		return JsonResponse({"FName":firstName,"lName":lastName,"pPic":prfilePic,"EmailId":Id,"quote":quote})
 	else :
 		return HttpResponse("<center><h1>You did something wrong</h1></center>")
+
+#Forget Password
+def forgetPassword(request):
+	return render(request,'forgetPassword.html')
+
+@csrf_exempt
+def forgetPasswordOTP(request):
+	print("okkkkk")
+	Email=request.POST.get("Email",'DefaultValue')
+	print(request.method)
+	if request.method == "POST" and Email!="DefaultValue" and Email!="":
+		print("okkkkk")
+		RandomValue=random.randint(1001,99999)
+		RandomValue="LetsChat"+str(RandomValue)
+		print(RandomValue)
+		message=f"Your Email Address  {Email}  Your OTP is {RandomValue} for Forget Password Do not share your password to anyone."
+		send_mail(
+	    	'LetsChat',
+	    	message,
+	    	settings.EMAIL_HOST_USER,
+	    	[Email],
+	    	fail_silently=False)
+		request.session["forgetOtp"]=RandomValue
+		return JsonResponse({'Result':"Successfully"})
+	else:
+		return JsonResponse({'Result':"UnSuccessfully"})
+
+#Forget Password Process
+@csrf_exempt
+def forgetPasswordProcess(request):
+	if request.method == "POST":
+		OTP = request.POST.get('Otp','DefaultValue')
+		Email = request.POST.get('userName','DefaultValue')
+		if(request.session["forgetOtp"]==OTP):
+			print("OTP MATCH")
+			return render(request,'forgetPasswordProcess.html',{"Email":Email})
+		else:
+			return HttpResponse("<center><h1>Your Password is Incorrect<h1><center>")
+	return HttpResponseRedirect("/")
+
+@csrf_exempt
+def changeForgetPasword(request):
+	if request.method == "POST":
+		Email = request.POST.get('Email','DefaultValue')
+		fPassword = request.POST.get('fPassword','DefaultValue')
+		sPassword = request.POST.get('sPassword','DefaultValue')
+		if fPassword == sPassword:
+			print("SuccessFully")
+			del request.session['forgetOtp']
+			userRegistration.objects.filter(emailAddress=Email).update(password=make_password(fPassword))
+			print(Email)
+			return JsonResponse({"Status":"Successfully"})
+		else:
+			print("UnSuccessFully")
+			return JsonResponse({"Status":"UnSuccessfully"})
+	else:
+		return HttpResponseRedirect("/")

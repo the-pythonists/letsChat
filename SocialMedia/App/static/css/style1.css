@@ -4,25 +4,65 @@
 	box-sizing: border-box;
 
 }
-
-header h2{
-	padding-top:2%;
-	color:rgba(0, 150, 136, 1);
-	padding:2% 2% 2% 2%;
-}
-
 header{
-	border-bottom:4px solid grey;
+    
+    position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 100%;
+  
+  background-color:#E9ECEF;
+
+   -webkit-box-shadow: 0 8px 6px -6px grey;
+       -moz-box-shadow: 0 8px 6px -6px grey;
+            box-shadow: 0 8px 6px -6px grey;
+
 }
+
+
+#brand{
+        padding:16px;
+        color:#00a087;
+        margin-left:5%;
+        font-weight:bold;
+        padding:16px;
+        cursor:pointer;
+        
+
+    }
+
 
 #createAccountDiv{
 	padding:4%;
+    padding-top:2%;
 	align-content: center;
-	margin-top:5%;
 	color:grey;
+    margin-left:15%;
+    margin-right:15%;
+    margin-top:2%;
+    box-shadow: 0 14px 28px grey, 0 10px 10px grey;
+    margin-bottom:2%;
 }
 
+@media (max-width: 768px){
+    #createAccountDiv{
+    margin-left:0;
+    margin-right:0;
+    margin-top:0;
+    margin-bottom:2%;
 
+}
+}
+
+@media (min-width: 768px) and (max-width: 979px)  {
+    #createAccountDiv{
+    margin-left:15%;
+    margin-right:15%;
+    margin-top:10%;
+    margin-bottom:2%;
+    }
+}
 #message {
     display:none;
     background: #f1f1f1;

@@ -46,11 +46,15 @@ urlpatterns = [
     path("incomingRequest/",views.incomingRequest,name="incomingRequest"),#incoming Request
     path("outgoingRequest/",views.outgoingRequest,name="outgoingRequest"),#incoming Request
     path("userIntroInsert/",views.userIntroInsert,name="userIntroInsert"),
-    path("Userprofile/",views.Userprofile,name="Userprofile"),#User Profile
+    # path("Userprofile/",views.Userprofile,name="Userprofile"),#User Profile
     path("userProfileInsert/",views.userProfileInsert,name="userProfileInsert"),#User Profile Store
     path("myfriends/",views.myfriends,name="myfriends"), #User All Friends
     path("myFriendsProcess/",views.myFriendsProcess,name="myFriendsProcess"), #User All Friends Process
     path("automaticallylike/",views.automaticallylike,name="automaticallylike"), #Automatically Check the Like Count
+    path("forgetPassword/",views.forgetPassword,name="forgetPassword"), #Forget Password
+    path("forgetPasswordProcess/",views.forgetPasswordProcess,name="forgetPasswordProcess"), #Forget Password Process
+    path("forgetPasswordOTP/",views.forgetPasswordOTP,name="forgetPasswordOTP"), #Forget Password OTP
+    path("changeForgetPasword/",views.changeForgetPasword,name="changeForgetPasword"), #Forget change Forget Pasword Password OTP
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

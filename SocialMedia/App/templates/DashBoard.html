@@ -30,8 +30,8 @@
   <div class="overlay-content">
       <span class="closebtn" onclick="closeSearch()" title="Close Overlay">×</span>
     <form action="/search/" method="POST">{% csrf_token %}
-      <input type="text" placeholder="Search.." name="search">
-      <button type="submit"><i class="fa fa-search"></i></button>
+      <input type="text" placeholder="Search.." name="search" id="searchBtnId">
+      <button type="submit"><i class="fa fa-search" id="searchBtnSubmitId"></i></button>
     </form>
   </div>
 </div>
@@ -45,7 +45,7 @@
       <p><a href="/changepassword/" style="color: rgba(0, 150, 136, 1);"> Change Password</a></p>
       <br><hr>
       <p>Notifications</p><br><hr>
-      <p onclick="nightMode()">Night Mode</p><br><hr>
+      <p onclick="Mode()" id="modeId">Night Mode</p><br><hr>
       <p ><a href="/logout/" style="color: rgba(0, 150, 136, 1);"> LogOut</a></p><br><hr>
       <p style="padding-bottom:2%;" onclick="closeLogOut()">Cancel</p>      
     </div>
@@ -54,12 +54,12 @@
 
 <div class="wrapper">
   <div class="top_navbar">
-    <div class="hamburger">
+    <div class="hamburger" id="hamBurgerId">
        <div class="one"></div>
        <div class="two"></div>
        <div class="three"></div>
     </div>
-    <div class="top_menu">
+    <div class="top_menu" id="top_navbarId">
       <div class="logo">LetsChat</div>
       <div id="wrapper1">
         <li class="input-button">
@@ -98,7 +98,7 @@
     </div>
   </div>
   
-  <div class="sidebar">
+  <div class="sidebar" id="slidebarId">
       <ul>
       	<li><a href="/profile/{{userInfo.userName}}">
           <span class="icon"><i class=""><img src="{{userInfo.profilePic.url}}" style="width:45px;height:45px;border-radius:50%;vertical-align:middle;"></i></span>
@@ -128,7 +128,7 @@
     </ul>
   </div>
   
-  <div class="main_container">
+  <div class="main_container" id="PostContainerId">
     <div class="">
       
       <div id="PostAlert"><h4 style="color:rgba(0, 150, 136, 1);">{{flag}} <span style="float:right;"><i class="far fa-times-circle" onclick="PostAlertClose()"></i></span></h4></div>
@@ -149,7 +149,7 @@
       </div>
       <br><br>
 
-      <div style="background:rgba(191, 191, 191, 0.5);padding:2%;width:90%;">
+      <div style="background:rgba(191, 191, 191, 0.5);padding:2%;width:90%;" id="postAllSectionId">
       		<div>
             {% for data,data2,data4 in userData %}
             <a href="/profile/{{data.userId}}">
@@ -204,8 +204,8 @@
             
     });
     
-document.getElementById("SubmitPost").style.display="block";
-
+    document.getElementById("SubmitPost").style.display="block";
+    Mode();
   }
   
     

@@ -53,11 +53,11 @@
                 {% if isFriend %}
                 <input type="button" onclick="request();" name="" value="Unfriend" id="addbtn" class="btn btn-danger pull-right"  style="display:block;">
                 {% elif isRequest %}
-                <input type="button" onclick="request();" name="" value="Cancel Request" id="addbtn" class="btn btn-secondary pull-right"  style="display:block;">
+                <input type="button" name="" value="Cancel Request" id="addbtn" class="btn btn-secondary pull-right"  style="display:block;">
                 {% elif isRequested %}
                 <input type="button" onclick="request();" name="" value="Confirm Request" id="addbtn" class="btn btn-success pull-right"  style="display:block;">
                 {% else %}
-                <input type="button" onclick="request();" name="" value="Add Friend" id="addbtn" class="btn btn-danger pull-right"  style="display:none;">
+                <input type="button" name="" value="Add Friend" id="addbtn" class="btn btn-danger pull-right"  style="display:none;">
                 {% endif %}
                 <h2 id="headerName">{{data.firstName}} {{data.lastName}}</h2>
                 <h4 id="headerQuote">{{data.quote}}</h4>
@@ -444,6 +444,7 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script type="text/javascript" src="{%static 'js/Userprofile.js'%}"></script>
+<script type="text/javascript" src="{%static 'js/RequestSocket.js'%}"></script>
 
 
 <script type="text/javascript">

@@ -334,12 +334,19 @@ body{
 
 /*Night Mode*/
 body {
-  background-color: white;
+  background-color: grey;
   color: black;
 }
 
-.dark-mode {
-  background-image:url('/static/images/darkimage3.jpg');
+.dark-mode{
+  
+  background:grey;
+  color: white;
+}
+
+.day-mode{
+  background: #e1ecf2;
+  background-image:url('/static/images/body-light.jpg');
   color: white;
 }
 

@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -70,6 +71,15 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'SocialMedia.wsgi.application'
+ASGI_APPLICATION = 'SocialMedia.routing.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1',6379)],
+        },
+    },
+}
 
 
 # Database
@@ -121,7 +131,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'sj27754@gmail.com'
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_PASSWORD = '97608854409'
 
 
 

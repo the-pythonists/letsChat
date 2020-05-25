@@ -3,19 +3,23 @@
 <head>
 	<title></title>
 	{%load static%}
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<meta charset="UTF-8">
+	  <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+	  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<link rel="StyleSheet" type="text/css" href="{%static 'css/style1.css'%}">
 
 </head>
 <body>
-<header class="container-fluid">
-	<h2>LetsChat</h2>
+<header>
+      <h4 id="brand">LetsChat</h4>
 </header>
-<div class="container w-50 bg-dark" style="color: white;">
-		<h2 class="text-center mt-2">Create a new account</h2>
+    <br><br><br><br>
+<div class="container">
+		
 	<div id="createAccountDiv">
+		<h4 class="text-center">Create a new account</h4>
 		<form action="/signup/" method="post">{% csrf_token %}
 			<input type="text" class="form-control" placeholder="First Name" required id="fname" name="firstName"><br><!--Att1 Stands for Attribute 1-->
 			<input type="text" class="form-control" placeholder="Last Name" required id="lname" name="lastName"><br><!--Att1 Stands for Attribute 1-->
@@ -24,7 +28,7 @@
 			<input type="email" class="form-control" placeholder="Email" required id="Email" onclick="Form_Validate(1)" name="Email">
 			<p id="EmailMessage" style="color:red;"></p>
 			<br>
-			<center><p class="btn-block btn-success text-center w-50 py-2 rounded" onclick="OtpCall()">Send OTP</p></center><br>
+			<center><p class="btn-block btn-success text-center w-50 py-2 rounded" onclick="OtpCall()" id="otpBlock">Send OTP</p></center><br>
 			<input type="text" class="form-control" placeholder="OTP" required id="Att1" onclick="Form_Validate(2)" name="OneTimePass">
 			<br>
 			 
@@ -48,37 +52,8 @@
 	
 	</div>
 </div>
+<br>
 </body>
-<script>
-	/* Check Username from Database */
-	$('#userName').keyup(function(){
-	var username = $('#userName').val();
-	if(username.length>=5){
-	$.ajax({
-			method:'POST',
-			url:'/uservalidate/',
-			data:{
-				username:username
-			},
-			success:function(data){
-			if(data['Result'] == 1){
-			
-			$('input[type="submit"]').attr('disabled','true')
-			}
-			else{
-			// $('input[type="submit"]').attr('disabled','true')
-			$('input[type="submit"]').removeAttr('disabled')
-			}
-		}
-	});
-	}
-	else{
-	$('input[type="submit"]').attr('disabled','true')
-	}
-
-	});
-
-</script>
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
