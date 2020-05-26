@@ -13,7 +13,6 @@ class ChatConsumer(WebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
-
         self.accept()
 
     def disconnect(self, close_code):
@@ -22,10 +21,10 @@ class ChatConsumer(WebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
-
     # Receive message from WebSocket
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
+        print(text_data_json)
         action = text_data_json['action']
         if action == 'add':
             sender = text_data_json['sender']
@@ -84,7 +83,7 @@ class ChatConsumer(WebsocketConsumer):
         action = event['action']
         if action == 'add':
             sender = event['sender']
-            receiver = event['receiver'],
+            receiver = event['receiver']
             userFullName = event['userFullName']
             userPic = event['userPic']
 
@@ -128,3 +127,5 @@ class ChatConsumer(WebsocketConsumer):
                 'sender': sender,
                 'receiver':receiver
             }))
+
+

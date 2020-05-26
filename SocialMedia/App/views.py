@@ -403,6 +403,7 @@ def liveSearchProcess(request):
 def addfriend(request):
 	profileId = request.POST.get('profileId')
 	action = request.POST.get('action')
+	print(action)
 	request.session['friendProfile'] = profileId # USED IN NEXT FUNCTION FOR REQUEST CONFIRM
 
 	if action == 'add':
@@ -428,12 +429,13 @@ def addfriend(request):
 		Notifications.objects.filter(notificationType='friend',sender=request.session['user'],receiver=profileId).delete()
 		Notifications.objects.filter(notificationType='friend',sender=profileId,receiver=request.session['user']).delete()
 		return JsonResponse({"Result":"Successfully Removed"})
-	elif 'changeHTML':
 
-		return JsonResponse({"Result":"Successfully Removed"})
-	
 	elif action == 'confirm':
+		print('views conf')
 		return HttpResponseRedirect('/requestConfirm')
+	
+	elif action == 'changeHTML':
+		return JsonResponse({"Result":"Successfully Removed"})
 	else:
 		return JsonResponse({'Result':'Nothing Done'})
 
@@ -479,8 +481,8 @@ def requestConfirm(request):
 	notification=notify,viewed=False).save()
 
 	Friend_Requests.objects.filter(sender=friendId,receiver=myId).delete()
-
-	return JsonResponse({'Result':'Succuss','name':senderName})
+	senderPic = userRegistration.objects.get(userId=myId).profilePic
+	return JsonResponse({'Result':'Succuss','name':senderName,'receiver':friendId,'senderPic':senderPic.url})
 
 def search(request):
 	if request.method == "POST":

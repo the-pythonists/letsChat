@@ -41,7 +41,7 @@ $(".btn-pref .btn").click(function () {
     $(this).removeClass("btn-default").addClass("btn-primary");   
 });
 
-val1=document.getElementById("currentUserId").innerHTML;
+val1=document.getElementById("profile").innerHTML;
 val2=document.getElementById("profileUser").innerHTML;
 if(val1==val2){
   document.getElementById("EditProfileButton").style.display="block";
@@ -158,14 +158,21 @@ function request(action,user1,user2){
       })
       }
       else if(btnvalue === 'confirm'){
+        console.log('in req');
+      console.log(myself);
+      console.log(userProfile);
         $.ajax({
         method:'POST',
+        // yha pr issue hai ajax url p ni ja rha ye
         url:'/addfriend/',
         data:{
             profileId:userProfile,
             action:'confirm' // 1 for adding
         },
         success:function(e){
+          // import notification;
+          // notification.confirmNotification(sender,receiver,name,senderPic);
+
             document.getElementById('addbtn').value="Unfriend";
             document.getElementById('addbtn').style.background="red";
             document.getElementById('addbtn').style.border="2px solid red";

@@ -39,17 +39,20 @@
 <!--Main Body-->
 <div>
 {% for data in user %}
-
-    <input type="hidden" id="profile" name="profileId" value="{{data.userName}}">
+  
+    <input type="hidden" id="profile" name="profileId" value="{{data.userName}}"> 
+  <!-- logged user details -->
     <input type="hidden" id="currentUserFullName" name="currentUserFullName" value="{{currentUserFullName}}">
     <input type="hidden" id="currentUserPic" name="currentUserPic" value="{{currentUserPic}}">
-
+    <input type="hidden" id="currentUserId" name="currentUserId" value="{{currentUserId}}">
+  <!--  -->
     <div class="container jumbotron">
         <div class="fb-profile">
             <img align="left" class="fb-image-lg" src="{{data.coverPic.url}}" alt="Profile image example" />
             <img align="left" class="fb-image-profile thumbnail" src="{{data.profilePic.url}}" alt="Profile image example" id="avtar" style="border:6px solid rgba(0, 150, 136, 0.8)";/>
             <div class="fb-profile-text">
-                <h2 hidden id="currentUserId">{{currentUserId}}</h2>
+                <h2 hidden id="
+                ">{{currentUserId}}</h2>
                 <button type="button" class="btn btn-primary btn-lg pull-right" data-toggle="modal" data-target="#myModal" style="display:none;" id="EditProfileButton">
                   Edit Profile
                 </button>
@@ -65,88 +68,7 @@
                 {% endif %}
                 
                 <script>
-          //         user = document.getElementById('profile').value;
-          //         myself = document.getElementById('currentUserId').innerHTML;
-          // // THIS IS GLOBAL CHATSOCKET AVAILABLE EVERYWHERE THROUGH SERVER
-          //         const chatSocket = new WebSocket(
-          //           'ws://'
-          //           + window.location.host
-          //           + '/ws/chat/'
-          //           + 'path'
-          //           + '/'
-          //       );
-          // // THIS FUNCTION RECEIVES DATA FROM consumers.py FILE AND PROCESSES ACCORDINGLY
-          //       chatSocket.onmessage = function(e) {
-          //           const data = JSON.parse(e.data);
-                  
-          //           if (data.action === 'add'){
-          //               if (data.receiver === myself){
-          //               document.querySelector('#addbtn').value = 'Confirm Request';
-          //               }
-          //             }
-          //           else if (data.action === 'cancel'){
-          //             if (data.receiver === myself){
-          //             document.querySelector('#addbtn').value = 'Add Friend';
-          //             }
-          //           }
-          //           else if (data.action === 'confirm'){
-          //             if (data.receiver === myself){
-          //             document.querySelector('#addbtn').value = 'Unfriend';
-          //             }
-          //           }
-          //           else if (data.action === 'unfriend'){
-          //             if (data.receiver === myself){
-          //             document.querySelector('#addbtn').value = 'Add Friend';
-          //             }
-          //           }
-          //       };
-                    
-
-          //       chatSocket.onclose = function(e) {
-          //           console.error('Chat socket closed unexpectedly');
-          //       };
-          // // THIS FUNCTION IS STARTING POINT, IT RECEIVES BUTTON VALUE AND PROCESSES ACCORDINGLY
-          //         document.querySelector('#addbtn').onclick = function(e) {
-          //           const btn = document.querySelector('#addbtn');
-          //           const btnValue = btn.value;
-          //           // console.log(btnValue);
-          //         if (btnValue === 'Add Friend'){
-          //             chatSocket.send(JSON.stringify({
-          //             'action':'add',
-          //             'sender': myself,
-          //             'receiver':user
-          //             }));
-          //             request('add', myself, user);
-          //         }
-          //         else if (btnValue === 'Cancel Request'){
-          //           chatSocket.send(JSON.stringify({
-          //             'action':'cancel',
-          //             'sender': myself,
-          //             'receiver':user
-          //             }));
-          //             request('cancel', myself, user);
-          //         }
-          //         else if (btnValue === 'Confirm Request'){
-          //           chatSocket.send(JSON.stringify({
-          //             'action':'confirm',
-          //             'sender': myself,
-          //             'receiver':user
-          //             }));
-          //             request('confirm', myself, user);
-          //         }
-          //         else if (btnValue === 'Unfriend'){
-          //           chatSocket.send(JSON.stringify({
-          //             'action':'unfriend',
-          //             'sender': myself,
-          //             'receiver':user
-          //             }));
-          //             request('unfriend', myself, user);
-          //         }
-          //         else{console.log('Else Part');}
-                              
-          //                     // console.log(message);
-          //                 };
-          //        ;
+       
                 </script>
                 
                 <h2 id="headerName">{{data.firstName}} {{data.lastName}}</h2>
@@ -535,6 +457,7 @@
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script type="text/javascript" src="{%static 'js/Userprofile.js'%}"></script>
 <script type="text/javascript" src="{%static 'js/RequestSocket.js'%}"></script>
+<script type="text/javascript" src="{%static 'js/notifications.js'%}"></script>
 
 
 <script type="text/javascript">
