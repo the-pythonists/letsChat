@@ -158,9 +158,7 @@ function request(action,user1,user2){
       })
       }
       else if(btnvalue === 'confirm'){
-        console.log('in req');
-      console.log(myself);
-      console.log(userProfile);
+        
         $.ajax({
         method:'POST',
         // yha pr issue hai ajax url p ni ja rha ye

@@ -12,16 +12,35 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
   <link rel="stylesheet" type="text/css" href="{%static 'css/emojionearea.min.css'%}">
   <script src="{%static 'js/emojionearea.min.js'%}"></script>
+  <script type="text/javascript" src="{%static 'js/RequestSocket.js'%}"></script>
 	<script>
 		$(document).ready(function(){
 			$(".hamburger").click(function(){
 			   $(".wrapper").toggleClass("collapse");
 			});
-		});
+    });
+    // Check browser support
+      if (typeof(Storage) !== "undefined") {
+        // Store
+        localStorage.setItem("loggedUserID", '{{userInfo.userId}}');
+        localStorage.setItem("loggedUser", '{{userInfo.firstName}} {{userInfo.lastName}}');
+        localStorage.setItem("loggedUserPic", '{{userInfo.profilePic.url}}');
+        // Retrieve
+        // document.getElementById("result").innerHTML = sessionStorage.getItem("lastname");
+        // console.log(localStorage.getItem("loggedUserID"));
+        // console.log(localStorage.getItem("loggedUser"));
+        // console.log(localStorage.getItem("loggedUserPic"));
+      } else {
+        document.getElementById("result").innerHTML = "Sorry, your browser does not support Web Storage...";
+      }
+
 	</script>
 </head>
 <body>
-
+  <input type="hidden" value="{{userInfo.firstName}} {{userInfo.lastName}}" id="currentUserFullName">
+  <input type="hidden" value="{{userInfo.profilePic.url}}" id="currentUserPic">
+  <input type="hidden" value="{{userInfo.userId}" id="currentUserId">
+  <input type="hidden" value="Add Friend" id="addbtn">
 <!--Search bar-->
 <div id="myOverlay" class="overlay">
   <span class="closebtn" onclick="closeSearch()" title="Close Overlay">×</span>
@@ -41,7 +60,10 @@
     <div id="logOutDiv">
       <p><a href="/changepassword/" style="color: rgba(0, 150, 136, 1);"> Change Password</a></p>
       <br><hr>
-      <p>Notifications</p><br><hr>
+      <p>Notifications
+        <!-- <input type="hidden" value="danish" id="NotificationCount"> -->
+       
+      </p><br><hr>
       <p onclick="nightMode()">Night Mode</p><br><hr>
       <p ><a href="/logout/" style="color: rgba(0, 150, 136, 1);"> LogOut</a></p><br><hr>
       <p style="padding-bottom:2%;" onclick="closeLogOut()">Cancel</p>      
@@ -109,7 +131,8 @@
           </a></li>
         <li><a href="/notifications/" class="active">
           <span class="icon"><i class="fas fa-bell"></i></span>
-          <span class="title">Notification</span>
+          <span class="title" id="NotificationCount" >Notification</span>
+          <div id="noti_Counter">kbkh</div>
           </a></li>
         
     </ul>
@@ -182,7 +205,7 @@
     
   </div>
 </div>
-  
+  <h1 hidden id="pageiId">Page1</h1>
 <script>
   function emojiCreater(){
     $("#TextPost").emojioneArea({
@@ -217,29 +240,28 @@ document.getElementById("SubmitPost").style.display="block";
     })
   }
 
-
-
 //Automatically Check Like Request
-setInterval(function()
-{
-$.ajax({
-      method:'POST',
-      url:'/automaticallylike/',
+// setInterval(function()
+// {
+// $.ajax({
+//       method:'POST',
+//       url:'/automaticallylike/',
       
-      success:function(e){
+//       success:function(e){
         
         
-        for(i=0;i<((e.like).length);i++){
+//         for(i=0;i<((e.like).length);i++){
           
-          document.getElementById(e.userData[i]).innerHTML=e.like[i]+" Likes";
-        }
-      },
-      error:function(data){
-        console.log('Failed');
-      }
-    });
-}, 5000); 
+//           document.getElementById(e.userData[i]).innerHTML=e.like[i]+" Likes";
+//         }
+//       },
+//       error:function(data){
+//         console.log('Failed');
+//       }
+//     });
+// }, 5000); 
 </script>
 </body>
+<script type="text/javascript" src="{%static 'js/RequestSocket.js'%}"></script>
 <script type="text/javascript" src="{%static 'js/script1.js'%}"></script>
 </html>

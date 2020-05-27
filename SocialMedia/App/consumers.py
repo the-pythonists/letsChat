@@ -56,13 +56,17 @@ class ChatConsumer(WebsocketConsumer):
         elif action == 'confirm':
             sender = text_data_json['sender']
             receiver = text_data_json['receiver']
+            name = text_data_json['name']
+            pic = text_data_json['pic']
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
                 {
                     'type': 'chat_message',
                     'action':'confirm',
                     'sender': sender,
-                    'receiver':receiver
+                    'receiver':receiver,
+                    'name':name,
+                    'pic':pic
                 })
         elif action == 'unfriend':
             sender = text_data_json['sender']
@@ -110,12 +114,16 @@ class ChatConsumer(WebsocketConsumer):
         elif action == 'confirm':
             sender = event['sender']
             receiver = event['receiver']
+            name = event['name']
+            pic = event['pic']
 
         # Send message to WebSocket
             self.send(text_data=json.dumps({
                 'action':action,
                 'sender': sender,
-                'receiver':receiver
+                'receiver':receiver,
+                'name':name,
+                'pic':pic
             }))
         elif action == 'unfriend':
             sender = event['sender']

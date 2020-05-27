@@ -434,8 +434,17 @@ def addfriend(request):
 		print('views conf')
 		return HttpResponseRedirect('/requestConfirm')
 	
-	elif action == 'changeHTML':
+	elif action == 'changeRequestHTML':
 		return JsonResponse({"Result":"Successfully Removed"})
+
+	elif action == 'changeNotificationHTML':
+		senderDetail = userRegistration.objects.get(userId=profileId)
+		senderName = str(senderDetail.firstName) + ' ' + str(senderDetail.lastName)
+		senderPic = str(senderDetail.profilePic.url)
+		return JsonResponse({"Result":"Successfully Removed","name":senderName,"pic":senderPic})
+	
+	elif action == 'changeDashboardHTML':
+		return JsonResponse({"Result":"Successfully Removed"})	
 	else:
 		return JsonResponse({'Result':'Nothing Done'})
 
