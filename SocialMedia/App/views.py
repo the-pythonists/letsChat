@@ -163,66 +163,85 @@ def myFriendsProcess(request):
 
 @csrf_exempt
 def postlike(request):
-	Id = request.POST.get('postID')
-	likes = Likes.objects.get(postId=Id)
-	isLiked=True
-	count=0
-	print(len(likes.postLikedBy))
-	count = len(likes.postLikedBy)
-	for i in (likes.postLikedBy):
-		count=count+1
-		if(i==request.session['user']):
-			isLiked=False
-			
-	if isLiked:
-		if likes.postId==Id:
-			postLikedBy = request.session['user']
-			postLikedOf = "To be Written"
-			likes.postLikedBy.append(request.session['user'])
-			likeList=[]
-			likeList=likes.postLikedBy
-			Likes.objects.filter(postId=Id).update(postLikedBy=likeList)
-			return JsonResponse({'Result':(count+1),'color':"rgba(0, 150, 136,1)"})
-	else:
-		if likes.postId==Id:
-			postLikedBy = request.session['user']
-			postLikedOf = "To be Written"
-			likes.postLikedBy.remove(request.session['user'])
-			likeList=[]
-			likeList=likes.postLikedBy
-			Likes.objects.filter(postId=Id).update(postLikedBy=likeList)
-			return JsonResponse({'Result':(count-1),'color':"grey"})
+	postId = request.POST.get('postId')
+	postLikedOf = request.POST.get('postLikedOf')
+	postLiker = request.POST.get('postLikedBy')
 
-@csrf_exempt
-def automaticallylike(request):
-	userInfo = userRegistration.objects.get(userId=request.session['user'])
-	userData = UserPost.objects.filter(userId=request.session['user']).order_by('-date') # '-' for descending order
-	friends = AllFriends.objects.get(userId=request.session['user']).Friends
-	postList = []
-	def UserAllPost():
-		for item in userData:
-			yield item
-	def FriendPosts():
-		for item in friends:
-			t = UserPost.objects.filter(userId=item)
-			for i in t:
-				Id = i.postId
-				yield i
-	FriendPosts()
-	AllPost = chain(UserAllPost(), FriendPosts())
-	postsId = []
-	for item in AllPost:
-		postsId.append(item.postId)
-		postList.append(item)
-	postList.sort(key=lambda x: x.date,reverse = True)      #for reversed :  (reverse = True)
+	likes = Likes.objects.get(postId=postId)
+	if postLiker in likes.postLikedBy: # Checking if friend is already liked 
+		likes.postLikedBy.remove(postLiker)
+		LikesList = likes.postLikedBy
+		Likes.objects.filter(postId=postId).update(postId=postId,postLikedBy=LikesList)
+		totalLikes = len(LikesList)
+		return JsonResponse({'Result':'Success','totalLikes':totalLikes,'message':'unliked'})
+
+	else:
+		likes.postLikedBy.append(postLiker)
+		LikesList = likes.postLikedBy
+		Likes.objects.filter(postId=postId).update(postId=postId,postLikedBy=LikesList)
+		totalLikes = len(LikesList)
+		return JsonResponse({'Result':'Success','totalLikes':totalLikes,'message':'liked'})
+
+# 	Id = request.POST.get('postID')
+# 	likes = Likes.objects.get(postId=Id)
+# 	isLiked=True
+# 	count=0
+# 	print(len(likes.postLikedBy))
+# 	count = len(likes.postLikedBy)
+# 	for i in (likes.postLikedBy):
+# 		count=count+1
+# 		if(i==request.session['user']):
+# 			isLiked=False
+			
+# 	if isLiked:
+# 		if likes.postId==Id:
+# 			postLikedBy = request.session['user']
+# 			postLikedOf = "To be Written"
+# 			likes.postLikedBy.append(request.session['user'])
+# 			likeList=[]
+# 			likeList=likes.postLikedBy
+# 			Likes.objects.filter(postId=Id).update(postLikedBy=likeList)
+# 			return JsonResponse({'Result':(count+1),'color':"rgba(0, 150, 136,1)"})
+# 	else:
+# 		if likes.postId==Id:
+# 			postLikedBy = request.session['user']
+# 			postLikedOf = "To be Written"
+# 			likes.postLikedBy.remove(request.session['user'])
+# 			likeList=[]
+# 			likeList=likes.postLikedBy
+# 			Likes.objects.filter(postId=Id).update(postLikedBy=likeList)
+# 			return JsonResponse({'Result':(count-1),'color':"grey"})
+
+# @csrf_exempt
+# def automaticallylike(request):
+# 	userInfo = userRegistration.objects.get(userId=request.session['user'])
+# 	userData = UserPost.objects.filter(userId=request.session['user']).order_by('-date') # '-' for descending order
+# 	friends = AllFriends.objects.get(userId=request.session['user']).Friends
+# 	postList = []
+# 	def UserAllPost():
+# 		for item in userData:
+# 			yield item
+# 	def FriendPosts():
+# 		for item in friends:
+# 			t = UserPost.objects.filter(userId=item)
+# 			for i in t:
+# 				Id = i.postId
+# 				yield i
+# 	FriendPosts()
+# 	AllPost = chain(UserAllPost(), FriendPosts())
+# 	postsId = []
+# 	for item in AllPost:
+# 		postsId.append(item.postId)
+# 		postList.append(item)
+# 	postList.sort(key=lambda x: x.date,reverse = True)      #for reversed :  (reverse = True)
 		
-	like=[]
-	for i in postsId:
-		likes = Likes.objects.get(postId=i)
-		like.append(len(likes.postLikedBy))
-	date_now = datetime.datetime.now()
-	params = {'userData':postsId,"date_now":date_now,'like':like}
-	return JsonResponse(params)
+# 	like=[]
+# 	for i in postsId:
+# 		likes = Likes.objects.get(postId=i)
+# 		like.append(len(likes.postLikedBy))
+# 	date_now = datetime.datetime.now()
+# 	params = {'userData':postsId,"date_now":date_now,'like':like}
+# 	return JsonResponse(params)
 
 def login(request):
 	if request.method == 'POST':
@@ -556,7 +575,7 @@ def test(request):
 	# AllFriends(userId=myId).save()
 	# AllFriends(userId=friendId).save()
 	# Album(id=3).save()
-
+	Likes(postId = 'cd2d8468aa37496899616e746f30be4b').save()
 	return render(request,'test.html')
 
 @csrf_exempt

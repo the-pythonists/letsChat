@@ -8,11 +8,9 @@ try{
 }
 
 catch(e){
-  myself = document.getElementById('currentUserId').value;
-
+  // myself = document.getElementById('currentUserId').value;
+  myself = 'sarthak26';
 }
-name = localStorage.getItem("loggedUser");
-              pic = localStorage.getItem("loggedUserPic")
 
 // // THIS IS GLOBAL CHATSOCKET AVAILABLE EVERYWHERE THROUGH SERVER
         const chatSocket = new WebSocket(
@@ -92,7 +90,7 @@ name = localStorage.getItem("loggedUser");
             'sender': myself,
             'receiver':user,
             'name':name,
-            'pic':pic
+            'userPic':userPic
             }));
             request('confirm', myself, user);
         }

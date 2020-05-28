@@ -92,13 +92,13 @@ class Photos(models.Model):
 
 
 class Likes(models.Model):
-    postId = models.CharField(max_length=100)
-    postLikes = models.IntegerField(default=0)
+    postId = models.CharField(max_length=100,default='',blank=True)
+    postLikes = models.IntegerField(default=0,blank=True)
     postLikedBy = ListCharField(
-        base_field=models.CharField(max_length=50),
+        base_field=models.CharField(max_length=50,default='',blank=True),
         max_length=(100 * 100)
     )
-    postLikedOf = models.CharField(max_length=50,default='')
+    postLikedOf = models.CharField(max_length=50,default='',blank=True)
 
     def __str__(self):
         return self.postId

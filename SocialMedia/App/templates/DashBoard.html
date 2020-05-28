@@ -12,7 +12,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
   <link rel="stylesheet" type="text/css" href="{%static 'css/emojionearea.min.css'%}">
   <script src="{%static 'js/emojionearea.min.js'%}"></script>
-  <script type="text/javascript" src="{%static 'js/RequestSocket.js'%}"></script>
+
 	<script>
 		$(document).ready(function(){
 			$(".hamburger").click(function(){
@@ -37,10 +37,7 @@
 	</script>
 </head>
 <body>
-  <input type="hidden" value="{{userInfo.firstName}} {{userInfo.lastName}}" id="currentUserFullName">
-  <input type="hidden" value="{{userInfo.profilePic.url}}" id="currentUserPic">
-  <input type="hidden" value="{{userInfo.userId}" id="currentUserId">
-  <input type="hidden" value="Add Friend" id="addbtn">
+  
 <!--Search bar-->
 <div id="myOverlay" class="overlay">
   <span class="closebtn" onclick="closeSearch()" title="Close Overlay">×</span>
@@ -95,6 +92,7 @@
       </div>
       <ul>
         <li><form action="#" method="POST">{% csrf_token %}
+          
           <a><i class="fas fa-search" class="openBtn" onclick="openSearch()" style="margin-top:8px;"></i>
           </form></a></li>
         <li><a href="#">
@@ -144,7 +142,13 @@
       <div id="PostAlert"><h4 style="color:rgba(0, 150, 136, 1);">{{flag}} <span style="float:right;"><i class="far fa-times-circle" onclick="PostAlertClose()"></i></span></h4></div>
       <form method="Post" action="{% url 'PostSubmission' %}" id="PostWrapper"  enctype="multipart/form-data">
         {% csrf_token %}
-          <h4>Create Post</h4>
+        <!-- FOR JS TO WORK -->
+        <input type="hidden" value="{{userInfo.firstName}} {{userInfo.lastName}}" id="currentUserFullName">
+        <input type="hidden" value="{{userInfo.profilePic.url}}" id="currentUserPic">
+        <input type="hidden" value="{{userInfo.userId}}" id="currentUserId">
+        <!--  -->
+        <h4>Create Post</h4>
+        <input type="hidden" value="Add Friend" id="addbtn">
           <textarea name="Post_Title" placeholder="what's on your mind?" style="width:90%;height:15vh;padding:2%;resize: none;" oninput="visibleButton()" id="TextPost"></textarea>
           <div id="PostOpt">
             <a href="#" class="icon"><i class="fas fa-map-marker-alt" id="Post_Icon_Cusomize"></i></a>
@@ -187,9 +191,13 @@
             <img src="{{data.post.url}}" style="width:100%;">
             <br>
             {% endif %}
-            <strong><p id="{{data.postId}}" style="padding:8px 0px 0px 8px;">{{data2}} Likes</p></strong>
-      			<a><i class="fas fa-thumbs-up" id="PostResponse" name="{{data.postId}}" style="color:{{data4}};" onclick="likePost('{{data.postId}}')"></i></a>
-      			<a href="#"><i class="far fa-comment-alt" id="PostResponse"></i></a>
+            <strong><p id="Counter{{data.postId}}" style="padding:8px 0px 0px 8px;">{{data2}} Likes</p></strong>
+            <input type="hidden" value="{{data.postId}}" id="postLikeId">
+            <input type="hidden" value="{{data.userId}}" id="postOwner">
+            <input type="hidden" value="{{userInfo.userId}}" id="postLiker">
+
+      			<a><i class="fas fa-thumbs-up PostResponseLike" id="{{data.postId}}" onclick="postLiker('{{data.postId}}','{{data.userId}}','{{userInfo.userId}}')" name="{{data.postId}}" style="color:{{data4}};" ></i></a>
+      			<a href="#"><i class="far fa-comment-alt" id="PostResponseComment"></i></a>
       			<hr>
       			<br>
       			<form method="post" action="#">
@@ -218,27 +226,27 @@ document.getElementById("SubmitPost").style.display="block";
 
   }
   
-  function likePost(data){
+  // function likePost(data){
     
-    Id = data
+  //   Id = data
     
-    $.ajax({
-      method:'POST',
-      url:'/postlike/',
-      data:{
-        postID : Id
-      },
-      success:function(e){
-        likeCount = e['Result']
+  //   $.ajax({
+  //     method:'POST',
+  //     url:'/postlike/',
+  //     data:{
+  //       postID : Id
+  //     },
+  //     success:function(e){
+  //       likeCount = e['Result']
         
-        document.getElementsByName(Id)[0].style.color=e['color'];
-        document.getElementById(Id).innerHTML=likeCount+" Likes";
-      },
-      error:function(data){
-        console.log('Failed');
-      }
-    })
-  }
+  //       document.getElementsByName(Id)[0].style.color=e['color'];
+  //       document.getElementById(Id).innerHTML=likeCount+" Likes";
+  //     },
+  //     error:function(data){
+  //       console.log('Failed');
+  //     }
+  //   })
+  // }
 
 //Automatically Check Like Request
 // setInterval(function()
@@ -262,6 +270,7 @@ document.getElementById("SubmitPost").style.display="block";
 // }, 5000); 
 </script>
 </body>
-<script type="text/javascript" src="{%static 'js/RequestSocket.js'%}"></script>
 <script type="text/javascript" src="{%static 'js/script1.js'%}"></script>
+<script type="text/javascript" src="{%static 'js/LikeSocket.js'%}"></script>
+  <script type="text/javascript" src="{%static 'js/RequestSocket.js'%}"></script>
 </html>
