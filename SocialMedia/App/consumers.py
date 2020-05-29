@@ -13,7 +13,6 @@ class ChatConsumer(WebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
-
         self.accept()
 
     def disconnect(self, close_code):
@@ -22,10 +21,10 @@ class ChatConsumer(WebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
-
     # Receive message from WebSocket
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
+        print(text_data_json)
         action = text_data_json['action']
         if action == 'add':
             sender = text_data_json['sender']
@@ -57,13 +56,17 @@ class ChatConsumer(WebsocketConsumer):
         elif action == 'confirm':
             sender = text_data_json['sender']
             receiver = text_data_json['receiver']
+            name = text_data_json['name']
+            userPic = text_data_json['userPic']
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
                 {
                     'type': 'chat_message',
                     'action':'confirm',
                     'sender': sender,
-                    'receiver':receiver
+                    'receiver':receiver,
+                    'name':name,
+                    'userPic':userPic
                 })
         elif action == 'unfriend':
             sender = text_data_json['sender']
@@ -84,7 +87,7 @@ class ChatConsumer(WebsocketConsumer):
         action = event['action']
         if action == 'add':
             sender = event['sender']
-            receiver = event['receiver'],
+            receiver = event['receiver']
             userFullName = event['userFullName']
             userPic = event['userPic']
 
@@ -111,12 +114,16 @@ class ChatConsumer(WebsocketConsumer):
         elif action == 'confirm':
             sender = event['sender']
             receiver = event['receiver']
+            name = event['name']
+            userPic = event['userPic']
 
         # Send message to WebSocket
             self.send(text_data=json.dumps({
                 'action':action,
                 'sender': sender,
-                'receiver':receiver
+                'receiver':receiver,
+                'name':name,
+                'userPic':userPic
             }))
         elif action == 'unfriend':
             sender = event['sender']
@@ -128,3 +135,5 @@ class ChatConsumer(WebsocketConsumer):
                 'sender': sender,
                 'receiver':receiver
             }))
+
+

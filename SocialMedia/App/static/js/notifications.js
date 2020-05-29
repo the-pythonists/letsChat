@@ -13,29 +13,26 @@ function openCity(evt, cityName) {
 }
 
 function addrequest(Id){
-  console.log(Id);
-    // btnValue = document.getElementById("add").value;
-    // alert(Id);
-
-    sender = Id
-    // console.log(sender);
+  // console.log(Id);
+    senderId = Id
+    sender = document.getElementById('profile').value
+    
     $.ajax({
       method:'POST',
       url:'/requestConfirm/',
       data:{
-        sender : sender,
+        sender : senderId,
         action:'add'
       },
       success:function(e){
         name = e['name']
-        // console.log(e['name'])
-        // document.getElementById(Id).style.display="none";
-        // Need timer to remove this line after 2 seconds
-        document.getElementById(Id).innerHTML="You and " + name + " are now Friends.";
-        // time.sleep(3)
-        // document.getElementById(Id).style='none';
-        // setTimeout(doMoreStuff, 1000);
+        console.log(userProfile)
+        receiver = e['receiver']
+        senderPic = e['senderPic']
         
+        document.getElementById("user"+Id).innerHTML = "<b> " + name + "</b> <br><span style='margin-left:30px;'><span class='ml-5'>Request Accepted</span></span>";
+        console.log('calling fun');
+        confirmNotification(sender,receiver,name,senderPic);
       },
       error:function(data){
         console.log('Failed');
@@ -43,4 +40,51 @@ function addrequest(Id){
     })
   };
 
+
+  const chatSocket1 = new WebSocket(
+    'ws://'
+    + window.location.host
+    + '/ws/chat/'
+    + 'confirmPath'
+    + '/'
+  );
+  // FOR SENDING REQUEST CONFIRM NOTIFICATION
+  function confirmNotification(sender,receiver,name,senderPic){
+console.log('called');
+
+ // THIS IS GLOBAL CHATSOCKET FOR REQUEST CONFIRM NOTIFICATION AVAILABLE EVERYWHERE THROUGH SERVER
+
+// console.log('sendng data');
+// console.log(sender);
+// console.log(receiver);
+// console.log(name);
+// console.log(senderPic);
+chatSocket1.send(JSON.stringify({
+  'action':'add',
+  'sender': sender,
+  'receiver':receiver,
+  'name':name,
+  'senderPic':senderPic,
+})
+),
+
+// THIS FUNCTION RECEIVES DATA FROM consumers.py FILE AND PROCESSES ACCORDINGLY
+chatSocket1.onmessage = function(e) {
+  console.log('receiving data');
+  const data = JSON.parse(e.data);
+
   
+      if (data.receiver === sender){
+      document.querySelector('#allNotifications').value = name + ' Accepted your Friend Request';
+      
+      
+      }
+    
+  
+};
+  
+
+chatSocket1.onclose = function(e) {
+  console.error('Chat socket closed unexpectedly');
+};
+  }
