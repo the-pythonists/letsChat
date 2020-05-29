@@ -8,9 +8,8 @@ try{
 }
 
 catch(e){
-  // myself = document.getElementById('currentUserId').value;
-  myself = 'sarthak26';
-}
+  myself = document.getElementById('currentUserId').value;
+  }
 
 // // THIS IS GLOBAL CHATSOCKET AVAILABLE EVERYWHERE THROUGH SERVER
         const chatSocket = new WebSocket(
@@ -20,9 +19,11 @@ catch(e){
           + 'path'
           + '/'
       );
+      console.log(chatSocket);
 // THIS FUNCTION RECEIVES DATA FROM consumers.py FILE AND PROCESSES ACCORDINGLY
       chatSocket.onmessage = function(e) {
           const data = JSON.parse(e.data);
+          console.log(data)
           if (data.action === 'add'){
             
               if (data.receiver === myself){

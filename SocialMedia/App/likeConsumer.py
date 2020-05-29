@@ -4,7 +4,7 @@ from channels.generic.websocket import WebsocketConsumer
 
 class likeConsumer(WebsocketConsumer):
     def connect(self):
-        print('req conf')
+        print('LikeConsumer')
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'chat_%s' % self.room_name
 
@@ -23,7 +23,6 @@ class likeConsumer(WebsocketConsumer):
         )
     # Receive message from WebSocket
     def receive(self, text_data):
-        print(text_data,'received')
         text_data_json = json.loads(text_data)
         postId = text_data_json['postId']
         postLikedOf = text_data_json['postLikedOf']
@@ -42,7 +41,6 @@ class likeConsumer(WebsocketConsumer):
 
 # Receive message from room group
     def chat_message(self, event):
-        print('sending data')
         postId = event['postId']
         postLikedOf = event['postLikedOf']
         postLikedBy = event['postLikedBy']
