@@ -5,7 +5,7 @@ from django.conf import settings
 from django.http import JsonResponse
 import random
 from django.core.mail import send_mail
-from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story,Album,Photos
+from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story,Album,Photos,Messages
 from django.contrib.auth.hashers import make_password,check_password
 import datetime
 import uuid
@@ -14,6 +14,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.db.models import Q
 from django.core import serializers
 from itertools import chain
+from django.urls import reverse
 
 def index(request):
 	if request.session.has_key('user'):
@@ -72,6 +73,7 @@ def signup(request):
 				accountSave.save()
 				# Creating Blank Frined List
 				AllFriends(userId=username).save()
+				messages.warning(request,'Account Created Successfully !!')
 				return HttpResponseRedirect('/')
 			
 		else:
@@ -145,64 +147,33 @@ def changepassword(request):
 
 @csrf_exempt
 def postlike(request):
-	Id = request.POST.get('postID')
-	likes = Likes.objects.get(postId=Id)
-	isLiked=True
-	count=0
-	for i in (likes.postLikedBy):
-		count=count+1
-		if(i==request.session['user']):
-			isLiked=False
-			
-	if isLiked:
-		if likes.postId==Id:
-			postLikedBy = request.session['user']
-			postLikedOf = "To be Written"
-			likes.postLikedBy.append(request.session['user'])
-			likeList=[]
-			likeList=likes.postLikedBy
-			Likes.objects.filter(postId=Id).update(postLikedBy=likeList)
-			return JsonResponse({'Result':(count+1),'color':"rgba(0, 150, 136,1)"})
-	else:
-		if likes.postId==Id:
-			postLikedBy = request.session['user']
-			postLikedOf = "To be Written"
-			likes.postLikedBy.remove(request.session['user'])
-			likeList=[]
-			likeList=likes.postLikedBy
-			Likes.objects.filter(postId=Id).update(postLikedBy=likeList)
-			return JsonResponse({'Result':(count-1),'color':"grey"})
+	postId = request.POST.get('postId')
+	postLikedOf = request.POST.get('postLikedOf')
+	postLiker = request.POST.get('postLikedBy')
 
-@csrf_exempt
-def automaticallylike(request):
-	userInfo = userRegistration.objects.get(userId=request.session['user'])
-	userData = UserPost.objects.filter(userId=request.session['user']).order_by('-date') # '-' for descending order
-	friends = AllFriends.objects.get(userId=request.session['user']).Friends
-	postList = []
-	def UserAllPost():
-		for item in userData:
-			yield item
-	def FriendPosts():
-		for item in friends:
-			t = UserPost.objects.filter(userId=item)
-			for i in t:
-				Id = i.postId
-				yield i
-	FriendPosts()
-	AllPost = chain(UserAllPost(), FriendPosts())
-	postsId = []
-	for item in AllPost:
-		postsId.append(item.postId)
-		postList.append(item)
-	postList.sort(key=lambda x: x.date,reverse = True)      #for reversed :  (reverse = True)
-		
-	like=[]
-	for i in postsId:
-		likes = Likes.objects.get(postId=i)
-		like.append(len(likes.postLikedBy))
-	date_now = datetime.datetime.now()
-	params = {'userData':postsId,"date_now":date_now,'like':like}
-	return JsonResponse(params)
+	likes = Likes.objects.get(postId=postId)
+	if postLiker in likes.postLikedBy: # Checking if friend has already liked 
+		likes.postLikedBy.remove(postLiker)
+		LikesList = likes.postLikedBy
+		Likes.objects.filter(postId=postId).update(postId=postId,postLikedBy=LikesList)
+		totalLikes = len(LikesList)
+
+		Notifications.objects.filter(postId=postId,notificationType='like',sender=postLiker).delete()
+		return JsonResponse({'Result':'Success','totalLikes':totalLikes,'message':'unliked'})
+
+	else:
+		likes.postLikedBy.append(postLiker)
+		LikesList = likes.postLikedBy
+		Likes.objects.filter(postId=postId).update(postId=postId,postLikedBy=LikesList)
+		totalLikes = len(LikesList)
+
+		if postLikedOf != postLiker:
+			postLikedByPerson = userRegistration.objects.get(userId=postLiker)
+			postLikedByPersonName = str(postLikedByPerson.firstName) + ' ' + str(postLikedByPerson.lastName)
+			notificationMessage = postLikedByPersonName + ' Liked your Post'
+			Notifications(postId=postId,notificationType='like',fullName=postLikedByPersonName,sender=postLiker,
+				receiver=postLikedOf,notification=notificationMessage,viewed=False).save()
+		return JsonResponse({'Result':'Success','totalLikes':totalLikes,'message':'liked'})
 
 def login(request):
 	if request.method == 'POST':
@@ -222,6 +193,8 @@ def login(request):
 			return render(request,'index.html')
 	else:
 		if request.session.has_key('user'):
+			return HttpResponseRedirect('/')
+		elif request.session.keys():
 			return HttpResponseRedirect('/')
 		else:
 			return render(request,'index.html')
@@ -247,7 +220,7 @@ def notifications(request):
 			picUrl = detail.profilePic
 			picsList1.append(picUrl.url)
 	
-	params = {'request':zip(fRequests,picsList),'notification':zip(notification,picsList1),'UserName':uname}
+	params = {'request':zip(fRequests,picsList),'notification':zip(notification,picsList1),'UserName':uname,'userProfile':request.session['user']}
 	return render(request,'Notifications.html',params)
 
 
@@ -280,6 +253,7 @@ def profile(request,user):
 	ActiveUserPic = ActiveUser.profilePic
 	profileId = user
 	profileDetail = userRegistration.objects.filter(userId=user)
+	userPic = userRegistration.objects.get(userId=request.session['user']).profilePic
 	
 	# checking if searched person is req receiver or sender
 	if Friend_Requests.objects.filter(receiver=profileId,sender=request.session['user']):
@@ -304,7 +278,8 @@ def profile(request,user):
 	request.session['Watchprofile'] = profileId
 	params = {'user':profileDetail,'currentUserId':request.session['user'],
 		'isFriend':isFriend,'isRequest':isRequest,'isRequested':isRequested,
-		'ActiveUserName':ActiveUserName,'ActiveUserPic':ActiveUserPic,'ActiveUser':ActiveUser.userName}
+		'ActiveUserName':ActiveUserName,'ActiveUserPic':ActiveUserPic,'ActiveUser':ActiveUser.userName,
+		'currentUserFullName':request.session['name'],'currentUserPic':userPic.url}
 	return render(request,'Profile.html',params)
 
 def Userprofile(request):
@@ -334,6 +309,7 @@ def userProfileInsert(request):
 def addfriend(request):
 	profileId = request.POST.get('profileId')
 	action = request.POST.get('action')
+	print(action)
 	request.session['friendProfile'] = profileId # USED IN NEXT FUNCTION FOR REQUEST CONFIRM
 
 	if action == 'add':
@@ -355,15 +331,26 @@ def addfriend(request):
 		friend1.Friends.remove(request.session['user'])
 		friendList1 = friend1.Friends
 		AllFriends.objects.filter(userId=profileId).update(userId=profileId,Friends=friendList1)
-
-		# Deleting Notifications 
+# Deleting Notifications 
 		Notifications.objects.filter(notificationType='friend',sender=request.session['user'],receiver=profileId).delete()
 		Notifications.objects.filter(notificationType='friend',sender=profileId,receiver=request.session['user']).delete()
-
 		return JsonResponse({"Result":"Successfully Removed"})
-	
+
 	elif action == 'confirm':
+		print('views conf')
 		return HttpResponseRedirect('/requestConfirm')
+	
+	elif action == 'changeRequestHTML':
+		return JsonResponse({"Result":"Successfully Removed"})
+
+	elif action == 'changeNotificationHTML':
+		senderDetail = userRegistration.objects.get(userId=profileId)
+		senderName = str(senderDetail.firstName) + ' ' + str(senderDetail.lastName)
+		senderPic = str(senderDetail.profilePic.url)
+		return JsonResponse({"Result":"Successfully Removed","name":senderName,"pic":senderPic})
+	
+	elif action == 'changeDashboardHTML':
+		return JsonResponse({"Result":"Successfully Removed"})	
 	else:
 		return JsonResponse({'Result':'Nothing Done'})
 
@@ -405,12 +392,14 @@ def requestConfirm(request):
 
 		senderName = Friend_Requests.objects.get(sender=friendId).senderName
 	notify = request.session['name'] + ' accepted your Friend Request.'
+
 	Notifications(notificationType='friend',sender=myId,receiver=friendId,fullName=request.session['name'],
 	notification=notify,viewed=False).save()
 
 	Friend_Requests.objects.filter(sender=friendId,receiver=myId).delete()
+	senderPic = userRegistration.objects.get(userId=myId).profilePic
+	return JsonResponse({'Result':'Succuss','name':senderName,'receiver':friendId,'senderPic':senderPic.url})
 
-	return JsonResponse({'Result':'Succuss','name':senderName})
 
 @csrf_exempt
 def search(request):
@@ -451,9 +440,12 @@ def logout(request):
 
 def test(request):
 	# del request.session['user']
-	img = '/media/cover.jpg'
-	i = img.url
-	return render(request,'MyFriends.html',{'img':''})
+	#Likes(postId = 'cd2d8468aa37496899616e746f30be4b').save()
+	myId = 'shubham31'
+	friendId = 'danishcool'
+	AllFriends(userId=myId).save()
+	AllFriends(userId=friendId).save()
+	return render(request,'test.html')
 
 def userCoverInsert(request):
 	if request.method == "POST":
@@ -486,7 +478,7 @@ def outgoingRequest(request):
 		reciverId=[]
 		
 		for e in liveResult:
-			reciverId.append(e.receiverId)
+			reciverId.append(e.receiver)
 		return JsonResponse({"reciverId":reciverId})
 
 @csrf_exempt
@@ -498,7 +490,7 @@ def incomingRequest(request):
 		
 		for e in liveResult:
 			senderName.append(e.senderName)
-			senderId.append(e.senderId)
+			senderId.append(e.sender)
 		
 		return JsonResponse({"senderName":senderName,"senderId":senderId})
 
@@ -589,11 +581,8 @@ def forgetPassword(request):
 
 @csrf_exempt
 def forgetPasswordOTP(request):
-	print("okkkkk")
 	Email=request.POST.get("Email",'DefaultValue')
-	print(request.method)
 	if request.method == "POST" and Email!="DefaultValue" and Email!="":
-		print("okkkkk")
 		RandomValue=random.randint(1001,99999)
 		RandomValue="LetsChat"+str(RandomValue)
 		print(RandomValue)
@@ -632,10 +621,44 @@ def changeForgetPasword(request):
 			print("SuccessFully")
 			del request.session['forgetOtp']
 			userRegistration.objects.filter(emailAddress=Email).update(password=make_password(fPassword))
-			print(Email)
 			return JsonResponse({"Status":"Successfully"})
 		else:
 			print("UnSuccessFully")
 			return JsonResponse({"Status":"UnSuccessfully"})
 	else:
 		return HttpResponseRedirect("/")
+
+def messages(request):
+	if request.session.has_key('user'):
+		friendList = []
+		friends = AllFriends.objects.get(userId=request.session['user']).Friends
+		
+		for friend in friends:
+			friendData = userRegistration.objects.filter(userId=friend)
+			friendList.append(friendData)
+			print(friendData)
+
+		myData = userRegistration.objects.get(userId=request.session['user'])
+		params = {'friendList':friendList,'myData':myData}
+		return render(request,'chat.html',params)
+
+@csrf_exempt
+def getUsers(request):
+	Id = request.POST.get('inboxId')
+	users = Messages.objects.get(inboxId=Id).Users
+	return JsonResponse({'users':users,'loggedUser':request.session['user']})
+
+def inbox(request,user):
+	myId = request.session['user']
+	friendId = user
+	allMessages = Messages.objects.filter(Users=[myId,friendId]) | Messages.objects.filter(Users=[friendId,myId])
+	
+	if allMessages:
+		for msg in allMessages:
+			inboxId = msg.inboxId
+	else:
+		inboxId = uuid.uuid4().hex
+		
+	myData = userRegistration.objects.get(userId=request.session['user'])
+	friendData = userRegistration.objects.get(userId = user)
+	return render(request,'chat.html',{"flag":True,"friendData":friendData,'inboxId':inboxId,'myData':myData})

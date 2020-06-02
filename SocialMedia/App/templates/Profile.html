@@ -39,14 +39,20 @@
 <!--Main Body-->
 <div>
 {% for data in user %}
-    <input type="hidden" id="profile" name="profileId" value="{{data.userName}}">
+  <input type="hidden" id="profile" name="profileId" value="{{data.userName}}">
+    <!-- logged user details -->
+  <input type="hidden" id="currentUserFullName" name="currentUserFullName" value="{{currentUserFullName}}">
+  <input type="hidden" id="currentUserPic" name="currentUserPic" value="{{currentUserPic}}">
+  <input type="hidden" id="currentUserId" name="currentUserId" value="{{currentUserId}}">
+  <!--  -->
+
 
     <div class="container jumbotron">
         <div class="fb-profile">
             <img align="left" class="fb-image-lg" src="{{data.coverPic.url}}" alt="Profile image example" />
             <img align="left" class="fb-image-profile thumbnail" src="{{data.profilePic.url}}" alt="Profile image example" id="avtar" style="border:6px solid rgba(0, 150, 136, 0.8)";/>
             <div class="fb-profile-text">
-                <h2 hidden id="currentUserId">{{currentUserId}}</h2>
+                <h2 hidden id="">{{currentUserId}}</h2>
                 <button type="button" class="btn btn-primary btn-lg pull-right" data-toggle="modal" data-target="#myModal" style="display:none;" id="EditProfileButton">
                   Edit Profile
                 </button>

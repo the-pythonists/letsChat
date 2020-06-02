@@ -2,30 +2,24 @@
 <html>
 <head>
   <title></title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <meta charset="utf-8">
+   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://kit.fontawesome.com/b99e675b6e.js"></script> 
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css" />
   {%load static%}
-<link rel="StyleSheet" type="text/css" href="{%static 'css/album.css'%}">
+<link rel="stylesheet" type="text/css" href="{%static 'css/album.css'%}">
+  
 </head>
 <body>
-
+<div class="container-fluid">
 <header>
-  <h4 id="brand">LetsChat</h4>
+      <h3 id="brand">LetsChat</h3>
 </header>
-
+<br><br><br><br>
 <!-- Page Content -->
 
-
-<br><br><br><br>
-
-<!-- Add New Album
-<form action="/album/" method="POST">{% csrf_token %}
-  <input type="text" name="album" placeholder="Enter Album Name">
-  <input type="submit" value="Add Album">
-</form> -->
 
 <div class="tab">
   <button class="tablinks" onclick="openCity(event, 'profle')">Profile</button>
@@ -39,36 +33,40 @@
 
 <div id="profle" class="tabcontent" style="display:block;">
   {{img.post.url}}
-  <div class="container gallerys">
+  <div  class="container gallerys">
 
-
-
-    {% for img in profilePhotos %}
-    {% if img.Image != 'media/profile.jpeg' %}
-    <a href="{{img.Image.url}}" target="_blank">
-    <img src="{{img.Image.url}}" class="img-fluid">
-    </a>
-    {% endif %}
-  {% endfor %}
-    
-
-</div>
+      <div class="row">  
+            {% for img in profilePhotos %}
+            {% if img.Image != 'media/profile.jpeg' %}
+            <div class="col-lg-3 col-md-4 col-sm-6 col-12">
+              <a href="{{img.Image.url}}" target="_blank">
+              <img src="{{img.Image.url}}" class="img-fluid col-centered">
+              </a>
+            </div>
+            {% endif %}
+            {% endfor %}
+      </div>
 <!-- /.container -->
+</div>
 </div>
 
 <div id="cover" class="tabcontent">
   <h3>cover</h3>
+  <div  class="container gallerys">
+    <div class="row">  
   {% for img in coverPhotos %}
+  <div class="col-lg-3 col-md-4 col-sm-6 col-12"></div>
     <a href="{{img.Image.url}}" target="_blank">
-    <img src="{{img.Image.url}}" class="img-fluid">
+    <img src="{{img.Image.url}}" class="img-fluid col-centered">
     </a>
-
+  </div>
   {% endfor %}
-  
+</div>
+</div>
 </div>
 
 <div id="post" class="tabcontent">
-  <h3>Posts</h3>
+  <h3>post</h3>
   {% for img in photos %}
     {% if img.post %}
     <a href="{{img.post.url}}" target="_blank">
@@ -76,7 +74,6 @@
     </a>
     {% endif %}
   {% endfor %}
-  
 </div>
 
 <div id="newalbum" class="tabcontent">
@@ -88,8 +85,7 @@
     
 </div>
 
-
-
+</div>
 </body>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>

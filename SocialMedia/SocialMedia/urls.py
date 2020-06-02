@@ -50,11 +50,14 @@ urlpatterns = [
     path("userProfileInsert/",views.userProfileInsert,name="userProfileInsert"),#User Profile Store
     path("myfriends/",views.myfriends,name="myfriends"), #User All Friends
     path("myFriendsProcess/",views.myFriendsProcess,name="myFriendsProcess"), #User All Friends Process
-    path("automaticallylike/",views.automaticallylike,name="automaticallylike"), #Automatically Check the Like Count
+    #path("automaticallylike/",views.automaticallylike,name="automaticallylike"), #Automatically Check the Like Count
     path("forgetPassword/",views.forgetPassword,name="forgetPassword"), #Forget Password
     path("forgetPasswordProcess/",views.forgetPasswordProcess,name="forgetPasswordProcess"), #Forget Password Process
     path("forgetPasswordOTP/",views.forgetPasswordOTP,name="forgetPasswordOTP"), #Forget Password OTP
     path("changeForgetPasword/",views.changeForgetPasword,name="changeForgetPasword"), #Forget change Forget Pasword Password OTP
+    path("messages/",views.messages,name="messages"),
+    path("getUsers/",views.getUsers,name="getUsers"),
+    path("messages/<str:user>/",views.inbox,name="inbox"),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

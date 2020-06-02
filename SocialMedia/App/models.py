@@ -39,6 +39,7 @@ class Friend_Requests(models.Model):
 
 class AllFriends(models.Model):
     userId = models.CharField(max_length=50)
+    inboxId = models.CharField(max_length=50,default='',blank=True)
     Friends = ListCharField(
         base_field=models.CharField(max_length=50,blank=True),
         max_length=(100 * 100)
@@ -48,6 +49,7 @@ class AllFriends(models.Model):
         return self.userId
 
 class Notifications(models.Model):
+    postId = models.CharField(max_length=50,blank=True,default='')
     notificationType = models.CharField(max_length=50,default='',blank=True)    # 'friend' for Friend Request 'like' for Like 'comment' for Comment and so on
     fullName = models.CharField(max_length=55, blank=True)
     sender = models.CharField(max_length=55, blank=True)
@@ -90,29 +92,30 @@ class Photos(models.Model):
     Image = models.ImageField(upload_to='media',blank=True)
     date = models.DateTimeField(default=datetime.now, blank=True)
 
+
 class Likes(models.Model):
-    postId = models.CharField(max_length=100)
-    postLikes = models.IntegerField(default=0)
+    postId = models.CharField(max_length=100,default='',blank=True)
+    postLikes = models.IntegerField(default=0,blank=True)
     postLikedBy = ListCharField(
-        base_field=models.CharField(max_length=50),
+        base_field=models.CharField(max_length=50,default='',blank=True),
         max_length=(100 * 100)
     )
-    postLikedOf = models.CharField(max_length=50,default='')
+    postLikedOf = models.CharField(max_length=50,default='',blank=True)
 
     def __str__(self):
         return self.postId
 
-
-
-# class AllFriends(models.Model):
-#     FriendID = models.CharField(max_length=50,default='',blank=True,null=True)
-
-#     def __str__(self):
-#         return self.FriendID
-
-# class FriendList(models.Model):
-#     loggedUser = models.CharField(max_length=100,default='')
-#     Friends = models.ManyToManyField(AllFriends,default='',blank=True,null=True)
-
-#     def __str__(self):
-#         return self.loggedUser
+class Messages(models.Model):
+    inboxId = models.CharField(max_length=50,default='',blank=True)
+    Users = ListCharField(
+        base_field=models.CharField(max_length=50,default='',blank=True),
+        max_length=(100 * 100)
+    )
+    MessageID = models.CharField(max_length=500,default='',blank=True)
+    sender = models.CharField(max_length=500,default='',blank=True)
+    receiver = models.CharField(max_length=500,default='',blank=True)
+    is_read = models.BooleanField(default=False,blank=True)
+    Message = models.CharField(max_length=500,default='',blank=True)
+    date = models.DateField(default=datetime.now,blank=True)
+    def __str__(self):
+        return self.inboxId

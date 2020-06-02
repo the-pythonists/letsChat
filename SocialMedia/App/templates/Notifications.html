@@ -14,6 +14,11 @@
 	<h2 id="brand">LetsChat</h2>
 </header>
 <br><br><br><br>
+
+  <input type="hidden" value="{{userProfile}}" id="profile">
+  <input type="hidden" value="{{userProfile}}" id="currentUserId">
+  <input type="hidden" value="Add Friend" id="addbtn">
+
 <div class="container">
 <h4><strong id="pageTitle">Notifications</strong></h4>
 <section id="wrapper">
@@ -30,12 +35,12 @@
   <h3>Friend Requests</h3>
 
   <div class="notificationSect">
+      <span class="NotificationNotes" id="NotificationNotes"></span> <p >
     {% for data,data2 in request %}
-    {{data}}
     <input type="hidden" id="profile" name="profileId" value="{{data.userName}}">
     <div id="{{data.sender}}">
-      <p ><img src="{{data2}}" class="profilePic">
-      <span class="NotificationNotes"><b>{{data.senderName}}</b> Sent you Friend Request</span></p>
+     <img src="{{data2}}" class="profilePic">
+      </p>
       <div style="margin-left: 8%; margin-top: -20px;">
       <input type="button" onclick="addrequest('{{data.sender}}');" name="" value="Confirm" id="add">
           <input type="button" onclick="addrequest();" name="" value="Ignore" id="ignore">
@@ -62,7 +67,6 @@
 <div id="All" class="tabcontent">
   <h3>All</h3>
   <div class="notificationSect">
-    {{UserName}}
     {% for data3,data4 in notification %}
     <!-- {{data2}} -->
     <div id="{{data.sender}}">
@@ -71,18 +75,13 @@
         <button class="btn btn-primary">
           {{data3.notification}}
         </button>
-      <!-- <span class="NotificationNotes"><b></b></span></p> -->
       </a>
       <div style="margin-left: 8%; margin-top: -20px;">
       </div>
         <hr>
     </div>
-    <!-- <div id="{{data.senderId}}">
-      You and {{data.senderName}} are now Friends.
-    </div> -->
     {% endfor %}
-  	<!-- <p ><img src="{%static 'images/Logo.png'%}" class="profilePic"> -->
-  	<!-- <span class="NotificationNotes">x and y person likesyour post</span></p><hr> -->
+  	
   </div>
 </div>
 
