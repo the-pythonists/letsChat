@@ -51,7 +51,10 @@ urlpatterns = [
     # path("Userprofile/",views.Userprofile,name="Userprofile"),#User Profile
     path("userProfileInsert/",views.userProfileInsert,name="userProfileInsert"),#User Profile Store
     path("userIntroInsert/",views.userIntroInsert,name="userIntroInsert"),#Intro Insert
-
+    path("messages/",views.messages,name="messages"),
+    path("getUsers/",views.getUsers,name="getUsers"),
+    path("messages/<str:user>/",views.inbox,name="inbox"),
+        
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

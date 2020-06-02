@@ -1,0 +1,223 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Responsive Sidebar Menu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="{%static 'css/chat.css'%}">	
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" type="text/css" rel="stylesheet">
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script>
+    	$(document).ready(function(){
+    		$(".hamburger .fas").click(function(){
+		    	$(".wrapper").addClass("active")
+			})
+
+			$(".wrapper .sidebar .close").click(function(){
+		    	$(".wrapper").removeClass("active")
+			})
+    	})
+    </script>
+</head>
+<body>
+
+<div class="container-fluid">
+<div class="wrapper" style=" "style=" ">
+    <div class="sidebar" style=" ">
+      <div class="bg_shadow" style=" "></div>
+        <div class="sidebar__inner" style=" overflow-y:auto;
+    overflow-x:hidden;">
+           <div class="close" >
+          <i class="fas fa-times"></i>
+        </div>
+        
+        <ul class="siderbar_menu" style=" overflow-y:auto;
+    overflow-x:hidden;margin-bottom:15%;">
+          <h4 class="sidebar_Heading">Chats</h4>
+          <input type="text" name="friend" placeholder="My friend" id="myFriend_Search">
+
+          <input type="hidden" id="inboxId" value="{{inboxId}}">
+
+          <input type="hidden" name="loggedUser" id="loggedUser" value="{{myData.userId}}">
+          <input type="hidden" name="loggedUserFullName" id="loggedUserFullName" value="{{myData.firstName}} {{myData.lastName}}">
+          <input type="hidden" name="loggedUserPic" id="loggedUserPic" value="{{myData.profilePic.url}}">
+          <input type="hidden" id="friend" value="{{friendData.userId}}">
+          {% for query in friendList %}
+          {% for friend in query %}
+          <hr>
+          <li class="this_Friend"><img src="{{friend.profilePic.url}}" class="onlineUserImage" onclick="chooseChat('{{friend.userId}}')"><a href="{{friend.userId}}/" class="onlineUserName">{{friend}}</a>
+          
+            <span class=" "><i class="fas fa-dot-circle "></i></span>
+          </li>
+          {% endfor %}
+          {% endfor %}
+          <hr>
+          
+        </ul>
+      </div>
+    </div>
+    <div class="main_container">
+
+    <header>
+      <h3 id="brand">LetsChat</h3>
+
+       <div class="hamburger">
+              <div class="hamburger__inner">
+                  <i class="fas fa-bars" style="position:fixed;top:25px;right:3%;color:rgba(0, 150, 136, 1); " ></i>  
+              </div>  
+          </div>
+    </header>
+
+      
+      
+      
+    </div>
+
+    
+</div>
+	
+<br><br><br><br>
+<div class="container ">
+
+  <div class="all_Friends">
+   
+      <div class="details_Div">
+      
+      <!--part-->
+      <div class="outer_ChatPerson">
+        <div class="chat_Person" >
+          <div class="person_Data">
+
+            <h6 class="chat_PersonName" data-toggle="modal" data-target="#myModal"><img src="{{friendData.profilePic.url}}" class="chat_PersonPic" >
+            {{friendData}}</h6>  
+          </div>
+          
+        </div>
+      </div>
+      <br><br><br><br><br>
+      <!--end Part-->
+      
+      
+      
+      
+      <!--Sender Terminal-->
+    <div class="peopleChat">
+      <div class="wrapperClassBlock"></div>
+
+
+      <!-- <p class="sender"><img src="" class="personProfilePicture"><strong class="ml-2">jhsfdgf</strong><br><span class="ml-5">kjhjknkmdfnjkfhnjkfhnkfghkghsjkd</span><span class="float-right">75675</span></p><br>
+      <p class="reciver"><img src="" class="personProfilePicture"><strong class="ml-2">jhsfdgf</strong><br><span class="ml-5">kjhjknkmdfnjkfhnjkfhnkfghkghsjkd</span><span class="float-right">75675</span></p><br>
+      <p class="sender"><img src="" class="personProfilePicture"><strong class="ml-2">jhsfdgf</strong><br><span class="ml-5">kjhjknkmdfnjkfhnjkfhnkfghkghsjkd</span><span class="float-right">75675</span></p><br>
+      <p class="reciver"><img src="" class="personProfilePicture"><strong class="ml-2">jhsfdgf</strong><br><span class="ml-5">kjhjknkmdfnjkfhnjkfhnkfghkghsjkd</span><span class="float-right">75675</span></p><br> -->
+    <!-- <p class="sender">
+      
+      <strong id="Chatform">You</strong><br>
+      <span>Hii Friends good Morning.</span>
+      <br><span style="color:grey;">11:01 AM | June 9</span>
+    </p> -->
+      <!--Reciver Terminal-->
+    <!-- <p class="reciver">
+      
+      <span></span>
+      <br><span style="color:grey;">11:01 AM | June 9</span>
+    </p> -->
+
+    <!-- <p class="sender">
+      <strong>You</strong><br>
+      <br><span style="color:grey;">Hii Friends good Morning.</span>
+
+    </p>
+      <!--Reciver Terminal
+    <p class="reciver">
+      <strong>sarthak JAIN</strong><br>
+      <span></span>
+      <span style="color:grey;">11:01 AM | June 9</span>
+    </p> -->
+
+  </div>
+      </div>
+
+    <!--Typed Message Here-->
+    <!-- <form id="Chatform" >
+      {% csrf_token %}-->
+    <input type="hidden" name="username" value="{{myData.userId}}"  id="chat-log"> 
+   <div class="type_msg">
+            <div class="input_msg_write">
+              <input type="text" class="form-control write_msg" id="message" name="message" placeholder="Type a message" style="resize:none;">
+              
+              <button class="msg_send_btn" id="Chatform" ><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
+            </div>
+  </div>
+  <!-- </form> -->
+
+  </div>
+
+  
+
+
+</div>
+
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog modal-sm">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title"><img src="{{friendData.profilePic.url}}" id="modelProfile"></h4>{{friendData}}
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        
+      </div>
+      <div class="modal-body">
+        <p style="color:#00a087;">About and phone number</p>
+        <div>
+          <p>Quote here</p>
+          <hr>
+          <p>{{friendData.mobile}}</p>
+        </div>
+       
+        <hr>
+        
+        <button class="btn" style="border:1px solid #00a087;color:#00a087;">Block</button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+{% if flag %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript" src="{%static 'js/TwoWaychat.js'%}"></script>
+{% endif %}
+</body>
+</html>

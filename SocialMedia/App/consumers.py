@@ -2,7 +2,7 @@ import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
-class ChatConsumer(WebsocketConsumer):
+class RequestConsumer(WebsocketConsumer):
     def connect(self):
         print('helooooooooo')
         self.room_name = self.scope['url_route']['kwargs']['room_name']

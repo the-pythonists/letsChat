@@ -39,6 +39,7 @@ class Friend_Requests(models.Model):
 
 class AllFriends(models.Model):
     userId = models.CharField(max_length=50)
+    inboxId = models.CharField(max_length=50,default='',blank=True)
     Friends = ListCharField(
         base_field=models.CharField(max_length=50,blank=True),
         max_length=(100 * 100)
@@ -104,17 +105,17 @@ class Likes(models.Model):
     def __str__(self):
         return self.postId
 
-
-
-# class AllFriends(models.Model):
-#     FriendID = models.CharField(max_length=50,default='',blank=True,null=True)
-
-#     def __str__(self):
-#         return self.FriendID
-
-# class FriendList(models.Model):
-#     loggedUser = models.CharField(max_length=100,default='')
-#     Friends = models.ManyToManyField(AllFriends,default='',blank=True,null=True)
-
-#     def __str__(self):
-#         return self.loggedUser
+class Messages(models.Model):
+    inboxId = models.CharField(max_length=50,default='',blank=True)
+    Users = ListCharField(
+        base_field=models.CharField(max_length=50,default='',blank=True),
+        max_length=(100 * 100)
+    )
+    MessageID = models.CharField(max_length=500,default='',blank=True)
+    sender = models.CharField(max_length=500,default='',blank=True)
+    receiver = models.CharField(max_length=500,default='',blank=True)
+    is_read = models.BooleanField(default=False,blank=True)
+    Message = models.CharField(max_length=500,default='',blank=True)
+    date = models.DateField(default=datetime.now,blank=True)
+    def __str__(self):
+        return self.inboxId

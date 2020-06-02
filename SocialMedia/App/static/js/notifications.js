@@ -26,13 +26,13 @@ function addrequest(Id){
       },
       success:function(e){
         name = e['name']
-        console.log(userProfile)
+        // console.log(userProfile)
         receiver = e['receiver']
         senderPic = e['senderPic']
         
         document.getElementById("user"+Id).innerHTML = "<b> " + name + "</b> <br><span style='margin-left:30px;'><span class='ml-5'>Request Accepted</span></span>";
         console.log('calling fun');
-        confirmNotification(sender,receiver,name,senderPic);
+        requestConfirmNotification(sender,receiver);    // not working
       },
       error:function(data){
         console.log('Failed');
@@ -44,7 +44,7 @@ function addrequest(Id){
   const chatSocket1 = new WebSocket(
     'ws://'
     + window.location.host
-    + '/ws/chat/'
+    + '/ws/request/'
     + 'confirmPath'
     + '/'
   );
@@ -54,11 +54,6 @@ console.log('called');
 
  // THIS IS GLOBAL CHATSOCKET FOR REQUEST CONFIRM NOTIFICATION AVAILABLE EVERYWHERE THROUGH SERVER
 
-// console.log('sendng data');
-// console.log(sender);
-// console.log(receiver);
-// console.log(name);
-// console.log(senderPic);
 chatSocket1.send(JSON.stringify({
   'action':'add',
   'sender': sender,

@@ -6,7 +6,7 @@ from django.http import JsonResponse
 import random
 from django.core.mail import send_mail
 from django.core.mail import send_mail
-from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story,Album,Photos
+from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story,Album,Photos,Messages
 from django.contrib.auth.hashers import make_password,check_password
 import datetime
 import uuid,json
@@ -14,6 +14,8 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.db.models import Q
 from django.core import serializers
 from itertools import chain
+from django.urls import reverse
+from django_pandas.io import read_frame
 
 def index(request):
 	if request.session.has_key('user'):
@@ -426,9 +428,9 @@ def requestConfirm(request):
 		# myId = 'mohammad.danish2694@gmail.com'
 		# friendId = 'sj27754@gmail.com'
 		# action = 1
-
 		friendId = request.session['friendProfile'] # GETTING VALUE FROM PREVIOUS FUNCTION ADD FRIEND
 		myId = request.session['user']
+		
 		action = 'add'
 	if action == 'add':
 		# Friend Add in Logged user List
@@ -449,7 +451,6 @@ def requestConfirm(request):
 			friendNewList = friendList.Friends
 			AllFriends.objects.filter(userId=friendId).update(userId=friendId,Friends=friendNewList)
 		
-
 		senderName = Friend_Requests.objects.get(sender=friendId).senderName
 	notify = request.session['name'] + ' accepted your Friend Request.'
 
@@ -518,8 +519,9 @@ def userCoverInsert(request):
 		return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
 
 def test(request):
-	myId = 'danish26'
-	friendId = 'shubham31'
+	userId = 'danish26'
+	Friend = 'shubham31'
+	Messages
 	# AllFriends(userId=myId).save()
 	# AllFriends(userId=friendId).save()
 	# Album(id=3).save()
@@ -573,3 +575,41 @@ def changepassword(request):
 				return HttpResponse('pasword not match')
 	else:
 		return render(request,'changepwd.html')
+
+def messages(request):
+	if request.session.has_key('user'):
+		friendList = []
+		friends = AllFriends.objects.get(userId=request.session['user']).Friends
+		
+		for friend in friends:
+			friendData = userRegistration.objects.filter(userId=friend)
+			friendList.append(friendData)
+			print(friendData)
+
+		myData = userRegistration.objects.get(userId=request.session['user'])
+		params = {'friendList':friendList,'myData':myData}
+		return render(request,'chat.html',params)
+
+@csrf_exempt
+def getUsers(request):
+	Id = request.POST.get('inboxId')
+	users = Messages.objects.get(inboxId=Id).Users
+	return JsonResponse({'users':users,'loggedUser':request.session['user']})
+
+def inbox(request,user):
+	myId = request.session['user']
+	friendId = user
+	allMessages = Messages.objects.filter(Users=[myId,friendId]) | Messages.objects.filter(Users=[friendId,myId])
+	
+	if allMessages:
+		for msg in allMessages:
+			inboxId = msg.inboxId
+	else:
+		inboxId = uuid.uuid4().hex
+		
+	myData = userRegistration.objects.get(userId=request.session['user'])
+	friendData = userRegistration.objects.get(userId = user)
+	return render(request,'chat.html',{"flag":True,"friendData":friendData,'inboxId':inboxId,'myData':myData})
+
+
+	

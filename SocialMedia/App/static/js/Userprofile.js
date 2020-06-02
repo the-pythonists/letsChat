@@ -177,15 +177,9 @@ function request(action,user1,user2){
         }
     })
     }
-      
         
-        
-    }
+  }
 
-
-
-
-//
 document.getElementById("introAlertMessage").style.display="none";
     function introSubmission(){
         
