@@ -116,6 +116,16 @@ class Messages(models.Model):
     receiver = models.CharField(max_length=500,default='',blank=True)
     is_read = models.BooleanField(default=False,blank=True)
     Message = models.CharField(max_length=500,default='',blank=True)
-    date = models.DateField(default=datetime.now,blank=True)
+    date = models.DateTimeField(default=datetime.now,blank=True)
     def __str__(self):
         return self.inboxId
+
+class TempRoom(models.Model):
+    RoomId = models.CharField(max_length=50,default='',blank=True)
+    Users = ListCharField(
+        base_field=models.CharField(max_length=50,default='',blank=True),
+        max_length=(100 * 100)
+    )
+
+    def __str__(self):
+        return self.RoomId

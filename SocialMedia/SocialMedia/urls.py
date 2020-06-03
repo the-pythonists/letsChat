@@ -52,7 +52,7 @@ urlpatterns = [
     path("userProfileInsert/",views.userProfileInsert,name="userProfileInsert"),#User Profile Store
     path("userIntroInsert/",views.userIntroInsert,name="userIntroInsert"),#Intro Insert
     path("messages/",views.messages,name="messages"),
-    path("getUsers/",views.getUsers,name="getUsers"),
+    path("saveMessage/",views.saveMessage,name="saveMessage"),
     path("messages/<str:user>/",views.inbox,name="inbox"),
         
 ]

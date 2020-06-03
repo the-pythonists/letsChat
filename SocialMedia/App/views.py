@@ -6,7 +6,7 @@ from django.http import JsonResponse
 import random
 from django.core.mail import send_mail
 from django.core.mail import send_mail
-from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story,Album,Photos,Messages
+from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story,Album,Photos,Messages,TempRoom
 from django.contrib.auth.hashers import make_password,check_password
 import datetime
 import uuid,json
@@ -576,6 +576,17 @@ def changepassword(request):
 	else:
 		return render(request,'changepwd.html')
 
+def friends(request):
+	friendList = []
+	friends = AllFriends.objects.get(userId=request.session['user']).Friends
+	
+	for friend in friends:
+		friendData = userRegistration.objects.filter(userId=friend)
+		friendList.append(friendData)
+		print(friendData)
+	return friendList
+
+
 def messages(request):
 	if request.session.has_key('user'):
 		friendList = []
@@ -590,12 +601,6 @@ def messages(request):
 		params = {'friendList':friendList,'myData':myData}
 		return render(request,'chat.html',params)
 
-@csrf_exempt
-def getUsers(request):
-	Id = request.POST.get('inboxId')
-	users = Messages.objects.get(inboxId=Id).Users
-	return JsonResponse({'users':users,'loggedUser':request.session['user']})
-
 def inbox(request,user):
 	myId = request.session['user']
 	friendId = user
@@ -603,13 +608,29 @@ def inbox(request,user):
 	
 	if allMessages:
 		for msg in allMessages:
+			print(msg)
 			inboxId = msg.inboxId
+	
 	else:
 		inboxId = uuid.uuid4().hex
-		
+		Messages(inboxId=inboxId,Users=[myId,friendId]).save()
 	myData = userRegistration.objects.get(userId=request.session['user'])
 	friendData = userRegistration.objects.get(userId = user)
-	return render(request,'chat.html',{"flag":True,"friendData":friendData,'inboxId':inboxId,'myData':myData})
+	return render(request,'chat.html',{"flag":True,"friendData":friendData,'inboxId':inboxId,
+		'myData':myData,'allMessages':allMessages,'friendList':friends(request)})
 
+@csrf_exempt
+def saveMessage(request):
+	inboxId = request.POST.get('inboxId')
+	user1 = request.POST.get('user1')
+	user2 = request.POST.get('user2')
+	messageid = uuid.uuid4()
+	sender = request.POST.get('sender')
+	receiver = request.POST.get('receiver')
+	message = request.POST.get('Message')
+	print([user1,user2],'user')
+	Messages(inboxId=inboxId,Users=[user1,user2],MessageID=messageid,sender=sender,
+	receiver=receiver,is_read=False,Message=message).save()
+	return JsonResponse({'Result':'Success'})
 
 	

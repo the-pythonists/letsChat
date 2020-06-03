@@ -52,7 +52,7 @@
           {% for query in friendList %}
           {% for friend in query %}
           <hr>
-          <li class="this_Friend"><img src="{{friend.profilePic.url}}" class="onlineUserImage" onclick="chooseChat('{{friend.userId}}')"><a href="{{friend.userId}}/" class="onlineUserName">{{friend}}</a>
+          <li class="this_Friend"><img src="{{friend.profilePic.url}}" class="onlineUserImage" onclick="chooseChat('{{friend.userId}}')"><a href="/messages/{{friend.userId}}/" class="onlineUserName">{{friend}}</a>
           
             <span class=" "><i class="fas fa-dot-circle "></i></span>
           </li>
@@ -109,13 +109,20 @@
       
       <!--Sender Terminal-->
     <div class="peopleChat">
+      
+
+      {% for msg in allMessages %}
+      {% if msg.sender %}
+      {% if msg.sender == myData.userId %}
+      <p class="sender"><a href="/profile/{{myData.userId}}" style="color:rgba(0, 150, 136, 1); text-decoration:none;"><img src="{{myData.profilePic.url}}" class="personProfilePicture"><strong class="ml-2">You</a></strong><br>
+        {% else %}
+      <p class="reciver"><a href="/profile/{{friendData.userId}}" style="color:#000000; text-decoration:none;"><img src="{{friendData.profilePic.url}}" class="personProfilePicture"><strong class="ml-2">{{friendData.firstName}} {{friendData.lastName}}</a></strong><br>
+      {% endif %}
+      <span class="ml-5">{{msg.Message}}</span><span class="float-right">{{msg.date|time}}</span></p><br>
+     
+      {% endif %}
+      {% endfor %}
       <div class="wrapperClassBlock"></div>
-
-
-      <!-- <p class="sender"><img src="" class="personProfilePicture"><strong class="ml-2">jhsfdgf</strong><br><span class="ml-5">kjhjknkmdfnjkfhnjkfhnkfghkghsjkd</span><span class="float-right">75675</span></p><br>
-      <p class="reciver"><img src="" class="personProfilePicture"><strong class="ml-2">jhsfdgf</strong><br><span class="ml-5">kjhjknkmdfnjkfhnjkfhnkfghkghsjkd</span><span class="float-right">75675</span></p><br>
-      <p class="sender"><img src="" class="personProfilePicture"><strong class="ml-2">jhsfdgf</strong><br><span class="ml-5">kjhjknkmdfnjkfhnjkfhnkfghkghsjkd</span><span class="float-right">75675</span></p><br>
-      <p class="reciver"><img src="" class="personProfilePicture"><strong class="ml-2">jhsfdgf</strong><br><span class="ml-5">kjhjknkmdfnjkfhnjkfhnkfghkghsjkd</span><span class="float-right">75675</span></p><br> -->
     <!-- <p class="sender">
       
       <strong id="Chatform">You</strong><br>

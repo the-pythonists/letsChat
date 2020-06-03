@@ -1,6 +1,7 @@
 
 var roomId = document.getElementById('inboxId').value ; 
-console.log(roomId)
+
+// console.log(roomId)
 
 friend = document.getElementById('friend').value;
 myself = document.getElementById('loggedUser').value;
@@ -33,9 +34,10 @@ function websocket_message_show(e){
 	var today = new Date();
 	var time = today.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
 	
-	message_data = JSON.parse(e.data);
-
+	var message_data = JSON.parse(e.data);
+	console.log(message_data.message)
 	if(message_data.sender==myself && message_data.receiver==friend){
+		message_save(message_data.message);
 	coding ='<p class="sender"><img src="'+message_data.loggedUserPic+'" class="personProfilePicture"><strong class="ml-2">'+message_data.loggedUserFullName+'</strong><br><span class="ml-5">'+message_data.message+'</span><span class="float-right">'+time+'</span></p><br>';
 	}
 	else if (message_data.sender==friend && message_data.receiver==myself){
@@ -46,4 +48,24 @@ function websocket_message_show(e){
 	$('.wrapperClassBlock').append(coding);
 	console.log('coding');
 }
-
+function message_save(message){
+$.ajax({
+	method:'POST',
+	url:'/saveMessage/',
+	data:{
+		inboxId : roomId,
+		user1:myself,
+		user2:friend,
+		sender:myself,
+		receiver:friend,
+		Message:message,
+	},
+	success:function(e){
+		console.log(e)
+	},
+	error:function(e){
+		console.log('Failed');
+	}
+})
+// console.log(Users);
+}
