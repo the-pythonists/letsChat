@@ -198,11 +198,14 @@
 
       			<a><i class="fas fa-thumbs-up PostResponseLike" id="{{data.postId}}" onclick="postLiker('{{data.postId}}','{{data.userId}}','{{userInfo.userId}}')" name="{{data.postId}}" style="color:{{data4}};" ></i></a>
       			<a href="#"><i class="far fa-comment-alt" id="PostResponseComment"></i></a>
-      			<hr>
+            <hr>
+            <span id="NewComment{{data.postId}}"></span>
+            <br>
       			<br>
-      			<form method="post" action="#">
+      			<form>
       				<img src="{{userInfo.profilePic.url}}" style="width:50px;height:50px;border-radius:50%;vertical-align: middle;">
-              <input type="text" placeholder="Drop your Comment" style="width:90%;padding:8px;">
+              <input type="text" placeholder="Drop your Comment" style="width:90%;padding:8px;" id="Comment{{data.postId}}">
+              <input type="button" onclick="comments('{{data.postId}}','{{data.userId}}','{{userInfo.userId}}')">
               </form>
       			<br><br>
     
@@ -273,4 +276,5 @@ document.getElementById("SubmitPost").style.display="block";
 <script type="text/javascript" src="{%static 'js/script1.js'%}"></script>
 <script type="text/javascript" src="{%static 'js/LikeSocket.js'%}"></script>
   <script type="text/javascript" src="{%static 'js/RequestSocket.js'%}"></script>
+  <script type="text/javascript" src="{%static 'js/CommentSocket.js'%}"></script>
 </html>

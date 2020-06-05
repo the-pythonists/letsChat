@@ -129,3 +129,14 @@ class TempRoom(models.Model):
 
     def __str__(self):
         return self.RoomId
+
+class Comments(models.Model):
+    postId = models.CharField(max_length=100,default='',blank=True)
+    commentId = models.CharField(max_length=100,default='',blank=True)
+    comment = models.CharField(max_length=500,default='',blank=True)
+    commentedBy = models.CharField(max_length=500,default='',blank=True)
+    commentedOf = models.CharField(max_length=50,default='',blank=True)
+    date = models.DateTimeField(default=datetime.now,blank=True)
+
+    def __str__(self):
+        return self.postId

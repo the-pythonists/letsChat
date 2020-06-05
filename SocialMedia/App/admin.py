@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story,Album,Photos,Messages,TempRoom
+from .models import *
 
 admin.site.register(userRegistration)
 admin.site.register(Friend_Requests)
@@ -12,3 +12,4 @@ admin.site.register(Album)
 admin.site.register(Photos)
 admin.site.register(Messages)
 admin.site.register(TempRoom)
+admin.site.register(Comments)

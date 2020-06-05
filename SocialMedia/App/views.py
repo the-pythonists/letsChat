@@ -6,7 +6,7 @@ from django.http import JsonResponse
 import random
 from django.core.mail import send_mail
 from django.core.mail import send_mail
-from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story,Album,Photos,Messages,TempRoom
+from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story,Album,Photos,Messages,TempRoom,Comments
 from django.contrib.auth.hashers import make_password,check_password
 import datetime
 import uuid,json
@@ -192,6 +192,26 @@ def postlike(request):
 			Notifications(postId=postId,notificationType='like',fullName=postLikedByPersonName,sender=postLiker,
 				receiver=postLikedOf,notification=notificationMessage,viewed=False).save()
 		return JsonResponse({'Result':'Success','totalLikes':totalLikes,'message':'liked'})
+
+@csrf_exempt
+def postcomment(request):
+	if request.POST.get('action'):
+		return JsonResponse({'Result':'Success'})
+	else:
+		postId = request.POST.get('postId')
+		commentedOf = request.POST.get('postCommentedOf')
+		commentedBy = request.POST.get('postCommentedBy')
+		comment = request.POST.get('comment')
+		commentId = 'comment'+str(uuid.uuid4().hex)
+		name = userRegistration.objects.get(userId=commentedBy)
+		fullname = name.firstName + ' ' + name.lastName
+		notify = fullname + ' commented on your post'
+
+		Comments(postId=postId,commentedOf=commentedOf,commentedBy=commentedBy,comment=comment,commentId=commentId).save()
+		Notifications(postId=postId,notificationType='comment',fullName=name,sender=commentedBy,receiver=commentedOf,
+		notification=notify,viewed=False).save()
+		return JsonResponse({'Result':'Success','comment':comment})
+
 
 def login(request):
 	if request.method == 'POST':
@@ -525,8 +545,9 @@ def test(request):
 	# AllFriends(userId=myId).save()
 	# AllFriends(userId=friendId).save()
 	# Album(id=3).save()
-	Likes(postId = 'cd2d8468aa37496899616e746f30be4b').save()
-	return render(request,'test.html')
+	return JsonResponse({'Result':'Success'})
+	# Likes(postId = 'cd2d8468aa37496899616e746f30be4b').save()
+	# return render(request,'test.html')
 
 @csrf_exempt
 def userIntroInsert(request):

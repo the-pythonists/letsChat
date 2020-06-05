@@ -34,6 +34,7 @@ urlpatterns = [
     path("storydelete/",views.storydelete,name="storydelete"),
     path("PostSubmission/",views.PostSubmission,name="PostSubmission"),
     path("postlike/",views.postlike,name="postlike"),
+    path("postcomment/",views.postcomment,name="postcomment"),
     # path("automaticallylike/",views.automaticallylike,name="automaticallylike"), #Automatically Check the Like Count
     path("album/",views.album,name="album"),
     path("profile/",views.searchProfile,name="searchProfile"),
