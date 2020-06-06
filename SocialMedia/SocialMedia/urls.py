@@ -56,8 +56,9 @@ urlpatterns = [
     path("forgetPasswordOTP/",views.forgetPasswordOTP,name="forgetPasswordOTP"), #Forget Password OTP
     path("changeForgetPasword/",views.changeForgetPasword,name="changeForgetPasword"), #Forget change Forget Pasword Password OTP
     path("messages/",views.messages,name="messages"),
-    path("getUsers/",views.getUsers,name="getUsers"),
+    path("saveMessage/",views.saveMessage,name="saveMessage"),
     path("messages/<str:user>/",views.inbox,name="inbox"),
+    path("postcomment/",views.postcomment,name="postcomment"),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

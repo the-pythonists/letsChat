@@ -5,7 +5,7 @@ from django.conf import settings
 from django.http import JsonResponse
 import random
 from django.core.mail import send_mail
-from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story,Album,Photos,Messages
+from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story,Album,Photos,Messages,TempRoom,Comments
 from django.contrib.auth.hashers import make_password,check_password
 import datetime
 import uuid
@@ -175,6 +175,25 @@ def postlike(request):
 				receiver=postLikedOf,notification=notificationMessage,viewed=False).save()
 		return JsonResponse({'Result':'Success','totalLikes':totalLikes,'message':'liked'})
 
+@csrf_exempt
+def postcomment(request):
+	if request.POST.get('action'):
+		return JsonResponse({'Result':'Success'})
+	else:
+		postId = request.POST.get('postId')
+		commentedOf = request.POST.get('postCommentedOf')
+		commentedBy = request.POST.get('postCommentedBy')
+		comment = request.POST.get('comment')
+		commentId = 'comment'+str(uuid.uuid4().hex)
+		name = userRegistration.objects.get(userId=commentedBy)
+		fullname = name.firstName + ' ' + name.lastName
+		notify = fullname + ' commented on your post'
+
+		Comments(postId=postId,commentedOf=commentedOf,commentedBy=commentedBy,comment=comment,commentId=commentId).save()
+		Notifications(postId=postId,notificationType='comment',fullName=name,sender=commentedBy,receiver=commentedOf,
+		notification=notify,viewed=False).save()
+		return JsonResponse({'Result':'Success','comment':comment})
+
 def login(request):
 	if request.method == 'POST':
 		email = request.POST.get("login_Email")
@@ -222,7 +241,6 @@ def notifications(request):
 	
 	params = {'request':zip(fRequests,picsList),'notification':zip(notification,picsList1),'UserName':uname,'userProfile':request.session['user']}
 	return render(request,'Notifications.html',params)
-
 
 def album(request):
 	if request.session.has_key('user'):
@@ -276,10 +294,12 @@ def profile(request,user):
 		isFriend = False
 
 	request.session['Watchprofile'] = profileId
+
+	postData = UserPost.objects.filter(userId=request.session['user'])
 	params = {'user':profileDetail,'currentUserId':request.session['user'],
 		'isFriend':isFriend,'isRequest':isRequest,'isRequested':isRequested,
 		'ActiveUserName':ActiveUserName,'ActiveUserPic':ActiveUserPic,'ActiveUser':ActiveUser.userName,
-		'currentUserFullName':request.session['name'],'currentUserPic':userPic.url}
+		'currentUserFullName':request.session['name'],'currentUserPic':userPic.url,'postData':postData}
 	return render(request,'Profile.html',params)
 
 def Userprofile(request):
@@ -628,6 +648,16 @@ def changeForgetPasword(request):
 	else:
 		return HttpResponseRedirect("/")
 
+def friends(request):
+	friendList = []
+	friends = AllFriends.objects.get(userId=request.session['user']).Friends
+
+	for friend in friends:
+		friendData = userRegistration.objects.filter(userId=friend)
+		friendList.append(friendData)
+		print(friendData)
+	return friendList
+
 def messages(request):
 	if request.session.has_key('user'):
 		friendList = []
@@ -642,12 +672,6 @@ def messages(request):
 		params = {'friendList':friendList,'myData':myData}
 		return render(request,'chat.html',params)
 
-@csrf_exempt
-def getUsers(request):
-	Id = request.POST.get('inboxId')
-	users = Messages.objects.get(inboxId=Id).Users
-	return JsonResponse({'users':users,'loggedUser':request.session['user']})
-
 def inbox(request,user):
 	myId = request.session['user']
 	friendId = user
@@ -655,10 +679,27 @@ def inbox(request,user):
 	
 	if allMessages:
 		for msg in allMessages:
+			print(msg)
 			inboxId = msg.inboxId
+	
 	else:
 		inboxId = uuid.uuid4().hex
-		
+		Messages(inboxId=inboxId,Users=[myId,friendId]).save()
 	myData = userRegistration.objects.get(userId=request.session['user'])
 	friendData = userRegistration.objects.get(userId = user)
-	return render(request,'chat.html',{"flag":True,"friendData":friendData,'inboxId':inboxId,'myData':myData})
+	return render(request,'chat.html',{"flag":True,"friendData":friendData,'inboxId':inboxId,
+		'myData':myData,'allMessages':allMessages,'friendList':friends(request)})
+
+@csrf_exempt
+def saveMessage(request):
+	inboxId = request.POST.get('inboxId')
+	user1 = request.POST.get('user1')
+	user2 = request.POST.get('user2')
+	messageid = uuid.uuid4()
+	sender = request.POST.get('sender')
+	receiver = request.POST.get('receiver')
+	message = request.POST.get('Message')
+	print([user1,user2],'user')
+	Messages(inboxId=inboxId,Users=[user1,user2],MessageID=messageid,sender=sender,
+	receiver=receiver,is_read=False,Message=message).save()
+	return JsonResponse({'Result':'Success'})
