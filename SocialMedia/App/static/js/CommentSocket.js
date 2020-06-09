@@ -48,7 +48,7 @@ commentSocket.onclose = function(e) {
             try{document.getElementById('noti_Counter').innerHTML = 'New Comment';
         }catch{}
         }
-    changeNotification(action='notification')
+    changeNotification(data.postCommentedBy,action='notification')
        
     };
 
@@ -67,16 +67,17 @@ function commented(postId, postCommentedOf, postCommentedBy,comment){
     })
 }
 
-function changeNotification(action){
+function changeNotification(postCommentedBy,action){
     $.ajax({
         method:'POST',
         url:'/postcomment/',
         data:{
-            action:action
+            action:action,
+            postCommentedBy:postCommentedBy,
         },
         success:function(e){
             try{
-            document.getElementById('likeComment').innerHTML = 'New Comment'
+            document.getElementById('likeComment').innerHTML = '<img src="'+e.pic+'">'+e.commenter + ' Commented on Your Post'
             }catch{}
         }
     })

@@ -6,7 +6,8 @@ from django.http import JsonResponse
 import random
 from django.core.mail import send_mail
 from django.core.mail import send_mail
-from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story,Album,Photos,Messages,TempRoom,Comments
+# from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story,Album,Photos,Messages,TempRoom,Comments
+from .models import *
 from django.contrib.auth.hashers import make_password,check_password
 import datetime
 import uuid,json
@@ -195,22 +196,25 @@ def postlike(request):
 
 @csrf_exempt
 def postcomment(request):
-	if request.POST.get('action'):
-		return JsonResponse({'Result':'Success'})
-	else:
-		postId = request.POST.get('postId')
-		commentedOf = request.POST.get('postCommentedOf')
-		commentedBy = request.POST.get('postCommentedBy')
-		comment = request.POST.get('comment')
-		commentId = 'comment'+str(uuid.uuid4().hex)
-		name = userRegistration.objects.get(userId=commentedBy)
-		fullname = name.firstName + ' ' + name.lastName
-		notify = fullname + ' commented on your post'
+	commentedBy = request.POST.get('postCommentedBy')
 
-		Comments(postId=postId,commentedOf=commentedOf,commentedBy=commentedBy,comment=comment,commentId=commentId).save()
-		Notifications(postId=postId,notificationType='comment',fullName=name,sender=commentedBy,receiver=commentedOf,
-		notification=notify,viewed=False).save()
-		return JsonResponse({'Result':'Success','comment':comment})
+	commenter = userRegistration.objects.get(userId=commentedBy)
+	if request.POST.get('action'):
+		return JsonResponse({'Result':'Success','commenter':str(commenter),'pic':str(commenter.profilePic.url)})
+
+	postId = request.POST.get('postId')
+	commentedOf = request.POST.get('postCommentedOf')
+	# commentedBy = request.POST.get('postCommentedBy')
+	comment = request.POST.get('comment')
+	commentId = 'comment'+str(uuid.uuid4().hex)
+	name = userRegistration.objects.get(userId=commentedBy)
+	fullname = commenter.firstName + ' ' + commenter.lastName
+	notify = fullname + ' commented on your post'
+
+	Comments(postId=postId,commentedOf=commentedOf,commentedBy=commentedBy,comment=comment,commentId=commentId).save()
+	Notifications(postId=postId,notificationType='comment',fullName=name,sender=commentedBy,receiver=commentedOf,
+	notification=notify,viewed=False).save()
+	return JsonResponse({'Result':'Success','comment':comment})
 
 
 def login(request):
@@ -326,7 +330,7 @@ def userProfileInsert(request):
 			status.profilePic = profileImage
 			status.save()
 			UserPost.objects.filter(userId=loginUser).update(userPic='/media/'+str(userRegistration.objects.get(userId=loginUser).profilePic))
-			
+			GroupChat.objects.filter(userId=loginUser).update(userPic='/media/'+str(userRegistration.objects.get(userId=loginUser).profilePic))
 			if not Album.objects.filter(AlbumID=request.session['user']):
 				Album(AlbumID=request.session['user'],Name='Profile Pictures').save()
 			
@@ -541,10 +545,9 @@ def userCoverInsert(request):
 def test(request):
 	userId = 'danish26'
 	Friend = 'shubham31'
-	Messages
-	# AllFriends(userId=myId).save()
-	# AllFriends(userId=friendId).save()
-	# Album(id=3).save()
+	# m = GroupChat.objects.values_list('Members', flat=True)
+	g = userRegistration.objects.get(userId=request.session['user']).Groups
+	print(g)	
 	return JsonResponse({'Result':'Success'})
 	# Likes(postId = 'cd2d8468aa37496899616e746f30be4b').save()
 	# return render(request,'test.html')
@@ -600,26 +603,25 @@ def changepassword(request):
 def friends(request):
 	friendList = []
 	friends = AllFriends.objects.get(userId=request.session['user']).Friends
-	
 	for friend in friends:
 		friendData = userRegistration.objects.filter(userId=friend)
 		friendList.append(friendData)
 		print(friendData)
-	return friendList
+
+	GroupsList = []
+	groups = userRegistration.objects.get(userId=request.session['user']).Groups
+	for group in groups:
+		allGroups = Groups.objects.filter(groupId=group)
+		GroupsList.append(allGroups)
+
+	return friendList,GroupsList
 
 
 def messages(request):
 	if request.session.has_key('user'):
-		friendList = []
-		friends = AllFriends.objects.get(userId=request.session['user']).Friends
-		
-		for friend in friends:
-			friendData = userRegistration.objects.filter(userId=friend)
-			friendList.append(friendData)
-			print(friendData)
-
+		friendList,GroupsList = friends(request)
 		myData = userRegistration.objects.get(userId=request.session['user'])
-		params = {'friendList':friendList,'myData':myData}
+		params = {'friendList':friendList,'myData':myData,'groups':GroupsList}
 		return render(request,'chat.html',params)
 
 def inbox(request,user):
@@ -637,15 +639,27 @@ def inbox(request,user):
 		Messages(inboxId=inboxId,Users=[myId,friendId]).save()
 	myData = userRegistration.objects.get(userId=request.session['user'])
 	friendData = userRegistration.objects.get(userId = user)
-	return render(request,'chat.html',{"flag":True,"friendData":friendData,'inboxId':inboxId,
-		'myData':myData,'allMessages':allMessages,'friendList':friends(request)})
+	friendList,groups = friends(request)
+
+	return render(request,'chat.html',{"inbox":True,"friendData":friendData,'inboxId':inboxId,
+		'myData':myData,'allMessages':allMessages,'friendList':friendList,'groups':groups})
+
+def groups(request,group):
+	myId = request.session['user']
+	allMessages = GroupChat.objects.filter(groupId=group)
+	
+	myData = userRegistration.objects.get(userId=request.session['user'])
+	friendList,groups = friends(request)
+	groupInfo = Groups.objects.get(groupId=group)
+	return render(request,'chat.html',{"groupChat":True,'groupId':group,'myData':myData,
+	'friendList':friendList,'groups':groups,'allMessages':allMessages,'groupInfo':groupInfo})
 
 @csrf_exempt
 def saveMessage(request):
 	inboxId = request.POST.get('inboxId')
 	user1 = request.POST.get('user1')
 	user2 = request.POST.get('user2')
-	messageid = uuid.uuid4()
+	messageid = 'privatemessage'+str(uuid.uuid4())
 	sender = request.POST.get('sender')
 	receiver = request.POST.get('receiver')
 	message = request.POST.get('Message')
@@ -654,4 +668,15 @@ def saveMessage(request):
 	receiver=receiver,is_read=False,Message=message).save()
 	return JsonResponse({'Result':'Success'})
 
-	
+@csrf_exempt
+def groupMessage_Save(request):
+	groupId = request.POST.get('groupId')
+	sender = request.POST.get('sender')
+	message = request.POST.get('Message')
+	messageid = 'groupmessage'+str(uuid.uuid4())
+
+	senderDetail = userRegistration.objects.get(userId=sender)
+	GroupChat(groupId=groupId,messageID=messageid,sender=sender,is_read=False,Message=message,
+	senderName=senderDetail.firstName+' '+senderDetail.lastName,senderPic='/media/'+str(senderDetail.profilePic),
+	).save()
+	return JsonResponse({'Result':'Success'})

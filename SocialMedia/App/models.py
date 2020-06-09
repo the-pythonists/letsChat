@@ -11,6 +11,10 @@ class userRegistration(models.Model):
     emailAddress = models.CharField(max_length=50,default='')
     password = models.CharField(max_length=100,default='')
     profilePic = models.ImageField(upload_to='media',default='media/profile.jpeg')
+    Groups = ListCharField(
+        base_field=models.CharField(max_length=50,default='',blank=True),
+        max_length=(100 * 100),blank=True
+    )
     coverPic = models.ImageField(upload_to='media',default='media/cover.jpg')   
     quote = models.CharField(max_length=1000,default='',blank=True)
     dOB = models.CharField(max_length=20,default='',blank=True)
@@ -129,6 +133,31 @@ class TempRoom(models.Model):
 
     def __str__(self):
         return self.RoomId
+
+class Groups(models.Model):
+    groupId = models.CharField(max_length=50,default='',blank=True)
+    groupName = models.CharField(max_length=50,default='',blank=True)
+    Members = ListCharField(
+        base_field=models.CharField(max_length=50,default='',blank=True),
+        max_length=(100 * 100)
+    )
+    groupInfo = models.CharField(max_length=50,default='',blank=True)
+    groupPic = models.ImageField(upload_to='media',default='media/group.jpg',blank=True)
+    def __str__(self):
+        return self.groupName
+
+class GroupChat(models.Model):
+    groupId = models.CharField(max_length=50,default='',blank=True)
+    messageID = models.CharField(max_length=50,default='',blank=True)
+    Message = models.CharField(max_length=500,default='',blank=True)
+    sender = models.CharField(max_length=500,default='',blank=True)
+    senderName = models.CharField(max_length=50,default='',blank=True)
+    senderPic = models.CharField(max_length=50,default='',blank=True)
+    is_read = models.BooleanField(default=False)
+    date = models.DateTimeField(default=datetime.now,blank=True)
+
+    def __list__(self):
+        return self.Members
 
 class Comments(models.Model):
     postId = models.CharField(max_length=100,default='',blank=True)

@@ -15,7 +15,7 @@ $("#showFriendSection").empty();
         	document.getElementById("totalConnection").innerHTML=(e.FName).length;
             console.log(e);
             for(var i=0;i<(e.FName).length;i++){
-            $('#showFriendSection').append('<div class="friend_Profile"><p><img src="'+e.pPic[i]+'"><span style="vertical-align: middle;font-weight:bold;">'+e.FName[i]+' '+e.lName[i]+'</span><br><span style="line-height:0;" id="userQuote">'+e.quote[i]+'</span><span><i class="fas fa-ellipsis-v pull-right" id="ellipsis"></i><button class="pull-right" id="userMessage" onclick="Message('+s+')">Message</button></span></p></div><br><hr>');
+            $('#showFriendSection').append('<div class="friend_Profile"><p><img src="'+e.pPic[i]+'"><span style="vertical-align: middle;font-weight:bold;">'+e.FName[i]+' '+e.lName[i]+'</span><br><span style="line-height:0;" id="userQuote">'+e.quote[i]+'</span><span><i class="fas fa-ellipsis-v pull-right" id="ellipsis"></i><a href="/messages/'+e.EmailId[i]+'/"><button class="pull-right" id="userMessage">Message</button></a></span></p></div><br><hr>');
     }
         },
         error:function(e){
@@ -42,7 +42,7 @@ function serachFriend(){
             	fN=e.FName[i]
             	if((fN.slice(0,l)).toUpperCase()==s.toUpperCase()){
             		document.getElementById("totalConnection").innerHTML=(v+1);
-            $('#showFriendSection').append('<div class="friend_Profile"><p><img src="'+e.pPic[i]+'"><span style="vertical-align: middle;font-weight:bold;">'+e.FName[i]+' '+e.lName[i]+'</span><br><span style="line-height:0;" id="userQuote">'+e.quote[i]+'</span><span><i class="fas fa-ellipsis-v pull-right" id="ellipsis"></i><button class="pull-right" id="userMessage" >Message</button></span></p></div><br><hr>');
+            $('#showFriendSection').append('<div class="friend_Profile"><p><img src="'+e.pPic[i]+'"><span style="vertical-align: middle;font-weight:bold;">'+e.FName[i]+' '+e.lName[i]+'</span><br><span style="line-height:0;" id="userQuote">'+e.quote[i]+'</span><span><i class="fas fa-ellipsis-v pull-right" id="ellipsis"></i><a href="/messages/'+e.EmailId[i]+'/"><button class="pull-right" id="userMessage" >Message</button></a></span></p></div><br><hr>');
         }}
     }
         

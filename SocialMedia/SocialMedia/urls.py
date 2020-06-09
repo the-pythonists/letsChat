@@ -54,7 +54,9 @@ urlpatterns = [
     path("userIntroInsert/",views.userIntroInsert,name="userIntroInsert"),#Intro Insert
     path("messages/",views.messages,name="messages"),
     path("saveMessage/",views.saveMessage,name="saveMessage"),
+    path("groupmessagesave/",views.groupMessage_Save,name="groupMessage_Save"),
     path("messages/<str:user>/",views.inbox,name="inbox"),
+    path("groups/<str:group>/",views.groups,name="groups"),
         
 ]
 
