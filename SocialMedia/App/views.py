@@ -13,10 +13,11 @@ import datetime
 import uuid,json
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db.models import Q
-from django.core import serializers
+# from django.core import serializers
 from itertools import chain
 from django.urls import reverse
-from django_pandas.io import read_frame
+# from django_pandas.io import read_frame
+from django.db.models import Subquery
 
 def index(request):
 	if request.session.has_key('user'):
@@ -33,9 +34,9 @@ def index(request):
 		def FriendPosts():
 			for friend in friends:
 				friendPost = UserPost.objects.filter(userId=friend).order_by('-date')
-				u = Photos.objects.filter(Album='Profile Pictures',PhotoID=item).order_by('-date')
-				print(item)
-				print(u)
+				# u = Photos.objects.filter(Album='Profile Pictures',PhotoID=item).order_by('-date')
+				# print(item)
+				# print(u)
 				for post in friendPost:
 					yield post
 		FriendPosts()
@@ -51,7 +52,15 @@ def index(request):
 				colorPost.append("rgba(0, 150, 136,1)")
 			else:
 				colorPost.append("grey")
-		params = {'userInfo':userInfo,'userData':zip(postList, like,colorPost),'date_now':datetime.datetime.now()}
+
+		# allComments = Comments.objects.all().values('comment','date','userInfo__firstName')
+		allComments = Comments.objects.all()
+		for i in allComments:
+			com = i.comment
+			name = i.userInfo.firstName
+		print(com,name)
+		params = {'userInfo':userInfo,'userData':zip(postList, like,colorPost),'date_now':datetime.datetime.now(),
+		'allComments':allComments}
 		return render(request,'DashBoard.html',params)
 	else:
 		return render(request,'index.html')
@@ -72,9 +81,8 @@ def signup(request):
 			elif userRegistration.objects.filter(mobile=mobile):
 				return render(request,'CreateAccount.html',{'message':'Account Already Present with Given Mobile Number'}) 
 			else:
-				accountSave = userRegistration(userId=username, firstName=fName, lastName=lName, userName=username, 
-				mobile=mobile,emailAddress = email, password = make_password(pwd))
-				accountSave.save()
+				userRegistration(userId=username, firstName=fName, lastName=lName, userName=username, 
+				mobile=mobile,emailAddress = email, password = make_password(pwd)).save()
 				# Creating Blank Frined List
 				AllFriends(userId=username).save()
 				return HttpResponseRedirect('/')	
@@ -211,10 +219,32 @@ def postcomment(request):
 	fullname = commenter.firstName + ' ' + commenter.lastName
 	notify = fullname + ' commented on your post'
 
-	Comments(postId=postId,commentedOf=commentedOf,commentedBy=commentedBy,comment=comment,commentId=commentId).save()
+
+	Comments(postId=postId,commentedOf=commentedOf,commentedBy=commentedBy,comment=comment,commentId=commentId,
+	userInfo=name).save()
+
 	Notifications(postId=postId,notificationType='comment',fullName=name,sender=commentedBy,receiver=commentedOf,
 	notification=notify,viewed=False).save()
 	return JsonResponse({'Result':'Success','comment':comment})
+
+@csrf_exempt
+def reply(request):
+	postId = request.POST.get('postId')
+	commentId = request.POST.get('commentId')
+	replyId = 'reply'+str(uuid.uuid4().hex)
+	repliedBy = request.POST.get('repliedBy')
+	repliedOn = request.POST.get('repliedOn')
+	reply = request.POST.get('reply')
+	user = userRegistration.objects.get(userId=repliedBy)
+	print(user)
+	
+	Replies(postId=postId,commentId=commentId,replyId=replyId,repliedBy=repliedBy,repliedOn=repliedOn,reply=reply,
+	userInfo=user).save()
+	
+	notify = str(user) + ' Replied to your Comment'
+	Notifications(postId=postId,notificationType='reply',fullName=str(user),sender=repliedBy,receiver=repliedOn,
+	notification=notify,viewed=False).save()
+	return JsonResponse({'Success':'Done'})
 
 
 def login(request):
@@ -287,11 +317,9 @@ def searchProfile(request):
 def profile(request,user):
 	
 	profileId = user
-	# profileId = userRegistration.objects.get(userId=user)
-	profileDetail = userRegistration.objects.filter(userId=user)
-	userPic = userRegistration.objects.get(userId=request.session['user']).profilePic
-	# print(userPic.url)
-	# checking if searched person is req receiver or sender
+	profileDetail = userRegistration.objects.get(userId=user)
+	userPic = profileDetail.profilePic
+
 	if Friend_Requests.objects.filter(receiver=profileId,sender=request.session['user']):
 		isRequest = True
 		isRequested = False
@@ -311,8 +339,8 @@ def profile(request,user):
 	else:
 		isFriend = False
 
-	request.session['Watchprofile'] = profileId
-	params = {'user':profileDetail,'currentUserId':request.session['user'],'currentUserFullName':request.session['name'],
+	# request.session['Watchprofile'] = profileId
+	params = {'data':profileDetail,'currentUserId':request.session['user'],'currentUserFullName':request.session['name'],
 		'currentUserPic':userPic.url,'isFriend':isFriend,'isRequest':isRequest,'isRequested':isRequested}
 	return render(request,'Profile1.html',params)
 
@@ -330,7 +358,7 @@ def userProfileInsert(request):
 			status.profilePic = profileImage
 			status.save()
 			UserPost.objects.filter(userId=loginUser).update(userPic='/media/'+str(userRegistration.objects.get(userId=loginUser).profilePic))
-			GroupChat.objects.filter(userId=loginUser).update(userPic='/media/'+str(userRegistration.objects.get(userId=loginUser).profilePic))
+			GroupChat.objects.filter(sender=loginUser).update(senderPic='/media/'+str(userRegistration.objects.get(userId=loginUser).profilePic))
 			if not Album.objects.filter(AlbumID=request.session['user']):
 				Album(AlbumID=request.session['user'],Name='Profile Pictures').save()
 			
@@ -613,7 +641,7 @@ def friends(request):
 	for group in groups:
 		allGroups = Groups.objects.filter(groupId=group)
 		GroupsList.append(allGroups)
-
+	# MyclubUser.objects.in_bulk([1, 3, 7])
 	return friendList,GroupsList
 
 
@@ -680,3 +708,39 @@ def groupMessage_Save(request):
 	senderName=senderDetail.firstName+' '+senderDetail.lastName,senderPic='/media/'+str(senderDetail.profilePic),
 	).save()
 	return JsonResponse({'Result':'Success'})
+
+def reportGetPost(request):
+	if request.method == "POST":
+		pic = request.POST.get('pic',"defaultValue")
+		msg = request.POST.get('msg',"defaultValue")
+		postId = request.POST.get('postId',"defaultValue")
+		if(pic=="defaultValue"):
+			pic=False
+		print(postId)
+		param={"pic":pic,"msg":msg,"postId":postId}
+		return render(request,'report.html',param)
+
+@csrf_exempt
+def reportSubmission(request):
+	if request.method == "POST":
+		postId = request.POST.get("postID")
+		reportTitle = request.POST.get("reportTitle")
+		print(postId)
+		Report(postId=postId,reportTitle=reportTitle).save()
+		return JsonResponse({"status":True})
+
+@csrf_exempt
+def taggedSearchFriends(request):
+	if request.method == "POST":
+		friends = AllFriends.objects.get(userId=request.session['user']).Friends
+		username = []
+		pic = []
+		userId = []
+		for i in friends:
+			userId.append(i)
+			friendName = userRegistration.objects.get(userId=i)
+			username.append(friendName.firstName+friendName.lastName)
+			pic.append(friendName.profilePic.url)
+			
+			
+		return JsonResponse({"name":username,"pic":pic,'userId':userId})

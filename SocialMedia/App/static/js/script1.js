@@ -94,38 +94,38 @@ function openLogOut() {
     $(document).ready(function () {
 
         // ANIMATEDLY DISPLAY THE NOTIFICATION COUNTER.
-        $('#noti_Counter')
-            .css({ opacity: 0 })
-            .text('7')  // ADD DYNAMIC VALUE (YOU CAN EXTRACT DATA FROM DATABASE OR XML).
-            .css({ top: '-10px' })
-            .animate({ top: '-2px', opacity: 1 }, 500);
+        // $('#noti_Counter')
+        //     .css({ opacity: 0 })
+        //     .text('7')  // ADD DYNAMIC VALUE (YOU CAN EXTRACT DATA FROM DATABASE OR XML).
+        //     .css({ top: '-10px' })
+        //     .animate({ top: '-2px', opacity: 1 }, 500);
 
-        $('#noti_Button').click(function () {
+        // $('#noti_Button').click(function () {
 
-            // TOGGLE (SHOW OR HIDE) NOTIFICATION WINDOW.
-            $('#notifications').fadeToggle('fast', 'linear', function () {
-                if ($('#notifications').is(':hidden')) {
-                    $('#noti_Button').css('background-color', '#2E467C');
-                }
-                // CHANGE BACKGROUND COLOR OF THE BUTTON.
-                else $('#noti_Button').css('background-color', '#FFF');
-            });
+        //     // TOGGLE (SHOW OR HIDE) NOTIFICATION WINDOW.
+        //     $('#notifications').fadeToggle('fast', 'linear', function () {
+        //         if ($('#notifications').is(':hidden')) {
+        //             $('#noti_Button').css('background-color', '#2E467C');
+        //         }
+        //         // CHANGE BACKGROUND COLOR OF THE BUTTON.
+        //         else $('#noti_Button').css('background-color', '#FFF');
+        //     });
 
-            $('#noti_Counter').fadeOut('slow');     // HIDE THE COUNTER.
+        //     $('#noti_Counter').fadeOut('slow');     // HIDE THE COUNTER.
 
-            return false;
-        });
+        //     return false;
+        // });
 
-        // HIDE NOTIFICATIONS WHEN CLICKED ANYWHERE ON THE PAGE.
-        $(document).click(function () {
-            $('#notifications').hide();
+        // // HIDE NOTIFICATIONS WHEN CLICKED ANYWHERE ON THE PAGE.
+        // $(document).click(function () {
+        //     $('#notifications').hide();
 
-            // CHECK IF NOTIFICATION COUNTER IS HIDDEN.
-            if ($('#noti_Counter').is(':hidden')) {
-                // CHANGE BACKGROUND COLOR OF THE BUTTON.
-                $('#noti_Button').css('background-color', '#2E467C');
-            }
-        });
+        //     // CHECK IF NOTIFICATION COUNTER IS HIDDEN.
+        //     if ($('#noti_Counter').is(':hidden')) {
+        //         // CHANGE BACKGROUND COLOR OF THE BUTTON.
+        //         $('#noti_Button').css('background-color', '#2E467C');
+        //     }
+        // });
 
         $('#notifications').click(function () {
             return false;       // DO NOTHING WHEN CONTAINER IS CLICKED.
@@ -366,3 +366,55 @@ function dayMode(){
     document.getElementsByClassName("storyProfileSection")[1].src=pic;
     document.getElementById('textStoryVisiblePersonName').innerHTML=name;
  }
+
+ //Post Result by Internet
+ function liveSearchPostResult(result)
+ {
+
+  document.getElementById("searchPostResultModel").src="https://www.bing.com/search?q="+result;
+  document.getElementById("PostResultSearchModel").innerHTML="Search : "+result;
+ }
+
+//Tag People Function1
+var taggedWholeFriendList;
+function tagPeopleFun1()
+{
+  
+  document.getElementById("tagLoader").style.display="block";
+  $.ajax({
+      method:'POST',
+      url:'/taggedSearchFriends/',
+      
+      success:function(e){
+        taggedWholeFriendList = e;
+        $('#tagPeoplenameArea').empty();
+        console.log(e);
+        document.getElementById("tagLoader").style.display="none";
+        for(i=0;i<(e.name).length;i++)
+        {
+         $('#tagPeoplenameArea').append('<input type="checkbox" id="'+e.userId[i]+'" name="'+e.userId[i]+'" value="'+e.userId[i]+'"><label for="'+e.userId[i]+'"><span><img src="'+e.pic[i]+'" style="width:45px;height:45px;border-radius:50%;margin:8px;"></span>'+e.name[i]+'</label><br>');
+        }
+
+      },
+      error:function(data){
+        console.log('Failed');
+      }
+    })
+
+}
+
+
+function tagFriendPeopleTextBox()
+{
+  $('#tagPeoplenameArea').empty();
+  var frnd = document.getElementById("tagFriendsTextBoxId").value;
+   for(i=0;i<(taggedWholeFriendList.name).length;i++)
+        {
+          if(((taggedWholeFriendList.name[i].toUpperCase()).search(frnd.toUpperCase()))!=-1)
+          {
+            $('#tagPeoplenameArea').append('<input type="checkbox" id="'+taggedWholeFriendList.userId[i]+'" name="'+taggedWholeFriendList.userId[i]+'" value="'+taggedWholeFriendList.userId[i]+'"><label for="'+taggedWholeFriendList.userId[i]+'"><span><img src="'+taggedWholeFriendList.pic[i]+'" style="width:45px;height:45px;border-radius:50%;margin:8px;"></span>'+taggedWholeFriendList.name[i]+'</label><br>');
+          }
+         
+        }
+
+}

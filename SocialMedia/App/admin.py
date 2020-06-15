@@ -1,6 +1,4 @@
 from django.contrib import admin
-# from .models import *
-from django.contrib import admin
 from django.apps import apps
 
 myapp = apps.get_app_config('App')

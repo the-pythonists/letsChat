@@ -38,7 +38,6 @@
 </div>
 <!--Main Body-->
 <div>
-{% for data in user %}
   
     <input type="hidden" id="profile" name="profileId" value="{{data.userName}}"> 
   <!-- logged user details -->
@@ -53,9 +52,14 @@
             <div class="fb-profile-text">
                 <h2 hidden id="
                 ">{{currentUserId}}</h2>
-                <button type="button" class="btn btn-primary btn-lg pull-right" data-toggle="modal" data-target="#myModal" style="display:none;" id="EditProfileButton">
+                
+                {% if currentUserId == data.userId %}
+                
+                <button type="button" class="btn btn-primary btn-lg pull-right" data-toggle="modal" data-target="#myModal" id="EditProfileButton">
                   Edit Profile
                 </button>
+                {% else %}
+                
                 {% if isFriend %}
                 <input type="button" onclick="request();" name="" value="Unfriend" id="addbtn" class="btn btn-danger pull-right"  style="display:block;">
                 {% elif isRequest %}
@@ -64,7 +68,8 @@
                 <input type="button" onclick="request();" name="" value="Confirm Request" id="addbtn" class="btn btn-success pull-right"  style="display:block;">
                 {% else %}
                 
-                <input type="button" name="" value="Add Friend" id="addbtn" class="btn btn-danger pull-right"  style="display:none;" >
+                <input type="button" name="" value="Add Friend" id="addbtn" class="btn btn-danger pull-right"  style="display:block;" >
+                {% endif %}
                 {% endif %}
                 
                 <script>
@@ -447,7 +452,6 @@
         </div>
       </div>
     </div>
-{% endfor %}
 </div>  
 <h1 hidden id="pageiId">Page2</h1>    
 </body>
