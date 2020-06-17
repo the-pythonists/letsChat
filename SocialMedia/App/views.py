@@ -34,12 +34,9 @@ def index(request):
 		def FriendPosts():
 			for friend in friends:
 				friendPost = UserPost.objects.filter(userId=friend).order_by('-date')
-				# u = Photos.objects.filter(Album='Profile Pictures',PhotoID=item).order_by('-date')
-				# print(item)
-				# print(u)
 				for post in friendPost:
 					yield post
-		FriendPosts()
+		# FriendPosts()
 		AllPost = chain(UserAllPost(), FriendPosts())
 		for item in AllPost:
 			postList.append(item)
@@ -629,20 +626,23 @@ def changepassword(request):
 		return render(request,'changepwd.html')
 
 def friends(request):
-	friendList = []
+	friendList = []; MessageList = []
 	friends = AllFriends.objects.get(userId=request.session['user']).Friends
 	for friend in friends:
 		friendData = userRegistration.objects.filter(userId=friend)
+		unreadMessage = Messages.objects.filter(is_read=False,sender=friend,receiver=request.session['user']).count()
+		MessageList.append(unreadMessage)
+		print(unreadMessage)
 		friendList.append(friendData)
-		print(friendData)
-
+		# print(friendData)
+	lt = zip(friendList,MessageList)
 	GroupsList = []
 	groups = userRegistration.objects.get(userId=request.session['user']).Groups
 	for group in groups:
 		allGroups = Groups.objects.filter(groupId=group)
 		GroupsList.append(allGroups)
 	# MyclubUser.objects.in_bulk([1, 3, 7])
-	return friendList,GroupsList
+	return lt,GroupsList
 
 
 def messages(request):
@@ -655,16 +655,19 @@ def messages(request):
 def inbox(request,user):
 	myId = request.session['user']
 	friendId = user
-	allMessages = Messages.objects.filter(Users=[myId,friendId]) | Messages.objects.filter(Users=[friendId,myId])
+	is_Inbox = Inbox.objects.filter(Users=[myId,friendId]) | Inbox.objects.filter(Users=[friendId,myId])
 	
-	if allMessages:
-		for msg in allMessages:
-			print(msg)
+	if is_Inbox:
+		for msg in is_Inbox:
 			inboxId = msg.inboxId
-	
+			messageInbox = msg.id
+		allMessages = Messages.objects.filter(Inbox=messageInbox)
+		unread = allMessages.filter(is_read=False,sender=user).count()
+		print(unread)
 	else:
 		inboxId = uuid.uuid4().hex
-		Messages(inboxId=inboxId,Users=[myId,friendId]).save()
+		Inbox(inboxId=inboxId,Users=[myId,friendId]).save()
+		allMessages = ''
 	myData = userRegistration.objects.get(userId=request.session['user'])
 	friendData = userRegistration.objects.get(userId = user)
 	friendList,groups = friends(request)
@@ -685,14 +688,14 @@ def groups(request,group):
 @csrf_exempt
 def saveMessage(request):
 	inboxId = request.POST.get('inboxId')
-	user1 = request.POST.get('user1')
-	user2 = request.POST.get('user2')
+	# user1 = request.POST.get('user1')
+	# user2 = request.POST.get('user2')
 	messageid = 'privatemessage'+str(uuid.uuid4())
 	sender = request.POST.get('sender')
 	receiver = request.POST.get('receiver')
 	message = request.POST.get('Message')
-	print([user1,user2],'user')
-	Messages(inboxId=inboxId,Users=[user1,user2],MessageID=messageid,sender=sender,
+	# print([user1,user2],'user')
+	Messages(Inbox=Inbox.objects.get(inboxId=inboxId),MessageID=messageid,sender=sender,
 	receiver=receiver,is_read=False,Message=message).save()
 	return JsonResponse({'Result':'Success'})
 

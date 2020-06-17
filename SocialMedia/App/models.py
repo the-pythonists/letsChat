@@ -115,21 +115,25 @@ class Likes(models.Model):
     def __str__(self):
         return self.postId
 
-class Messages(models.Model):
-    inboxId = models.CharField(max_length=50,default='',blank=True,unique=True)
+class Inbox(models.Model):
+    inboxId = models.CharField(max_length=50,default='',blank=True)
     Users = ListCharField(
         base_field=models.CharField(max_length=50,default='',blank=True),
         max_length=(100 * 100)
     )
+    def __int__(self):
+        return self.id
+
+
+class Messages(models.Model):
+    Inbox = models.ForeignKey(Inbox,on_delete=models.CASCADE)
     MessageID = models.CharField(max_length=500,default='',blank=True,unique=True)
     sender = models.CharField(max_length=500,default='',blank=True)
     receiver = models.CharField(max_length=500,default='',blank=True)
     is_read = models.BooleanField(default=False,blank=True)
     Message = models.TextField(default='',blank=True)
     date = models.DateTimeField(default=datetime.now,blank=True)
-    def __str__(self):
-        return self.inboxId
-
+   
 class TempRoom(models.Model):
     RoomId = models.CharField(max_length=50,default='',blank=True,unique=True)
     Users = ListCharField(
@@ -154,6 +158,7 @@ class Groups(models.Model):
 
 class GroupChat(models.Model):
     groupId = models.CharField(max_length=50,default='',blank=True)
+    Group = models.ForeignKey(Groups,on_delete=models.CASCADE,default=1)
     messageID = models.CharField(max_length=50,default='',blank=True,unique=True)
     Message = models.TextField(default='',blank=True)
     sender = models.CharField(max_length=500,default='',blank=True)
