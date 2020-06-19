@@ -82,9 +82,14 @@ class UserPost(models.Model):
 
 class Story(models.Model):
     userId = models.CharField(max_length=50,default='')
-    media = models.FileField(upload_to="profiles",blank=True)
+    media = models.ImageField(upload_to="profiles",blank=True)
     uploadTime = models.DateTimeField(default=datetime.now, blank=True)
-
+    storyType = models.CharField(max_length=20,default='')
+    fontFamily = models.CharField(max_length=75,default='')
+    fontSize = models.CharField(max_length=50,default='')
+    Caption = models.CharField(max_length=150,default='')
+    color = models.CharField(max_length=75,default='')
+    
     def __str__(self):
         return self.userId
 
@@ -194,3 +199,10 @@ class Replies(models.Model):
 
     def __str__(self):
         return self.postId
+
+#For Report
+class Report(models.Model):
+    postId = models.CharField(max_length=100,default='')
+    reportTitle= models.CharField(max_length=100,default='')
+    status = models.BooleanField(default=False)
+

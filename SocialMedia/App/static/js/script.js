@@ -67,6 +67,8 @@ myInput.onkeyup = function() {
 function OtpCall(){
 	// alert('OTPGeneration Function Called');
   email=document.getElementById("Email").value;
+ 
+  $('#otpBlock').append('<br><span><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></span>');
   // alert(email);
  $.ajax({
                 method:'POST',
@@ -77,10 +79,12 @@ function OtpCall(){
                 success:function(data){
                   console.log("Successfully")
                   document.getElementById("EmailMessage").innerHTML="OTP has been delivered on your Email address.";
+                  document.getElementById("otpBlock").innerHTML="Message has Sent";
                 },
                 error:function(data){
                     console.log('Error!');
                     document.getElementById("EmailMessage").innerHTML="Please Check your Email Address";
+                    document.getElementById("otpBlock").innerHTML="Message has Sent";
                 }
 
 
@@ -101,3 +105,5 @@ function Form_Validate(v){
 		document.getElementById(idmaker).disabled=true;
 	}
 }
+
+

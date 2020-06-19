@@ -69,3 +69,28 @@ $.ajax({
 })
 // console.log(Users);
 }
+
+
+document.querySelector('#message').onclick = messaageSeen;
+document.querySelector('#friendName'+friend).onclick = messaageSeen;
+
+function messaageSeen(){
+	console.log(friend);
+	console.log(myself);
+
+	$.ajax({
+		method:'POST',
+		url:'/seenMessage/'+sender+'/'+receiver+'/',
+		data:{
+			sender:friend,
+			receiver:myself,
+		},
+		success:function(e){
+			console.log(e)
+			document.getElementById('unreadmsg'+friend).innerHTML = '';
+		},
+		error:function(e){
+			console.log('Failed');
+		}
+	})
+}

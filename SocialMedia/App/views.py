@@ -5,8 +5,6 @@ from django.conf import settings
 from django.http import JsonResponse
 import random
 from django.core.mail import send_mail
-from django.core.mail import send_mail
-# from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story,Album,Photos,Messages,TempRoom,Comments
 from .models import *
 from django.contrib.auth.hashers import make_password,check_password
 import datetime
@@ -37,6 +35,90 @@ def index(request):
 				for post in friendPost:
 					yield post
 		# FriendPosts()
+		storyList = []
+		StoryOwnerList = []
+		tempStoryList = []
+		tempStoryOwner = ""
+		tempMedia = ""
+		tempUploadTime = ""
+		tempStoryType = ""
+		tempFontFamily = ""
+		tempFontSize = ""
+		tempCaption = ""
+		tempColor = ""
+		lenthCaption = ""
+		#Check myself Stories
+		myStories = Story.objects.filter(userId=request.session['user'])
+		if myStories.exists():
+			StoryOwner = userRegistration.objects.get(userId=request.session['user'])
+			for l in myStories:
+				lenthCaption =lenthCaption + str(len(l.Caption)) +"@"
+				tempMedia = tempMedia + "/media/"+str(l.media) +"@"
+				tempUploadTime = tempUploadTime + str(l.uploadTime) +"@"
+				tempStoryType = tempStoryType + l.storyType +"@"
+				tempFontFamily = tempFontFamily + l.fontFamily +"@"
+				tempFontSize = tempFontSize + l.fontSize +"@"
+				tempCaption = tempCaption + l.Caption 
+				tempColor = tempColor + l.color +"@"
+				
+				tempStoryOwner = "Me" + ","
+				StoryOwner.userName = " Me"
+			StoryOwnerList.append(StoryOwner)
+			tempStoryList.insert(0,tempMedia)
+			tempStoryList.insert(1,tempUploadTime)
+			tempStoryList.insert(2,tempStoryType)
+			tempStoryList.insert(3,tempFontFamily)
+			tempStoryList.insert(4,tempFontSize)
+			tempStoryList.insert(5,tempCaption)
+			tempStoryList.insert(6,tempColor)
+			tempStoryList.insert(7,lenthCaption)		
+			
+			storyList.append(tempStoryList)
+			
+			
+		#Get Friends Sttories
+		for friend in friends:
+			#print(friend)
+			allStories = Story.objects.filter(userId=friend)
+			#print(allStories)
+			if allStories.exists():
+				StoryOwner = userRegistration.objects.get(userId=friend)
+				print(len(allStories))
+				tempStoryList = []
+				tempStoryOwner = ""
+				tempMedia = ""
+				tempUploadTime = ""
+				tempStoryType = ""
+				tempFontFamily = ""
+				tempFontSize = ""
+				tempCaption = ""
+				tempColor = ""
+				lenthCaption = ""
+				for l in allStories:
+					lenthCaption =lenthCaption + str(len(l.Caption)) +"@"
+					tempMedia = tempMedia + "/media/"+str(l.media) +"@"
+					tempUploadTime = tempUploadTime + str(l.uploadTime) +"@"
+					tempStoryType = tempStoryType + l.storyType +"@"
+					tempFontFamily = tempFontFamily + l.fontFamily +"@"
+					tempFontSize = tempFontSize + l.fontSize +"@"
+					tempCaption = tempCaption + l.Caption 
+					tempColor = tempColor + l.color +"@"
+					
+				StoryOwnerList.append(StoryOwner)
+				tempStoryList.insert(0,tempMedia)
+				tempStoryList.insert(1,tempUploadTime)
+				tempStoryList.insert(2,tempStoryType)
+				tempStoryList.insert(3,tempFontFamily)
+				tempStoryList.insert(4,tempFontSize)
+				tempStoryList.insert(5,tempCaption)
+				tempStoryList.insert(6,tempColor)
+				tempStoryList.insert(7,lenthCaption)		
+				
+				storyList.append(tempStoryList)
+					#storyList.append(l)	
+					#StoryOwnerList.append(StoryOwner)
+
+		storiesFullData = zip(StoryOwnerList,storyList)
 		AllPost = chain(UserAllPost(), FriendPosts())
 		for item in AllPost:
 			postList.append(item)
@@ -56,11 +138,70 @@ def index(request):
 			com = i.comment
 			name = i.userInfo.firstName
 		print(com,name)
+
+		notification = Notifications.objects.filter(receiver=request.session['user']).order_by('-date')
+		picsList1 = []
+		uname = ''   # IF USER HAS NO NOTIFICATION
+		for Id in notification:
+			senderDetail = userRegistration.objects.filter(userId=Id.sender)
+			for detail in senderDetail:
+				
+				uname = detail.userName
+				picUrl = detail.profilePic
+				picsList1.append(picUrl.url)
 		params = {'userInfo':userInfo,'userData':zip(postList, like,colorPost),'date_now':datetime.datetime.now(),
-		'allComments':allComments}
-		return render(request,'DashBoard.html',params)
+		'allComments':allComments,"storyData":storiesFullData,'notification':zip(notification,picsList1)}
+		return render(request,'ds.html',params)
 	else:
 		return render(request,'index.html')
+def textStory(request):
+	return render(request,'textStory.html')
+
+
+def imageStory(request):
+	return render(request,'imageStory.html')
+
+
+@csrf_exempt
+def story(request):
+	print('here in stort')
+	if request.method == 'POST':
+		image = request.FILES.get('image')
+		print(image)
+		fontSize = request.POST.get('fontSize',"defaultValue")
+		storyType = request.POST.get('type',"defaultValue")
+		fontFamily = request.POST.get('fontFamily',"defaultValue")
+		Caption = request.POST.get('Caption',"defaultValue")
+		color = request.POST.get('color',"defaultValue")
+		
+
+		#media=image,
+
+		Story(userId=request.session['user'],media=image,storyType=storyType,fontFamily=fontFamily,fontSize=fontSize,Caption=Caption,color=color).save()
+		return JsonResponse({"Status":"Successfully"})
+	else:
+		stories = Story.objects.all()
+		return JsonResponse({"Status":"UnSuccessfully"})
+
+def imageStorySubmissionForm(request):
+	if request.method == 'POST':
+		image = request.FILES.get('image')
+		print(image)
+		fontSize = request.POST.get('fontSize',"defaultValue")
+		storyType = request.POST.get('type',"defaultValue")
+		fontFamily = request.POST.get('fontFamily',"defaultValue")
+		Caption = request.POST.get('Caption',"defaultValue")
+		color = request.POST.get('color',"defaultValue")
+		
+		#media=image,
+
+		Story(userId=request.session['user'],media=image,storyType=storyType,fontFamily=fontFamily,fontSize=fontSize,Caption=Caption,color=color).save()
+		return HttpResponseRedirect("/")
+	else:
+		stories = Story.objects.all()
+		return JsonResponse({"Status":"UnSuccessfully"})
+
+
 
 def signup(request):
 	if request.method == "POST":
@@ -102,6 +243,7 @@ def OtpGeneration(request):
 	Email=request.POST.get('Email','DefaultValue')
 	RandomValue="LetsChat"+str(random.randint(1001,99999))
 	print(RandomValue)
+	request.session["Otp"]=RandomValue
 	message=f"Your Email Address  {Email}  Your OTP is {RandomValue} Do not share your password to anyone."
 	send_mail(
     	'LetsChat',
@@ -109,20 +251,10 @@ def OtpGeneration(request):
     	settings.EMAIL_HOST_USER,
     	[Email],
     	fail_silently=False)
-	request.session["Otp"]=RandomValue
+	# request.session["Otp"]=RandomValue
 	# request.session["Email"]=Email
 	return JsonResponse({'Result':"Successfully"})
 
-def story(request):
-	
-	if request.method == 'POST':
-		userStory = request.FILES['story']
-
-		Story(userId=request.session['user'],media=userStory).save()
-		return HttpResponseRedirect('/')
-	else:
-		stories = Story.objects.all()
-		return render(request,'Story.html',{'story':stories})
 
 @csrf_exempt
 def storydelete(request):
@@ -312,7 +444,10 @@ def searchProfile(request):
 	return HttpResponseRedirect('/profile/'+username+'/')
 
 def profile(request,user):
-	
+	ActiveUser = userRegistration.objects.get(userId=request.session['user'])
+	ActiveUserName = ActiveUser.firstName
+	ActiveUserPic = ActiveUser.profilePic
+
 	profileId = user
 	profileDetail = userRegistration.objects.get(userId=user)
 	userPic = profileDetail.profilePic
@@ -337,8 +472,11 @@ def profile(request,user):
 		isFriend = False
 
 	# request.session['Watchprofile'] = profileId
+	postData = UserPost.objects.filter(userId=user).order_by('-date')
+	print(postData)
 	params = {'data':profileDetail,'currentUserId':request.session['user'],'currentUserFullName':request.session['name'],
-		'currentUserPic':userPic.url,'isFriend':isFriend,'isRequest':isRequest,'isRequested':isRequested}
+		'currentUserPic':userPic.url,'isFriend':isFriend,'isRequest':isRequest,'isRequested':isRequested,'ActiveUserPic':ActiveUserPic,'ActiveUser':ActiveUser.userName
+	,'ActiveUserName':ActiveUserName,'postData':postData}
 	return render(request,'Profile1.html',params)
 
 def Userprofile(request):
@@ -628,21 +766,24 @@ def changepassword(request):
 def friends(request):
 	friendList = []; MessageList = []
 	friends = AllFriends.objects.get(userId=request.session['user']).Friends
+	
+	# Messages.objects.filter(is_read=False,sender=sender,receiver=receiver).update(is_read=True)
+
 	for friend in friends:
 		friendData = userRegistration.objects.filter(userId=friend)
 		unreadMessage = Messages.objects.filter(is_read=False,sender=friend,receiver=request.session['user']).count()
 		MessageList.append(unreadMessage)
-		print(unreadMessage)
+		# print(unreadMessage)
 		friendList.append(friendData)
 		# print(friendData)
-	lt = zip(friendList,MessageList)
+	friendMessageList = zip(friendList,MessageList)
 	GroupsList = []
 	groups = userRegistration.objects.get(userId=request.session['user']).Groups
 	for group in groups:
 		allGroups = Groups.objects.filter(groupId=group)
 		GroupsList.append(allGroups)
 	# MyclubUser.objects.in_bulk([1, 3, 7])
-	return lt,GroupsList
+	return friendMessageList,GroupsList
 
 
 def messages(request):
@@ -656,7 +797,7 @@ def inbox(request,user):
 	myId = request.session['user']
 	friendId = user
 	is_Inbox = Inbox.objects.filter(Users=[myId,friendId]) | Inbox.objects.filter(Users=[friendId,myId])
-	
+	seenMessage(request,user,request.session['user'])
 	if is_Inbox:
 		for msg in is_Inbox:
 			inboxId = msg.inboxId
@@ -688,13 +829,11 @@ def groups(request,group):
 @csrf_exempt
 def saveMessage(request):
 	inboxId = request.POST.get('inboxId')
-	# user1 = request.POST.get('user1')
-	# user2 = request.POST.get('user2')
 	messageid = 'privatemessage'+str(uuid.uuid4())
 	sender = request.POST.get('sender')
 	receiver = request.POST.get('receiver')
 	message = request.POST.get('Message')
-	# print([user1,user2],'user')
+
 	Messages(Inbox=Inbox.objects.get(inboxId=inboxId),MessageID=messageid,sender=sender,
 	receiver=receiver,is_read=False,Message=message).save()
 	return JsonResponse({'Result':'Success'})
@@ -711,6 +850,12 @@ def groupMessage_Save(request):
 	senderName=senderDetail.firstName+' '+senderDetail.lastName,senderPic='/media/'+str(senderDetail.profilePic),
 	).save()
 	return JsonResponse({'Result':'Success'})
+
+@csrf_exempt
+def seenMessage(request,sender,receiver):
+	Messages.objects.filter(is_read=False,sender=sender,receiver=receiver).update(is_read=True)
+	return JsonResponse({'Result':'Success'})
+
 
 def reportGetPost(request):
 	if request.method == "POST":
@@ -735,7 +880,11 @@ def reportSubmission(request):
 @csrf_exempt
 def taggedSearchFriends(request):
 	if request.method == "POST":
-		friends = AllFriends.objects.get(userId=request.session['user']).Friends
+		if request.POST.get('action') == 'friend':
+			friend = request.POST.get('id')
+			friends = AllFriends.objects.get(userId=friend).Friends	
+		else:
+			friends = AllFriends.objects.get(userId=request.session['user']).Friends
 		username = []
 		pic = []
 		userId = []
@@ -747,3 +896,39 @@ def taggedSearchFriends(request):
 			
 			
 		return JsonResponse({"name":username,"pic":pic,'userId':userId})
+
+#Forget Password
+def forgetPassword(request):
+	return render(request,'forgetPassword.html')
+
+@csrf_exempt
+def forgetPasswordOTP(request):
+	Email=request.POST.get("Email",'DefaultValue')
+	if request.method == "POST" and Email!="DefaultValue" and Email!="":
+		RandomValue=random.randint(1001,99999)
+		RandomValue="LetsChat"+str(RandomValue)
+		print(RandomValue)
+		message=f"Your Email Address  {Email}  Your OTP is {RandomValue} for Forget Password Do not share your password to anyone."
+		send_mail(
+	    	'LetsChat',
+	    	message,
+	    	settings.EMAIL_HOST_USER,
+	    	[Email],
+	    	fail_silently=False)
+		request.session["forgetOtp"]=RandomValue
+		return JsonResponse({'Result':"Successfully"})
+	else:
+		return JsonResponse({'Result':"UnSuccessfully"})
+
+#Forget Password Process
+@csrf_exempt
+def forgetPasswordProcess(request):
+	if request.method == "POST":
+		OTP = request.POST.get('Otp','DefaultValue')
+		Email = request.POST.get('userName','DefaultValue')
+		if(request.session["forgetOtp"]==OTP):
+			print("OTP MATCH")
+			return render(request,'forgetPasswordProcess.html',{"Email":Email})
+		else:
+			return HttpResponse("<center><h1>Your Password is Incorrect<h1><center>")
+	return HttpResponseRedirect("/")

@@ -49,18 +49,18 @@
           <input type="hidden" name="loggedUserFullName" id="loggedUserFullName" value="{{myData.firstName}} {{myData.lastName}}">
           <input type="hidden" name="loggedUserPic" id="loggedUserPic" value="{{myData.profilePic.url}}">
           <input type="hidden" id="friend" value="{{friendData.userId}}">
-          {% for query,msg in friendList %}
+          {% for query,newMsg in friendList %}
           {% for friend in query %}
-          {# if msg == 0 #}
-          {# with msg="" #}     
           <hr>
-          <li class="this_Friend"><img src="{{friend.profilePic.url}}" class="onlineUserImage" onclick="chooseChat('{{friend.userId}}')"><a href="/messages/{{friend.userId}}/" class="onlineUserName">{{friend}} 
-            <span id="unreadmsg">{{msg}}</span></a>
-          
+          <li id="friendName{{friend.userId}}" class="this_Friend"><img src="{{friend.profilePic.url}}" class="onlineUserImage"><a href="/messages/{{friend.userId}}/" class="onlineUserName">{{friend}} 
+            {% if newMsg != 0 %}
+            <span id="unreadmsg{{friend.userId}}">{{newMsg}}</span></a>
+            <span class=" "><i class="fas fa-dot-circle "></i></span>
+            {% else %}
+            <span id="unreadmsg{{friend.userId}}"></span></a>
             <span class=" "><i class="fas fa-dot-circle "></i></span>
           </li>
-          {# endwith #}
-          {# endif #}
+          {% endif %}
           {% endfor %}
           {% endfor %}
 

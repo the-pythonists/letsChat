@@ -296,7 +296,6 @@ function closeTopSearchBar()
 
 
 
-
 function nightMode(){
   //alert("Okkk");
 
@@ -320,7 +319,9 @@ function nightMode(){
   for (i = 0; i < z.length; i++) {
     z[i].style.color="rgba(0, 150, 136, 1)";
   }
-    document.getElementById("profileInsideHR").style.background="rgba(0, 150, 136, 1)";
+    document.getElementById("profileInsideHR").style.background = "rgba(0, 150, 136, 1)";
+    document.getElementById("accountRightSectionPlaceModel").style.background = "black";
+
 
  }  
 
@@ -330,8 +331,29 @@ function dayMode(){
     document.cookie = "Mode=dayMode";
     var element = document.body;
     element.classList.toggle("day-mode");
-    //document.getElementById("body").style.backgroundImage="url(images/bg-body.jpg)";
+    document.getElementById("body").style.background="white";
+    document.getElementById("header").style.background="#E9ECEF";
+    document.getElementById("header").style.color="rgba(0, 150, 136, 1)";
+    document.getElementById("header").style.boxShadow="0px 0px 23px 0px rgba(0,0,0,0.5)";
+    document.getElementById("leftFixDiv").style.background="rgba(0, 150, 136, 0.6)";
+
+    document.getElementById("profilePicImage").style.border="2px solid white";
+    document.getElementsByClassName("maquee_text")[0].style.color="white";
+
+    var y = document.getElementsByClassName("icon");
+    var z = document.getElementsByClassName("title");
+    for (i = 0; i < y.length; i++) {
+    y[i].style.color="white";
     
+  }
+
+  for (i = 0; i < z.length; i++) {
+    z[i].style.color="white";
+  }
+    document.getElementById("profileInsideHR").style.background="white";
+   
+     document.getElementById("body").style.backgroundImage="url(static/images/body-light.jpg)";
+    document.getElementById("accountRightSectionPlaceModel").style.background = "white";
     /*document.getElementById("PostAlert").style.background="rgba(191, 191, 191, 0.5)";
     document.getElementById("PostAlert").style.color="black";
     document.getElementById("searchBtnId").style.background="white";
@@ -418,3 +440,115 @@ function tagFriendPeopleTextBox()
         }
 
 }
+
+function storyTextSetPlaceManager(media,storydate,storyType,family,size,textContent,color,lenCaption,name,pic)
+ {
+
+    $("#storySlidesId").empty();
+    console.log("media = "+media);
+    console.log("storydate = "+storydate);
+    console.log("storyType = "+storyType);
+    console.log("family = "+family);
+    console.log("size = "+size);
+    console.log("textContent = "+textContent);
+    console.log("color"+color);
+    var storyTypeLocal = storyType.split("@");
+    var familyLocal = family.split("@");
+    var sizeLocal = size.split("@");
+    var colorLocal = color.split("@");
+    var mediaLocal = media.split("@");
+    var lenCaptionLocal = lenCaption.split("@");
+
+    var startLen = 0;
+  for(var i=0 ; i< (storyTypeLocal.length)-1; i++) {
+    console.log("startLen ",startLen);
+    
+    console.log(textContent.slice(startLen,lenCaptionLocal[i]));
+
+    if(storyTypeLocal[i] == "image")
+    {
+      if(i==0){
+        $("#storySlidesId").append('<div class="carousel-item active" ><div id="VisibleStoryBodySection"><img src="'+mediaLocal[i]+'" style="width:100%;height:70vh;" alt="..."><h5 id="storyTextContent" style="color:'+colorLocal[i]+';font-family:'+familyLocal[i]+';">'+textContent.slice(startLen,lenCaptionLocal[i])+'</h5></div></div>');
+      }
+
+      else{
+      $("#storySlidesId").append('<div class="carousel-item" ><div id="VisibleStoryBodySection"><img src="'+mediaLocal[i]+'" style="width:100%;height:70vh;" alt="..."><h5 id="storyTextContent" style="color:'+colorLocal[i]+';font-family:'+familyLocal[i]+';">'+textContent.slice(startLen,parseInt(lenCaptionLocal[i])+startLen)+'</h5></div></div>');
+      }
+    }
+    else{
+
+      if(i==0){
+        $("#storySlidesId").append('<div class="carousel-item active" ><div style="width:100%;height:70vh;padding:2%;background:'+colorLocal[i]+';" ><p style="font-family:'+familyLocal[i]+';font-size:'+sizeLocal[i]+';">'+textContent.slice(startLen,lenCaptionLocal[i])+'</p></div></div>');
+      }
+
+      else{
+      $("#storySlidesId").append('<div class="carousel-item" ><div style="width:100%;height:70vh;padding:2%;background:'+colorLocal[i]+'; " ><p style="font-family:'+familyLocal[i]+';font-size:xx-large;">'+textContent.slice(startLen,parseInt(lenCaptionLocal[i])+startLen)+'</p></div></div>');
+      }
+
+
+    }
+
+    startLen = startLen + parseInt(lenCaptionLocal[i]);
+
+
+ }
+  
+  console.log("none Section Execute"+name);
+  if(name==" Me")
+  {
+    console.log("none Section Execute");
+    document.getElementById("StoryReplySectionPlaceId").style.display="none";
+  }
+  else
+  {
+    document.getElementById("StoryReplySectionPlaceId").style.display="block";
+  }
+    
+
+    document.getElementsByClassName("storyProfileSection")[0].src=pic;
+    document.getElementById('textStoryVisiblePersonName').innerHTML=name;
+ }
+
+
+
+
+ $(document).ready(function () {
+
+  // ANIMATEDLY DISPLAY THE NOTIFICATION COUNTER.
+  $('#noti_Counter')
+      .css({ opacity: 0 })
+      .text('7')  // ADD DYNAMIC VALUE (YOU CAN EXTRACT DATA FROM DATABASE OR XML).
+      .css({ top: '-10px' })
+      .animate({ top: '-2px', opacity: 1 }, 500);
+
+  $('#noti_Button').click(function () {
+
+      // TOGGLE (SHOW OR HIDE) NOTIFICATION WINDOW.
+      $('#notifications').fadeToggle('fast', 'linear', function () {
+          if ($('#notifications').is(':hidden')) {
+              $('#noti_Button').css('background-color', '#2E467C');
+          }
+          // CHANGE BACKGROUND COLOR OF THE BUTTON.
+          else $('#noti_Button').css('background-color', '#FFF');
+      });
+
+      $('#noti_Counter').fadeOut('slow');     // HIDE THE COUNTER.
+
+      return false;
+  });
+
+  // HIDE NOTIFICATIONS WHEN CLICKED ANYWHERE ON THE PAGE.
+  $(document).click(function () {
+      $('#notifications').hide();
+
+      // CHECK IF NOTIFICATION COUNTER IS HIDDEN.
+      if ($('#noti_Counter').is(':hidden')) {
+          // CHANGE BACKGROUND COLOR OF THE BUTTON.
+          $('#noti_Button').css('background-color', '#2E467C');
+      }
+  });
+
+  $('#notifications').click(function () {
+      return false;       // DO NOTHING WHEN CONTAINER IS CLICKED.
+  });
+});
