@@ -47,7 +47,7 @@
           <span class="title">Photos</span>
     </a>
     <br>
-    <a href="#" class="sideOptionIconLink">
+    <a href="/messages/" class="sideOptionIconLink">
           <span class="icon"><i class="far fa-comment-alt"></i></span>
           <span class="title">Messages</span>
     </a>
@@ -125,6 +125,11 @@
       <div id="PostAlert"><h4 style="color:rgba(0, 150, 136, 1);">{{flag}} <span style="float:right;"><i class="far fa-times-circle" onclick="PostAlertClose()"></i></span></h4></div>
       <form method="Post" action="{% url 'PostSubmission' %}" id="PostWrapper"  enctype="multipart/form-data">
         {% csrf_token %}
+        <!-- FOR JS TO WORK -->
+        <input type="hidden" value="{{userInfo.firstName}} {{userInfo.lastName}}" id="currentUserFullName">
+        <input type="hidden" value="{{userInfo.profilePic.url}}" id="currentUserPic">
+        <input type="hidden" value="{{userInfo.userId}}" id="currentUserId">
+        <!--  -->
           <h4 style="padding:8px;">Create Post</h4>
           <textarea name="Post_Title" placeholder="what's on your mind?" style="width:90%;height:15vh;padding:2%;resize:none;" oninput="visibleButton()" id="TextPost"></textarea>
           <div id="PostOpt">
@@ -296,10 +301,11 @@
 
           <div>
               {% for data,data2,data4 in userData %}
-
+              <a href="/profile/{{data.userId}}">
             <img src="{{data.userPic}}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
 
-            <span style="font-weight:bold;padding-left:8px;color:rgba(0,125,136,1);" >{{data.userName}}
+            <span style="font-weight:bold;padding-left:8px;color:rgba(0,125,136,1);" >{{data.userName}}</span>
+            </a>
 
               
               <div class="btn-group dropleft float-sm-right">
@@ -362,21 +368,71 @@
             <br>
             {% endif %}
             
-            <strong><p id="{{data.postId}}" style="padding:8px 0px 0px 8px;">{{data2}} Likes</p></strong>
+            <strong><p id="Counter{{data.postId}}" style="padding:8px 0px 0px 8px;">{{data2}} Likes</p></strong>
+            <input type="hidden" value="{{data.postId}}" id="postLikeId">
+            <input type="hidden" value="{{data.userId}}" id="postOwner">
+            <input type="hidden" value="{{userInfo.userId}}" id="postLiker">
+
             
-            <a><i class="fas fa-thumbs-up" id="PostResponse" name="{{data.postId}}" onclick="likePost('{{data.postId}}')" style="color:{{data4}};"></i></a>
-            <a href="#"><i class="far fa-comment-alt" id="PostResponse"></i></a>
+            <a><i class="fas fa-thumbs-up PostResponseLike" id="{{data.postId}}" name="{{data.postId}}" onclick="postLiker('{{data.postId}}','{{data.userId}}','{{userInfo.userId}}')" style="color:{{data4}};"></i></a>
+            <a href="#"><i class="far fa-comment-alt" id="PostResponseComment"></i></a>
             <hr>
+
+            <span id="NewComment{{data.postId}}"></span>
+            {% for comment in allComments %}
+            {% if comment.postId == data.postId %}
+            <img src="{{comment.userInfo.profilePic.url}}" alt="" width="40px" height="20px">
+            <span style="color: black;">{{comment.userInfo}}</span>
             <br>
-            <form method="post" action="#">
+            <span style="color: green;">{{comment.comment}}</span>
+            <span id="replybtn" onclick="reply('{{comment.postId}}','{{comment.commentId}}',
+            '{{comment.userInfo}}','{{comment.commentedBy}}')">Reply</span>
+            <span id="allReplies{{comment.commentId}}"></span>
+            <input type="text" style="display:none" id="reply{{comment.commentId}}">
+            <br>
+            {% endif %}
+            {% endfor %}
+            <br>
+            <br>
+            <form>
               <img src="{{userInfo.profilePic.url}}" style="width:50px;height:50px;border-radius:50%;vertical-align: middle;">
-              <input type="text" placeholder="Drop your Comment" style="width:90%;padding:8px;">
+              <input type="text" placeholder="Drop your Comment" style="width:90%;padding:8px;" id="Comment{{data.postId}}">
+              <input type="button" onclick="comments('{{data.postId}}','{{data.userId}}','{{userInfo.userId}}')" value="Post">
             </form>
             <br><br>
             {% endfor %}
           </div>
       </div>
+      <script>
+        function reply(ID,commentId,name,commentOf){
+          console.log(ID)
+          document.getElementById('reply'+commentId).style.display='block';
+          document.getElementById('reply'+commentId).focus();
+          document.getElementById('reply'+commentId).value=name;
 
+          $('#reply'+commentId).keyup(function(){
+        var reply = $('#reply'+commentId).val();
+        if (event.keyCode === 13){ // when enter key is pressed
+          console.log(reply);
+          $.ajax({
+                  method:'POST',
+                  url:'/reply/',
+                  data:{
+                    postId:ID,
+                    commentId:commentId,
+                    repliedBy:document.getElementById('currentUserId').value,
+                    repliedOn:commentOf,
+                    reply:reply,
+                  },
+                  success:function(data){
+          document.getElementById('allReplies'+commentId).innerHTML=reply
+        }
+              });
+        }
+
+      }
+      )};
+      </script>
 
 
 </div>
@@ -395,6 +451,10 @@
         </button>
       </div>
       <div class="modal-body">
+        <div id="selectedPeople">
+          
+        </div>
+
         <input type="text" class="form-control" oninput="tagFriendPeopleTextBox()" id="tagFriendsTextBoxId">
         <div class="spinner-border" role="status" id="tagLoader" style="display: none;">
           <span class="sr-only">Loading...</span>
@@ -447,5 +507,8 @@
 
 <script type="text/javascript" src="{%static 'js/script1.js'%}"></script>
 <script type="text/javascript" src="{%static 'js/notifications.js' %}"></script>
+<script type="text/javascript" src="{%static 'js/LikeSocket.js' %}"></script>
+<script type="text/javascript" src="{%static 'js/RequestSocket.js'%}"></script>
+<script type="text/javascript" src="{%static 'js/CommentSocket.js'%}"></script>
 
 </html>

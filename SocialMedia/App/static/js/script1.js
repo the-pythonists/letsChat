@@ -414,7 +414,7 @@ function tagPeopleFun1()
         document.getElementById("tagLoader").style.display="none";
         for(i=0;i<(e.name).length;i++)
         {
-         $('#tagPeoplenameArea').append('<input type="checkbox" id="'+e.userId[i]+'" name="'+e.userId[i]+'" value="'+e.userId[i]+'"><label for="'+e.userId[i]+'"><span><img src="'+e.pic[i]+'" style="width:45px;height:45px;border-radius:50%;margin:8px;"></span>'+e.name[i]+'</label><br>');
+         $('#tagPeoplenameArea').append('<span id="'+e.userId[i]+'"  onclick="tagging(\''+e.userId[i]+'\')" ><label for="'+e.userId[i]+'"><span><img src="'+e.pic[i]+'" style="width:45px;height:45px;border-radius:50%;margin:8px;"></span>'+e.name[i]+'</label></span><br>');
         }
 
       },
@@ -422,22 +422,6 @@ function tagPeopleFun1()
         console.log('Failed');
       }
     })
-
-}
-
-
-function tagFriendPeopleTextBox()
-{
-  $('#tagPeoplenameArea').empty();
-  var frnd = document.getElementById("tagFriendsTextBoxId").value;
-   for(i=0;i<(taggedWholeFriendList.name).length;i++)
-        {
-          if(((taggedWholeFriendList.name[i].toUpperCase()).search(frnd.toUpperCase()))!=-1)
-          {
-            $('#tagPeoplenameArea').append('<input type="checkbox" id="'+taggedWholeFriendList.userId[i]+'" name="'+taggedWholeFriendList.userId[i]+'" value="'+taggedWholeFriendList.userId[i]+'"><label for="'+taggedWholeFriendList.userId[i]+'"><span><img src="'+taggedWholeFriendList.pic[i]+'" style="width:45px;height:45px;border-radius:50%;margin:8px;"></span>'+taggedWholeFriendList.name[i]+'</label><br>');
-          }
-         
-        }
 
 }
 
@@ -552,3 +536,38 @@ function storyTextSetPlaceManager(media,storydate,storyType,family,size,textCont
       return false;       // DO NOTHING WHEN CONTAINER IS CLICKED.
   });
 });
+
+function tagFriendPeopleTextBox()
+{
+  $('#tagPeoplenameArea').empty();
+  var frnd = document.getElementById("tagFriendsTextBoxId").value;
+   for(i=0;i<(taggedWholeFriendList.name).length;i++)
+        {
+          if(((taggedWholeFriendList.name[i].toUpperCase()).search(frnd.toUpperCase()))!=-1)
+          {
+            $('#tagPeoplenameArea').append('<input type="checkbox" id="'+taggedWholeFriendList.userId[i]+'" name="'+taggedWholeFriendList.userId[i]+'" value="'+taggedWholeFriendList.userId[i]+'"><label for="'+taggedWholeFriendList.userId[i]+'"><span><img src="'+taggedWholeFriendList.pic[i]+'" style="width:45px;height:45px;border-radius:50%;margin:8px;"></span>'+taggedWholeFriendList.name[i]+'</label><br>');
+          }
+         
+        }
+
+}
+var seperator="";
+
+function tagging(val){
+  console.log('here',val)
+  if(seperator.search(val)<0)
+  {
+    seperator=seperator+","+val;
+  $("#selectedPeople").append('<span class="badge badge-primary" id="Badge'+val+'">'+val+'<button type="button" class="close" aria-label="Dismiss"  ><span aria-hidden="true" onclick="closeBadge(\''+val+'\')">&times;</span></button></span>');
+  }
+}
+
+function closeBadge(v)
+{
+  console.log("seperator = "+seperator);
+  console.log(v);
+  
+  seperator=seperator.replace(v,"");
+ 
+  document.getElementById("Badge"+v).remove();
+}
