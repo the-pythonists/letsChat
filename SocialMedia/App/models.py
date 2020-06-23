@@ -34,6 +34,7 @@ class userRegistration(models.Model):
     companyPosition = models.CharField(max_length=100,default='',blank=True)
     companyCity = models.CharField(max_length=50,default='',blank=True)
     companyDescription = models.CharField(max_length=1000,default='',blank=True)
+    onlineStatus = models.BooleanField(default=False,blank=True)
     joinedDate = models.DateTimeField(default=datetime.now)
 
     def __str__(self):

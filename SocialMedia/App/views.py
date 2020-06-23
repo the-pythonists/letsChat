@@ -17,6 +17,17 @@ from django.urls import reverse
 # from django_pandas.io import read_frame
 from django.db.models import Subquery
 
+@csrf_exempt
+def update_session(request):
+	if not request.is_ajax() or not request.method=='POST':
+		return HttpResponseNotAllowed(['POST'])
+	userRegistration.objects.filter(userId=request.session['user']).update(onlineStatus=True)
+	return HttpResponse(request.session['user'])
+
+	# if request.POST.get('action') == 'offline':
+		# userRegistration.objects.filter(userId=request.session['user']).update(onlineStatus=False)
+
+
 def index(request):
 	if request.session.has_key('user'):
 		userInfo = userRegistration.objects.get(userId=request.session['user'])

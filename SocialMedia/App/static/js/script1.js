@@ -397,34 +397,6 @@ function dayMode(){
   document.getElementById("PostResultSearchModel").innerHTML="Search : "+result;
  }
 
-//Tag People Function1
-var taggedWholeFriendList;
-function tagPeopleFun1()
-{
-  
-  document.getElementById("tagLoader").style.display="block";
-  $.ajax({
-      method:'POST',
-      url:'/taggedSearchFriends/',
-      
-      success:function(e){
-        taggedWholeFriendList = e;
-        $('#tagPeoplenameArea').empty();
-        console.log(e);
-        document.getElementById("tagLoader").style.display="none";
-        for(i=0;i<(e.name).length;i++)
-        {
-         $('#tagPeoplenameArea').append('<span id="'+e.userId[i]+'"  onclick="tagging(\''+e.userId[i]+'\')" ><label for="'+e.userId[i]+'"><span><img src="'+e.pic[i]+'" style="width:45px;height:45px;border-radius:50%;margin:8px;"></span>'+e.name[i]+'</label></span><br>');
-        }
-
-      },
-      error:function(data){
-        console.log('Failed');
-      }
-    })
-
-}
-
 function storyTextSetPlaceManager(media,storydate,storyType,family,size,textContent,color,lenCaption,name,pic)
  {
 
@@ -537,6 +509,34 @@ function storyTextSetPlaceManager(media,storydate,storyType,family,size,textCont
   });
 });
 
+//Tag People Function1
+var taggedWholeFriendList;
+function tagPeopleFun1()
+{
+  
+  document.getElementById("tagLoader").style.display="block";
+  $.ajax({
+      method:'POST',
+      url:'/taggedSearchFriends/',
+      
+      success:function(e){
+        taggedWholeFriendList = e;
+        $('#tagPeoplenameArea').empty();
+        console.log(e);
+        document.getElementById("tagLoader").style.display="none";
+        for(i=0;i<(e.name).length;i++)
+        {
+         $('#tagPeoplenameArea').append('<span id="'+e.userId[i]+'"  onclick="tagging(\''+e.userId[i]+'\')" ><label for="'+e.userId[i]+'"><span><img src="'+e.pic[i]+'" style="width:45px;height:45px;border-radius:50%;margin:8px;"></span>'+e.name[i]+'</label></span><br>');
+        }
+
+      },
+      error:function(data){
+        console.log('Failed');
+      }
+    })
+
+}
+
 function tagFriendPeopleTextBox()
 {
   $('#tagPeoplenameArea').empty();
@@ -545,7 +545,7 @@ function tagFriendPeopleTextBox()
         {
           if(((taggedWholeFriendList.name[i].toUpperCase()).search(frnd.toUpperCase()))!=-1)
           {
-            $('#tagPeoplenameArea').append('<input type="checkbox" id="'+taggedWholeFriendList.userId[i]+'" name="'+taggedWholeFriendList.userId[i]+'" value="'+taggedWholeFriendList.userId[i]+'"><label for="'+taggedWholeFriendList.userId[i]+'"><span><img src="'+taggedWholeFriendList.pic[i]+'" style="width:45px;height:45px;border-radius:50%;margin:8px;"></span>'+taggedWholeFriendList.name[i]+'</label><br>');
+            $('#tagPeoplenameArea').append('<span id="'+taggedWholeFriendList.userId[i]+'" onclick="tagging(\''+taggedWholeFriendList.userId[i]+'\')"><label for="'+taggedWholeFriendList.userId[i]+'"><span><img src="'+taggedWholeFriendList.pic[i]+'" style="width:45px;height:45px;border-radius:50%;margin:8px;"></span>'+taggedWholeFriendList.name[i]+'</label></span><br>');
           }
          
         }
@@ -570,4 +570,9 @@ function closeBadge(v)
   seperator=seperator.replace(v,"");
  
   document.getElementById("Badge"+v).remove();
+}
+
+function tagSave(){
+  val = document.getElementById('selectedPeople')
+  console.log(val)
 }

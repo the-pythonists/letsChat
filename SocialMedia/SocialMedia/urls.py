@@ -21,6 +21,8 @@ from App import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('update_session/',views.update_session,name='update_session'),
+    
     path('',views.index,name='index'),
     path('signup/',views.signup,name='signup'),
     path("OtpGeneration/", views.OtpGeneration,name="OtpGeneration"),#Otp Generation

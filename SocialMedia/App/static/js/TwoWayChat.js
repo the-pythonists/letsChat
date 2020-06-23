@@ -35,14 +35,20 @@ function websocket_message_show(e){
 	var time = today.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
 	
 	var message_data = JSON.parse(e.data);
-	console.log(message_data.message)
+	// console.log(message_data.message)
 	if(message_data.sender==myself && message_data.receiver==friend){
 		message_save(message_data.message);
+		
 	coding ='<p class="sender"><img src="'+message_data.loggedUserPic+'" class="personProfilePicture"><strong class="ml-2">'+'You'+'</strong><br><span class="ml-5">'+message_data.message+'</span><span class="float-right">'+time+'</span></p><br>';
 	}
 	else if (message_data.sender==friend && message_data.receiver==myself){
 		coding ='<p class="reciver"><img src="'+message_data.loggedUserPic+'" class="personProfilePicture"><strong class="ml-2">'+message_data.loggedUserFullName+'</strong><br><span class="ml-5">'+message_data.message+'</span><span class="float-right">'+time+'</span></p><br>';
-		// coding = "<p class='reciver'><img src="+"'message_data.loggedUserPic'"+ "class='personProfilePicture'><strong >"+message_data.username+"</strong><br><span class='ml-5'>"+message_data.message+"</span><span class='float-right'>"+time+"</span></p>";
+		unreadMsgs = document.getElementById('unreadmsg'+friend).innerText;
+		if (unreadMsgs == ''){
+			unreadMsgs = 0
+		}
+		document.getElementById('unreadmsg'+friend).innerHTML=parseInt(unreadMsgs)+1;
+		console.log(typeof 'unreadmsg',unreadMsgs)
 	}
 
 	$('.wrapperClassBlock').append(coding);
@@ -67,11 +73,10 @@ $.ajax({
 		console.log('Failed');
 	}
 })
-// console.log(Users);
 }
 
 
-document.querySelector('#message').onclick = messaageSeen;
+// document.querySelector('#message').onclick = messaageSeen;
 document.querySelector('#friendName'+friend).onclick = messaageSeen;
 
 function messaageSeen(){
