@@ -5,39 +5,125 @@ from django.conf import settings
 from django.http import JsonResponse
 import random
 from django.core.mail import send_mail
-from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story,Album,Photos,Messages,TempRoom,Comments
+#from .models import userRegistration,Friend_Requests,UserPost,Likes,AllFriends,Notifications,Story,Album,Photos,Messages,TempRoom,Comments
+from .models import *
 from django.contrib.auth.hashers import make_password,check_password
 import datetime
 import uuid
 from django.contrib import messages
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db.models import Q
-from django.core import serializers
 from itertools import chain
 from django.urls import reverse
+from django.db.models import Subquery
 
 def index(request):
 	if request.session.has_key('user'):
 		userInfo = userRegistration.objects.get(userId=request.session['user'])
 		userData = UserPost.objects.filter(userId=request.session['user']).order_by('-date') # '-' for descending order
+		
 		friends = AllFriends.objects.get(userId=request.session['user']).Friends
+		
 		postList = []
 		def UserAllPost():
 			for item in userData:
 				yield item
 
 		def FriendPosts():
-			for item in friends:
-				t = UserPost.objects.filter(userId=item).order_by('-date')
-				u = Photos.objects.filter(Album='Profile Pictures',PhotoID=item).order_by('-date')
-				print(item)
-				for i in t:
-					yield i
+			for friend in friends:
+				friendPost = UserPost.objects.filter(userId=friend).order_by('-date')
+				for post in friendPost:
 
+					yield post
+		# FriendPosts()
+		storyList = []
+		StoryOwnerList = []
+		tempStoryList = []
+		tempStoryOwner = ""
+		tempMedia = ""
+		tempUploadTime = ""
+		tempStoryType = ""
+		tempFontFamily = ""
+		tempFontSize = ""
+		tempCaption = ""
+		tempColor = ""
+		lenthCaption = ""
+		#Check myself Stories
+		myStories = Story.objects.filter(userId=request.session['user'])
+		if myStories.exists():
+			StoryOwner = userRegistration.objects.get(userId=request.session['user'])
+			for l in myStories:
+				lenthCaption =lenthCaption + str(len(l.Caption)) +"@"
+				tempMedia = tempMedia + "/media/"+str(l.media) +"@"
+				tempUploadTime = tempUploadTime + str(l.uploadTime) +"@"
+				tempStoryType = tempStoryType + l.storyType +"@"
+				tempFontFamily = tempFontFamily + l.fontFamily +"@"
+				tempFontSize = tempFontSize + l.fontSize +"@"
+				tempCaption = tempCaption + l.Caption 
+				tempColor = tempColor + l.color +"@"
+				
+				tempStoryOwner = "Me" + ","
+				StoryOwner.userName = " Me"
+			StoryOwnerList.append(StoryOwner)
+			tempStoryList.insert(0,tempMedia)
+			tempStoryList.insert(1,tempUploadTime)
+			tempStoryList.insert(2,tempStoryType)
+			tempStoryList.insert(3,tempFontFamily)
+			tempStoryList.insert(4,tempFontSize)
+			tempStoryList.insert(5,tempCaption)
+			tempStoryList.insert(6,tempColor)
+			tempStoryList.insert(7,lenthCaption)		
+			
+			storyList.append(tempStoryList)
+			
+			
+		#Get Friends Stories
+		for friend in friends:
+			#print(friend)
+			allStories = Story.objects.filter(userId=friend)
+			#print(allStories)
+			if allStories.exists():
+				StoryOwner = userRegistration.objects.get(userId=friend)
+				print(len(allStories))
+				tempStoryList = []
+				tempStoryOwner = ""
+				tempMedia = ""
+				tempUploadTime = ""
+				tempStoryType = ""
+				tempFontFamily = ""
+				tempFontSize = ""
+				tempCaption = ""
+				tempColor = ""
+				lenthCaption = ""
+				for l in allStories:
+					lenthCaption =lenthCaption + str(len(l.Caption)) +"@"
+					tempMedia = tempMedia + "/media/"+str(l.media) +"@"
+					tempUploadTime = tempUploadTime + str(l.uploadTime) +"@"
+					tempStoryType = tempStoryType + l.storyType +"@"
+					tempFontFamily = tempFontFamily + l.fontFamily +"@"
+					tempFontSize = tempFontSize + l.fontSize +"@"
+					tempCaption = tempCaption + l.Caption 
+					tempColor = tempColor + l.color +"@"
+					
+				StoryOwnerList.append(StoryOwner)
+				tempStoryList.insert(0,tempMedia)
+				tempStoryList.insert(1,tempUploadTime)
+				tempStoryList.insert(2,tempStoryType)
+				tempStoryList.insert(3,tempFontFamily)
+				tempStoryList.insert(4,tempFontSize)
+				tempStoryList.insert(5,tempCaption)
+				tempStoryList.insert(6,tempColor)
+				tempStoryList.insert(7,lenthCaption)		
+				
+				storyList.append(tempStoryList)
+					#storyList.append(l)	
+					#StoryOwnerList.append(StoryOwner)
+
+		storiesFullData = zip(StoryOwnerList,storyList)
 		AllPost = chain(UserAllPost(), FriendPosts())
 		for item in AllPost:
 			postList.append(item)
-		postList.sort(key=lambda x: x.date,reverse = True)      #for reversed :  (reverse = True)
+		postList.sort(key=lambda x: x.date,reverse = True) 
 		like=[]; colorPost = []
 		for i in postList:
 			likes = Likes.objects.get(postId=i.postId)
@@ -46,11 +132,81 @@ def index(request):
 				colorPost.append("rgba(0, 150, 136,1)")
 			else:
 				colorPost.append("grey")
-		date_now = datetime.datetime.now()
-		params = {'userInfo':userInfo,'userData':zip(postList, like,colorPost),"date_now":date_now}
+		qry =[]
+		lnth = []
+		for item in postList:
+			poId=item.postId
+			s =(TaggedPeople.objects.get(postId=poId).taggedPersons)
+			if len(s)>0:
+				qry.append(userRegistration.objects.filter(userId=s[0]))
+				lnth.append(len(s)-1)
+			else:
+				qry.append("")
+				lnth.append("")
+				
+		# allComments = Comments.objects.all().values('comment','date','userInfo__firstName')
+		allComments = Comments.objects.all()
+		for i in allComments:
+			com = i.comment
+			name = i.userInfo.firstName
+		
+		notification = Notifications.objects.filter(receiver=request.session['user']).order_by('-date')
+		picsList1 = []
+		uname = ''   # IF USER HAS NO NOTIFICATION
+		for Id in notification:
+			senderDetail = userRegistration.objects.filter(userId=Id.sender)
+			for detail in senderDetail:
+				
+				uname = detail.userName
+				picUrl = detail.profilePic
+				picsList1.append(picUrl.url)
+		params = {'userInfo':userInfo,'userData':zip(postList, like,colorPost,qry,lnth),'date_now':datetime.datetime.now(),
+		'allComments':allComments,"storyData":storiesFullData,'notification':zip(notification,picsList1)}
 		return render(request,'DashBoard.html',params)
 	else:
 		return render(request,'index.html')
+
+def textStory(request):
+	return render(request,'textStory.html')
+
+def imageStory(request):
+	return render(request,'imageStory.html')
+
+@csrf_exempt
+def story(request):
+	if request.method == 'POST':
+		image = request.FILES.get('image')
+		fontSize = request.POST.get('fontSize',"defaultValue")
+		storyType = request.POST.get('type',"defaultValue")
+		fontFamily = request.POST.get('fontFamily',"defaultValue")
+		Caption = request.POST.get('Caption',"defaultValue")
+		color = request.POST.get('color',"defaultValue")
+		
+
+		#media=image,
+
+		Story(userId=request.session['user'],media=image,storyType=storyType,fontFamily=fontFamily,fontSize=fontSize,Caption=Caption,color=color).save()
+		return JsonResponse({"Status":"Successfully"})
+	else:
+		stories = Story.objects.all()
+		return JsonResponse({"Status":"UnSuccessfully"})
+
+def imageStorySubmissionForm(request):
+	if request.method == 'POST':
+		image = request.FILES.get('image')
+		fontSize = request.POST.get('fontSize',"defaultValue")
+		storyType = request.POST.get('type',"defaultValue")
+		fontFamily = request.POST.get('fontFamily',"defaultValue")
+		Caption = request.POST.get('Caption',"defaultValue")
+		color = request.POST.get('color',"defaultValue")
+		
+		#media=image,
+
+		Story(userId=request.session['user'],media=image,storyType=storyType,fontFamily=fontFamily,fontSize=fontSize,Caption=Caption,color=color).save()
+		return HttpResponseRedirect("/")
+	else:
+		stories = Story.objects.all()
+		return JsonResponse({"Status":"UnSuccessfully"})
 
 def signup(request):
 	if request.method == "POST":
@@ -68,12 +224,11 @@ def signup(request):
 			elif userRegistration.objects.filter(mobile=mobile):
 				return render(request,'CreateAccount.html',{'message':'Account Already Present with Given Mobile Number'}) 
 			else:
-				accountSave = userRegistration(userId=username, firstName=fName, lastName=lName, userName=username, 
-				mobile=mobile,emailAddress = email, password = make_password(pwd))
-				accountSave.save()
+				userRegistration(userId=username, firstName=fName, lastName=lName, userName=username, 
+				mobile=mobile,emailAddress = email, password = make_password(pwd)).save()
 				# Creating Blank Frined List
 				AllFriends(userId=username).save()
-				messages.warning(request,'Account Created Successfully !!')
+				# messages.success(request,'Account Created Successfully !!')
 				return HttpResponseRedirect('/')
 			
 		else:
@@ -91,30 +246,19 @@ def uservalidate(request):
 
 @csrf_exempt
 def OtpGeneration(request):
-	Email=request.POST.get('Email','DefaultValue')
-	RandomValue=random.randint(1001,99999)
-	RandomValue="LetsChat"+str(RandomValue)
+	Email = request.POST.get('Email','DefaultValue')
+	RandomValue = random.randint(1001,99999)
+	RandomValue = "LetsChat"+str(RandomValue)
+	request.session["Otp"] = RandomValue
 	print(RandomValue)
-	message=f"Your Email Address  {Email}  Your OTP is {RandomValue} Do not share your password to anyone."
+	message = f"Your Email Address  {Email}  Your OTP is {RandomValue} Do not share your password to anyone."
 	send_mail(
     	'LetsChat',
     	message,
     	settings.EMAIL_HOST_USER,
     	[Email],
     	fail_silently=False)
-	request.session["Otp"]=RandomValue
-	# request.session["Email"]=Email
 	return JsonResponse({'Result':"Successfully"})
-
-def story(request):
-	
-	if request.method == 'POST':
-		userStory = request.FILES['story']
-
-		Story(userId=request.session['user'],media=userStory).save()
-		return HttpResponseRedirect('/')
-	else:
-		return render(request,'Story.html')
 
 @csrf_exempt
 def storydelete(request):
@@ -177,23 +321,46 @@ def postlike(request):
 
 @csrf_exempt
 def postcomment(request):
+	commentedBy = request.POST.get('postCommentedBy')
+
+	commenter = userRegistration.objects.get(userId=commentedBy)
 	if request.POST.get('action'):
-		return JsonResponse({'Result':'Success'})
-	else:
-		postId = request.POST.get('postId')
-		commentedOf = request.POST.get('postCommentedOf')
-		commentedBy = request.POST.get('postCommentedBy')
-		comment = request.POST.get('comment')
-		commentId = 'comment'+str(uuid.uuid4().hex)
-		name = userRegistration.objects.get(userId=commentedBy)
-		fullname = name.firstName + ' ' + name.lastName
-		notify = fullname + ' commented on your post'
+		return JsonResponse({'Result':'Success','commenter':str(commenter),'pic':str(commenter.profilePic.url)})
 
-		Comments(postId=postId,commentedOf=commentedOf,commentedBy=commentedBy,comment=comment,commentId=commentId).save()
-		Notifications(postId=postId,notificationType='comment',fullName=name,sender=commentedBy,receiver=commentedOf,
-		notification=notify,viewed=False).save()
-		return JsonResponse({'Result':'Success','comment':comment})
+	postId = request.POST.get('postId')
+	commentedOf = request.POST.get('postCommentedOf')
+	# commentedBy = request.POST.get('postCommentedBy')
+	comment = request.POST.get('comment')
+	commentId = 'comment'+str(uuid.uuid4().hex)
+	name = userRegistration.objects.get(userId=commentedBy)
+	fullname = commenter.firstName + ' ' + commenter.lastName
+	notify = fullname + ' commented on your post'
 
+	Comments(postId=postId,commentedOf=commentedOf,commentedBy=commentedBy,comment=comment,commentId=commentId,
+	userInfo=name).save()
+	Notifications(postId=postId,notificationType='comment',fullName=name,sender=commentedBy,receiver=commentedOf,
+	notification=notify,viewed=False).save()
+	return JsonResponse({'Result':'Success','comment':comment})
+
+@csrf_exempt
+def reply(request):
+	postId = request.POST.get('postId')
+	commentId = request.POST.get('commentId')
+	replyId = 'reply'+str(uuid.uuid4().hex)
+	repliedBy = request.POST.get('repliedBy')
+	repliedOn = request.POST.get('repliedOn')
+	reply = request.POST.get('reply')
+	user = userRegistration.objects.get(userId=repliedBy)
+	
+	Replies(postId=postId,commentId=commentId,replyId=replyId,repliedBy=repliedBy,repliedOn=repliedOn,reply=reply,
+	userInfo=user).save()
+	
+	notify = str(user) + ' Replied to your Comment'
+	Notifications(postId=postId,notificationType='reply',fullName=str(user),sender=repliedBy,receiver=repliedOn,
+	notification=notify,viewed=False).save()
+	return JsonResponse({'Success':'Done'})
+
+@csrf_exempt
 def login(request):
 	if request.method == 'POST':
 		email = request.POST.get("login_Email")
@@ -208,7 +375,7 @@ def login(request):
 			return HttpResponseRedirect('/')
 			
 		else:
-			messages.warning(request,'Please Check Your Email and Password.!!')
+			# messages.warning(request,'Please Check Your Email and Password.!!')
 			return render(request,'index.html')
 	else:
 		if request.session.has_key('user'):
@@ -270,8 +437,8 @@ def profile(request,user):
 	ActiveUserName = ActiveUser.firstName
 	ActiveUserPic = ActiveUser.profilePic
 	profileId = user
-	profileDetail = userRegistration.objects.filter(userId=user)
-	userPic = userRegistration.objects.get(userId=request.session['user']).profilePic
+	profileDetail = userRegistration.objects.get(userId=user)
+	userPic = profileDetail.profilePic
 	
 	# checking if searched person is req receiver or sender
 	if Friend_Requests.objects.filter(receiver=profileId,sender=request.session['user']):
@@ -293,13 +460,11 @@ def profile(request,user):
 	else:
 		isFriend = False
 
-	request.session['Watchprofile'] = profileId
+	postData = UserPost.objects.filter(userId=request.session['user']).order_by('-date')
+	params = {'data':profileDetail,'currentUserId':request.session['user'],'currentUserFullName':request.session['name'],
+	'currentUserPic':userPic.url,'isFriend':isFriend,'isRequest':isRequest,'isRequested':isRequested,'ActiveUserPic':ActiveUserPic,'ActiveUser':ActiveUser.userName
+	,'ActiveUserName':ActiveUserName,'postData':postData}
 
-	postData = UserPost.objects.filter(userId=request.session['user'])
-	params = {'user':profileDetail,'currentUserId':request.session['user'],
-		'isFriend':isFriend,'isRequest':isRequest,'isRequested':isRequested,
-		'ActiveUserName':ActiveUserName,'ActiveUserPic':ActiveUserPic,'ActiveUser':ActiveUser.userName,
-		'currentUserFullName':request.session['name'],'currentUserPic':userPic.url,'postData':postData}
 	return render(request,'Profile.html',params)
 
 def Userprofile(request):
@@ -310,15 +475,26 @@ def userProfileInsert(request):
 		profileUserId=request.POST.get('ProfileUser')
 		profileImage=request.FILES['profileImage']
 		loginUser=request.session['user']
+		postType = 'profilePhoto'
+		Id = uuid.uuid4().hex	
+		user = request.session['user']
+		PostMessage = ''
+	
 		if profileUserId==loginUser:
 			status=userRegistration.objects.get(userId=loginUser)
 			status.profilePic = profileImage
 			status.save()
 			UserPost.objects.filter(userId=loginUser).update(userPic='/media/'+str(userRegistration.objects.get(userId=loginUser).profilePic))
+			GroupChat.objects.filter(sender=loginUser).update(senderPic='/media/'+str(userRegistration.objects.get(userId=loginUser).profilePic))
 			if not Album.objects.filter(AlbumID=request.session['user']):
 				Album(AlbumID=request.session['user'],Name='Profile Pictures').save()
 			
+			PostStatus = UserPost(PostType=postType,postId=Id,userId=user,userName=request.session['name'],post=profileImage,
+			Message = PostMessage,userPic='/media/'+str(userRegistration.objects.get(userId=user).profilePic)
+			).save()
+			likes = Likes(postId=Id).save()
 			Photos(Album='Profile Pictures',PhotoID=request.session['user'],Image=profileImage).save()
+
 			return HttpResponseRedirect('/profile/'+loginUser+'/')
 		else:
 			return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
@@ -329,7 +505,6 @@ def userProfileInsert(request):
 def addfriend(request):
 	profileId = request.POST.get('profileId')
 	action = request.POST.get('action')
-	print(action)
 	request.session['friendProfile'] = profileId # USED IN NEXT FUNCTION FOR REQUEST CONFIRM
 
 	if action == 'add':
@@ -357,7 +532,6 @@ def addfriend(request):
 		return JsonResponse({"Result":"Successfully Removed"})
 
 	elif action == 'confirm':
-		print('views conf')
 		return HttpResponseRedirect('/requestConfirm')
 	
 	elif action == 'changeRequestHTML':
@@ -436,14 +610,16 @@ def search(request):
 
 def PostSubmission(request):
 	if request.session.has_key('user'):
+		postType = 'post'
 		Id = uuid.uuid4().hex	
 		user = request.session['user']
 		PostMessage = request.POST.get('Post_Title','DefaultValue')
 		PostMedia = request.FILES.get('MediaFile')
 	
-		PostStatus=UserPost(postId=Id,userId=user,userName=request.session['name'],post=PostMedia,
-		Message=PostMessage,userPic='/media/'+str(userRegistration.objects.get(userId=user).profilePic)
+		PostStatus = UserPost(PostType=postType,postId=Id,userId=user,userName=request.session['name'],post=PostMedia,
+		Message = PostMessage,userPic='/media/'+str(userRegistration.objects.get(userId=user).profilePic)
 		).save()
+		tagging = TaggedPeople(taggedId=request.session['name']+Id,postId=Id).save()
 		likes = Likes(postId=Id).save()
 		return HttpResponseRedirect('/')
 	else:
@@ -455,7 +631,7 @@ def logout(request):
 		del request.session['user']
 		return HttpResponseRedirect('/')
 	else:
-		messages.warning(request,'You are already logout. Please login...')
+		#messages.warning(request,'You are already logout. Please login...')
 		return render(request,'index.html')
 
 def test(request):
@@ -472,6 +648,10 @@ def userCoverInsert(request):
 		profileUserId = request.POST.get('coverUser','DefaultValue')
 		coverImage = request.FILES['coverImage']
 		loginUser = request.session['user']
+		postType = 'coverPhoto'
+		Id = uuid.uuid4().hex	
+		user = request.session['user']
+		PostMessage = ''
 		if profileUserId==loginUser:
 			status = userRegistration.objects.get(userId=loginUser)
 			status.coverPic = coverImage
@@ -479,6 +659,10 @@ def userCoverInsert(request):
 			if not Album.objects.filter(AlbumID=request.session['user'],Name='Cover Photos'):
 				Album(AlbumID=request.session['user'],Name='Cover Photos').save()
 			
+			PostStatus = UserPost(PostType=postType,postId=Id,userId=user,userName=request.session['name'],post=coverImage,
+			Message = PostMessage,userPic='/media/'+str(userRegistration.objects.get(userId=user).profilePic)
+			).save()
+			likes = Likes(postId=Id).save()
 			Photos(Album='Cover Photos',PhotoID=request.session['user'],Image=coverImage).save()
 			return HttpResponseRedirect('/profile/'+loginUser+'/')
 		else:
@@ -638,68 +822,176 @@ def changeForgetPasword(request):
 		fPassword = request.POST.get('fPassword','DefaultValue')
 		sPassword = request.POST.get('sPassword','DefaultValue')
 		if fPassword == sPassword:
-			print("SuccessFully")
 			del request.session['forgetOtp']
 			userRegistration.objects.filter(emailAddress=Email).update(password=make_password(fPassword))
 			return JsonResponse({"Status":"Successfully"})
 		else:
-			print("UnSuccessFully")
 			return JsonResponse({"Status":"UnSuccessfully"})
 	else:
 		return HttpResponseRedirect("/")
 
 def friends(request):
-	friendList = []
+	friendList = []; MessageList = []
 	friends = AllFriends.objects.get(userId=request.session['user']).Friends
-
 	for friend in friends:
 		friendData = userRegistration.objects.filter(userId=friend)
+		unreadMessage = Messages.objects.filter(is_read=False,sender=friend,receiver=request.session['user']).count()
+		MessageList.append(unreadMessage)
+		# print(unreadMessage)
 		friendList.append(friendData)
-		print(friendData)
-	return friendList
+		# print(friendData)
+	friendMessageList = zip(friendList,MessageList)
+	GroupsList = []
+	groups = userRegistration.objects.get(userId=request.session['user']).Groups
+	for group in groups:
+		allGroups = Groups.objects.filter(groupId=group)
+		GroupsList.append(allGroups)
+	# MyclubUser.objects.in_bulk([1, 3, 7])
+	return friendMessageList,GroupsList
 
 def messages(request):
 	if request.session.has_key('user'):
-		friendList = []
-		friends = AllFriends.objects.get(userId=request.session['user']).Friends
-		
-		for friend in friends:
-			friendData = userRegistration.objects.filter(userId=friend)
-			friendList.append(friendData)
-			print(friendData)
-
+		friendList,GroupsList = friends(request)
 		myData = userRegistration.objects.get(userId=request.session['user'])
-		params = {'friendList':friendList,'myData':myData}
+		params = {'friendList':friendList,'myData':myData,'groups':GroupsList}
 		return render(request,'chat.html',params)
 
 def inbox(request,user):
 	myId = request.session['user']
 	friendId = user
-	allMessages = Messages.objects.filter(Users=[myId,friendId]) | Messages.objects.filter(Users=[friendId,myId])
-	
-	if allMessages:
-		for msg in allMessages:
-			print(msg)
+	is_Inbox = Inbox.objects.filter(Users=[myId,friendId]) | Inbox.objects.filter(Users=[friendId,myId])
+	seenMessage(request,user,request.session['user'])
+	if is_Inbox:
+		for msg in is_Inbox:
 			inboxId = msg.inboxId
-	
+			messageInbox = msg.id
+		allMessages = Messages.objects.filter(Inbox=messageInbox)
+		unread = allMessages.filter(is_read=False,sender=user).count()
 	else:
 		inboxId = uuid.uuid4().hex
-		Messages(inboxId=inboxId,Users=[myId,friendId]).save()
+		Inbox(inboxId=inboxId,Users=[myId,friendId]).save()
+		allMessages = ''
 	myData = userRegistration.objects.get(userId=request.session['user'])
 	friendData = userRegistration.objects.get(userId = user)
-	return render(request,'chat.html',{"flag":True,"friendData":friendData,'inboxId':inboxId,
-		'myData':myData,'allMessages':allMessages,'friendList':friends(request)})
+	friendList,groups = friends(request)
+
+	return render(request,'chat.html',{"inbox":True,"friendData":friendData,'inboxId':inboxId,
+		'myData':myData,'allMessages':allMessages,'friendList':friendList,'groups':groups})
+
+def groups(request,group):
+	myId = request.session['user']
+	allMessages = GroupChat.objects.filter(groupId=group)
+	
+	myData = userRegistration.objects.get(userId=request.session['user'])
+	friendList,groups = friends(request)
+	groupInfo = Groups.objects.get(groupId=group)
+	return render(request,'chat.html',{"groupChat":True,'groupId':group,'myData':myData,
+	'friendList':friendList,'groups':groups,'allMessages':allMessages,'groupInfo':groupInfo})
 
 @csrf_exempt
 def saveMessage(request):
 	inboxId = request.POST.get('inboxId')
-	user1 = request.POST.get('user1')
-	user2 = request.POST.get('user2')
-	messageid = uuid.uuid4()
+	messageid = 'privatemessage'+str(uuid.uuid4())
 	sender = request.POST.get('sender')
 	receiver = request.POST.get('receiver')
 	message = request.POST.get('Message')
-	print([user1,user2],'user')
-	Messages(inboxId=inboxId,Users=[user1,user2],MessageID=messageid,sender=sender,
+	Messages(Inbox=Inbox.objects.get(inboxId=inboxId),MessageID=messageid,sender=sender,
 	receiver=receiver,is_read=False,Message=message).save()
 	return JsonResponse({'Result':'Success'})
+
+@csrf_exempt
+def groupMessage_Save(request):
+	groupId = request.POST.get('groupId')
+	sender = request.POST.get('sender')
+	message = request.POST.get('Message')
+	messageid = 'groupmessage'+str(uuid.uuid4())
+
+	senderDetail = userRegistration.objects.get(userId=sender)
+	GroupChat(groupId=groupId,messageID=messageid,sender=sender,is_read=False,Message=message,
+	senderName=senderDetail.firstName+' '+senderDetail.lastName,senderPic='/media/'+str(senderDetail.profilePic),
+	).save()
+	return JsonResponse({'Result':'Success'})
+
+@csrf_exempt
+def seenMessage(request,sender,receiver):
+	Messages.objects.filter(is_read=False,sender=sender,receiver=receiver).update(is_read=True)
+	return JsonResponse({'Result':'Success'})
+
+def reportGetPost(request):
+	if request.method == "POST":
+		pic = request.POST.get('pic',"defaultValue")
+		msg = request.POST.get('msg',"defaultValue")
+		postId = request.POST.get('postId',"defaultValue")
+		if(pic=="defaultValue"):
+			pic=False
+		param={"pic":pic,"msg":msg,"postId":postId}
+		return render(request,'report.html',param)
+
+@csrf_exempt
+def reportSubmission(request):
+	if request.method == "POST":
+		postId = request.POST.get("postID")
+		reportTitle = request.POST.get("reportTitle")
+		Report(postId=postId,reportTitle=reportTitle).save()
+		return JsonResponse({"status":True})
+
+@csrf_exempt
+def taggedSearchFriends(request):
+	if request.method == "POST":
+		if request.POST.get('action') == 'friend':
+			friend = request.POST.get('id')
+			friends = AllFriends.objects.get(userId=friend).Friends	
+			username = []
+			pic = []
+			userId = []
+			for i in friends:
+				userId.append(i)
+				friendName = userRegistration.objects.get(userId=i)
+				username.append(friendName.firstName + ' ' +friendName.lastName)
+				pic.append(friendName.profilePic.url)
+				
+			return JsonResponse({"name":username,"pic":pic,'userId':userId})
+		else:
+			friends = AllFriends.objects.get(userId=request.session['user']).Friends
+			pid = request.POST.get('postId')
+			tagPersonList = TaggedPeople.objects.get(postId=pid).taggedPersons
+			taggedUsers = [userRegistration.objects.filter(userId=user) for user in tagPersonList]
+			allName = []
+			for userQuerySet in taggedUsers:
+				for user in userQuerySet:
+					fname = user.firstName
+					lname = user.lastName
+					allName.append(fname+' '+lname)
+			username = []
+			pic = []
+			userId = []
+			for i in friends:
+				userId.append(i)
+				friendName = userRegistration.objects.get(userId=i)
+				username.append(friendName.firstName + ' ' +friendName.lastName)
+				pic.append(friendName.profilePic.url)
+				
+			return JsonResponse({"name":username,"pic":pic,'userId':userId,'allTaggedList':tagPersonList,'allName':allName})
+		
+
+@csrf_exempt
+def tagSubmissionForm(request):
+	tagPerson = request.POST.get('tagPerson')
+	postId = request.POST.get('postId')
+	tagPersonList = list(tagPerson.split(","))
+	
+	TaggedPeople.objects.filter(postId=postId).update(taggedPersons=tagPerson[1:])
+	
+	return HttpResponse(tagPerson) 
+@csrf_exempt
+def showAllTagPerson(request):
+	postId = request.POST.get('postId')
+	qry = TaggedPeople.objects.get(postId = postId).taggedPersons
+	Fname =[]
+	Lname =[] 
+	for person in qry:
+		qry1=userRegistration.objects.get(userName=person)
+		Fname.append(qry1.firstName)
+		Lname.append(qry1.lastName)
+
+	return JsonResponse({"status":"successfully","userName":qry,"FName":Fname,"LName":Lname})

@@ -28,43 +28,54 @@
 <body>
 
 <!--Header-->
-<div id="navbar">
-    <a href="/" id="logo">letsChat</a>
-    <div id="navbar-right">
-      <a class="active" href="/profile/{{ActiveUser}}"><img src="{{ActiveUserPic.url}}" class="img-circle" width="25px" height="25px" alt="profilePic"><span class="ml-1">{{ActiveUserName}}</span></a>
-      <a href="/">Home</a>
-      <a href="#about">About</a>
-    </div>
+<<div id="navbar">
+  <a href="/" id="logo">letsChat</a>
+  <div id="navbar-right">
+    <a class="active" href="/profile/{{ActiveUser}}"><img src="{{ActiveUserPic.url}}" class="img-circle" width="25px" height="25px" alt="profilePic"><span class="ml-1">{{ActiveUserName}}</span></a>
+    <a href="/">Home</a>
+    <a href="#about">About</a>
   </div>
+</div>
 <!--Main Body-->
 <div>
-{% for data in user %}
-  <input type="hidden" id="profile" name="profileId" value="{{data.userName}}">
-    <!-- logged user details -->
-  <input type="hidden" id="currentUserFullName" name="currentUserFullName" value="{{currentUserFullName}}">
-  <input type="hidden" id="currentUserPic" name="currentUserPic" value="{{currentUserPic}}">
-  <input type="hidden" id="currentUserId" name="currentUserId" value="{{currentUserId}}">
+  
+    <input type="hidden" id="profile" name="profileId" value="{{data.userName}}"> 
+  <!-- logged user details -->
+    <input type="hidden" id="currentUserFullName" name="currentUserFullName" value="{{currentUserFullName}}">
+    <input type="hidden" id="currentUserPic" name="currentUserPic" value="{{currentUserPic}}">
+    <input type="hidden" id="currentUserId" name="currentUserId" value="{{currentUserId}}">
   <!--  -->
-
-
     <div class="container jumbotron">
         <div class="fb-profile">
             <img align="left" class="fb-image-lg" src="{{data.coverPic.url}}" alt="Profile image example" />
             <img align="left" class="fb-image-profile thumbnail" src="{{data.profilePic.url}}" alt="Profile image example" id="avtar" style="border:6px solid rgba(0, 150, 136, 0.8)";/>
             <div class="fb-profile-text">
-                <h2 hidden id="">{{currentUserId}}</h2>
-                <button type="button" class="btn btn-primary btn-lg pull-right" data-toggle="modal" data-target="#myModal" style="display:none;" id="EditProfileButton">
+                <h2 hidden id="
+                ">{{currentUserId}}</h2>
+                
+                {% if currentUserId == data.userId %}
+                
+                <button type="button" class="btn btn-primary btn-lg pull-right" data-toggle="modal" data-target="#myModal" id="EditProfileButton">
                   Edit Profile
                 </button>
+                {% else %}
+                
                 {% if isFriend %}
                 <input type="button" onclick="request();" name="" value="Unfriend" id="addbtn" class="btn btn-danger pull-right"  style="display:block;">
                 {% elif isRequest %}
-                <input type="button" name="" value="Cancel Request" id="addbtn" class="btn btn-secondary pull-right"  style="display:block;">
+                <input type="button"  name="" value="Cancel Request" id="addbtn" class="btn btn-secondary pull-right"  style="display:block;">
                 {% elif isRequested %}
                 <input type="button" onclick="request();" name="" value="Confirm Request" id="addbtn" class="btn btn-success pull-right"  style="display:block;">
                 {% else %}
-                <input type="button" name="" value="Add Friend" id="addbtn" class="btn btn-danger pull-right"  style="display:none;">
+                
+                <input type="button" name="" value="Add Friend" id="addbtn" class="btn btn-danger pull-right"  style="display:block;" >
                 {% endif %}
+                {% endif %}
+                
+                <script>
+       
+                </script>
+                
                 <h2 id="headerName">{{data.firstName}} {{data.lastName}}</h2>
                 <h4 id="headerQuote">{{data.quote}}</h4>
 
@@ -76,7 +87,7 @@
             <div class="tab">
               <button class="tablinks" onclick="openCity(event, 'Timeline')">Timeline</button>
               <button class="tablinks" onclick="openCity(event, 'About')">About</button>
-              <button class="tablinks" onclick="openCity(event, 'Friends')">Friends</button>
+              <span onclick="tagPeopleFun1('{{data.userId}}')"><button class="tablinks" onclick="openCity(event, 'Friends')">Friends</button></span>
               <button class="tablinks" onclick="openCity(event, 'Photos')">Photos</button>
             </div>
 
@@ -84,28 +95,43 @@
               <h3>Timeline</h3><br>
               <br><br><br>
               {% for i in postData %}
-              <section class="container" style="margin:4%;border-radius:8px;
-  box-shadow:0 10px 20px rgba(0,0,0,0.19),0 6px 6px rgba(0,0,0,0.23);">
+              <section class="container pt-4" style="margin:4%;border-radius:8px;
+                  box-shadow:0 10px 20px rgba(0,0,0,0.19),0 6px 6px rgba(0,0,0,0.23);">
   
   <h5>
-  </p><img src="{{i.userPic}}" style="width:55px;height:55px;padding:2px;border-radius:50%;vertical-align:middle;">
-  <span class="w-100">{{i.userName}}</span>  <br>
+  </p>
+  {% if i.PostType == 'post' %}
+  <img src="{{i.userPic}}" style="width:55px;height:55px;padding:2px;border-radius:50%;vertical-align:middle;">
+  <span class="w-100">{{i.userName}}</span>
+  {% elif i.PostType == 'profilePhoto' %}
+  <img src="{{i.userPic}}" style="width:55px;height:55px;padding:2px;border-radius:50%;vertical-align:middle;">
+  <span class="w-100">{{i.userName}}</span>
+  <span style="color: gray; font-weight:normal;"> updated his profile photo.</span>
+  {% else %}
+  <img src="{{i.userPic}}" style="width:55px;height:55px;padding:2px;border-radius:50%;vertical-align:middle;">
+  <span class="w-100">{{i.userName}}</span>
+    <span style="color: gray; font-weight:normal;"> updated his cover photo.</span>
+  {% endif %}
+  
+  <br>
   <span class="ml-5 pl-5">{{i.date|date:'M t'}} at {{i.date|time}}</span></h5>
 	<div class="row">
 
 		<div class="col-lg-12 col-md-12 col-sm-12 col-12 " style="width:75%;">
-        <h4 align='center'>
+        <h4>
             {{i.Message}}
             </h4>
 		</div>
 		<div class="col-lg-12 col-md-12">
+      {% if i.post %}
         <img src="{{i.post.url}}" class="img-responsive" style='vertical-align: middle;max-height:200px;'>
+        {% endif %}
         <div class="row my-4">
           <div class="col-lg-1 col-md-1 col-sm-1 col-1">
-        <img src="{{currentUserPic}}" style="width:55px;height:55px;padding:2px;border-radius:50%;vertical-align:middle;">
+        <img src="{{ActiveUserPic.url}}" style="width:55px;height:55px;padding:2px;border-radius:50%;vertical-align:middle;">
         </div>
         <div class="col-lg-9 col-md-9 col-sm-9 col-9">
-          <textarea placeholder="comment here..." class="form-control" style="width:100%;border-radius:25px;border:2px solid grey;padding:8px;"></textarea>
+          <textarea placeholder="comment here..." class="form-control" style="resize:none;width:100%;border-radius:25px;border:2px solid grey;padding:8px;"></textarea>
           </div>
           <div class="col-lg-2 col-md-2 col-sm-2 col-2">
           <button class = "btn btn-success" style=" border-radius:25px;padding:15px 25px 15px 25px;margin-left:-15%;">Send</button>
@@ -113,7 +139,7 @@
           </div>
 		</div>
 	</div>
-</section>  
+</section> 
 {% endfor %}
             </div>
 
@@ -173,6 +199,10 @@
 
             <div id="Friends" class="tabcontent">
               <h3>Friends</h3>
+              <div class="spinner-border" role="status" id="tagLoader" style="display: none;">
+                <span class="sr-only">Loading...</span>
+              </div>
+              <div id="friendsListId"></div>
               
             </div>
 
@@ -473,9 +503,8 @@
         </div>
       </div>
     </div>
-{% endfor %}
-</div>
-
+</div>  
+<h1 hidden id="pageiId">Page2</h1>    
 </body>
 
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
@@ -483,6 +512,7 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script type="text/javascript" src="{%static 'js/Userprofile.js'%}"></script>
+<script type="text/javascript" src="{%static 'js/notifications.js'%}"></script>
 <script type="text/javascript" src="{%static 'js/RequestSocket.js'%}"></script>
 
 

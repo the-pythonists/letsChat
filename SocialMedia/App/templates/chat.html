@@ -43,21 +43,40 @@
           <h4 class="sidebar_Heading">Chats</h4>
           <input type="text" name="friend" placeholder="My friend" id="myFriend_Search">
 
+          <!-- FOR INBOX  -->
           <input type="hidden" id="inboxId" value="{{inboxId}}">
-
           <input type="hidden" name="loggedUser" id="loggedUser" value="{{myData.userId}}">
           <input type="hidden" name="loggedUserFullName" id="loggedUserFullName" value="{{myData.firstName}} {{myData.lastName}}">
           <input type="hidden" name="loggedUserPic" id="loggedUserPic" value="{{myData.profilePic.url}}">
           <input type="hidden" id="friend" value="{{friendData.userId}}">
-          {% for query in friendList %}
+          {% for query,newMsg in friendList %}
           {% for friend in query %}
           <hr>
-          <li class="this_Friend"><img src="{{friend.profilePic.url}}" class="onlineUserImage" onclick="chooseChat('{{friend.userId}}')"><a href="/messages/{{friend.userId}}/" class="onlineUserName">{{friend}}</a>
+          <li id="friendName{{friend.userId}}" class="this_Friend"><img src="{{friend.profilePic.url}}" class="onlineUserImage"><a href="/messages/{{friend.userId}}/" class="onlineUserName">{{friend}} 
+            {% if newMsg != 0 %}
+            <span id="unreadmsg{{friend.userId}}">{{newMsg}}</span></a>
+            <span class=" "><i class="fas fa-dot-circle "></i></span>
+            {% else %}
+            <span id="unreadmsg{{friend.userId}}"></span></a>
+            <span class=" "><i class="fas fa-dot-circle "></i></span>
+          </li>
+          {% endif %}
+          {% endfor %}
+          {% endfor %}
+
+          <!-- FOR GROUPS -->
+          <input type="hidden" id="groupId" value="{{groupId}}">
+          {% for query,newMsg in groups %}
+          {% for group in query %}
+          <hr>
+          <li class="this_Friend"><img src="{{group.groupPic.url}}" class="onlineUserImage" onclick="chooseChat('{{friend.userId}}')"><a href="/groups/{{group.groupId}}/" class="onlineUserName">{{group.groupName}}
+            <span>{{newMsg}}</span></a>
           
             <span class=" "><i class="fas fa-dot-circle "></i></span>
           </li>
           {% endfor %}
           {% endfor %}
+          
           <hr>
           
         </ul>
@@ -75,12 +94,7 @@
           </div>
     </header>
 
-      
-      
-      
     </div>
-
-    
 </div>
 	
 <br><br><br><br>
@@ -94,9 +108,14 @@
       <div class="outer_ChatPerson">
         <div class="chat_Person" >
           <div class="person_Data">
-
+            {% if groupChat %}
+            <h6 class="chat_PersonName" data-toggle="modal" data-target="#myModal"><img src="{{groupInfo.groupPic.url}}" class="chat_PersonPic" >
+            {{groupInfo}}</h6>
+            {% endif %}
+            {% if inbox %}
             <h6 class="chat_PersonName" data-toggle="modal" data-target="#myModal"><img src="{{friendData.profilePic.url}}" class="chat_PersonPic" >
-            {{friendData}}</h6>  
+            {{friendData}}</h6>
+            {% endif %}  
           </div>
           
         </div>
@@ -104,56 +123,33 @@
       <br><br><br><br><br>
       <!--end Part-->
       
-      
-      
-      
       <!--Sender Terminal-->
     <div class="peopleChat">
       
 
       {% for msg in allMessages %}
+      
       {% if msg.sender %}
-      {% if msg.sender == myData.userId %}
-      <p class="sender"><a href="/profile/{{myData.userId}}" style="color:rgba(0, 150, 136, 1); text-decoration:none;"><img src="{{myData.profilePic.url}}" class="personProfilePicture"><strong class="ml-2">You</a></strong><br>
+        {% if msg.sender == myData.userId %}
+          <p class="sender"><a href="/profile/{{myData.userId}}" style="color:rgba(0, 150, 136, 1); text-decoration:none;"><img src="{{myData.profilePic.url}}" class="personProfilePicture"><strong class="ml-2">You</a></strong><br>
+            <span class="ml-5">{{msg.Message}}</span><span class="float-right">{{msg.date|time}}</span></p><br>
         {% else %}
-      <p class="reciver"><a href="/profile/{{friendData.userId}}" style="color:#000000; text-decoration:none;"><img src="{{friendData.profilePic.url}}" class="personProfilePicture"><strong class="ml-2">{{friendData.firstName}} {{friendData.lastName}}</a></strong><br>
-      {% endif %}
-      <span class="ml-5">{{msg.Message}}</span><span class="float-right">{{msg.date|time}}</span></p><br>
-     
+          {% if groupChat %}
+          <p class="reciver"><a href="/profile/{{msg.sender}}" style="color:#000000; text-decoration:none;"><img src="{{msg.senderPic}}" class="personProfilePicture"><strong class="ml-2">{{msg.senderName}}</a></strong><br>
+            <span class="ml-5">{{msg.Message}}</span><span class="float-right">{{msg.date|time}}</span></p><br>
+          {% endif %}
+        {% if inbox %}
+        <p class="reciver"><a href="/profile/{{friendData.userId}}" style="color:#000000; text-decoration:none;"><img src="{{friendData.profilePic.url}}" class="personProfilePicture"><strong class="ml-2">{{friendData.firstName}} {{friendData.lastName}}</a></strong><br>
+          <span class="ml-5">{{msg.Message}}</span><span class="float-right">{{msg.date|time}}</span></p><br>
+          {% endif %}
+          {% endif %}
       {% endif %}
       {% endfor %}
       <div class="wrapperClassBlock"></div>
-    <!-- <p class="sender">
-      
-      <strong id="Chatform">You</strong><br>
-      <span>Hii Friends good Morning.</span>
-      <br><span style="color:grey;">11:01 AM | June 9</span>
-    </p> -->
-      <!--Reciver Terminal-->
-    <!-- <p class="reciver">
-      
-      <span></span>
-      <br><span style="color:grey;">11:01 AM | June 9</span>
-    </p> -->
-
-    <!-- <p class="sender">
-      <strong>You</strong><br>
-      <br><span style="color:grey;">Hii Friends good Morning.</span>
-
-    </p>
-      <!--Reciver Terminal
-    <p class="reciver">
-      <strong>sarthak JAIN</strong><br>
-      <span></span>
-      <span style="color:grey;">11:01 AM | June 9</span>
-    </p> -->
-
+    
   </div>
       </div>
 
-    <!--Typed Message Here-->
-    <!-- <form id="Chatform" >
-      {% csrf_token %}-->
     <input type="hidden" name="username" value="{{myData.userId}}"  id="chat-log"> 
    <div class="type_msg">
             <div class="input_msg_write">
@@ -162,15 +158,10 @@
               <button class="msg_send_btn" id="Chatform" ><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
             </div>
   </div>
-  <!-- </form> -->
-
+  
   </div>
 
-  
-
-
 </div>
-
 
 <!-- Modal -->
 <div id="myModal" class="modal fade" role="dialog">
@@ -179,21 +170,38 @@
     <!-- Modal content-->
     <div class="modal-content">
       <div class="modal-header">
+        {% if groupChat %}
+        <h4 class="modal-title"><img src="{{groupInfo.groupPic.url}}" id="modelProfile"></h4>{{groupInfo}}
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        {% endif %}
+        {% if inbox %}
         <h4 class="modal-title"><img src="{{friendData.profilePic.url}}" id="modelProfile"></h4>{{friendData}}
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        
+        {% endif %}
       </div>
+
       <div class="modal-body">
         <p style="color:#00a087;">About and phone number</p>
         <div>
-          <p>Quote here</p>
+          {% if groupChat %}
+          <p>{{groupInfo.groupInfo}}</p>
+          <hr>
+        
+        <button class="btn" style="border:1px solid #00a087;color:#00a087;">Leave</button>
+          {% endif %}
+          {% if inbox %}
+          <p>{{friendData.quote}}</p>
           <hr>
           <p>{{friendData.mobile}}</p>
-        </div>
-       
-        <hr>
+          <hr>
         
         <button class="btn" style="border:1px solid #00a087;color:#00a087;">Block</button>
+          {% endif %}
+        </div>
+       
+        <!-- <hr>
+        
+        <button class="btn" style="border:1px solid #00a087;color:#00a087;">Block</button> -->
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
@@ -202,11 +210,6 @@
 
   </div>
 </div>
-
-
-
-
-
 
 </div>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -222,9 +225,14 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
-{% if flag %}
+{% if inbox %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script type="text/javascript" src="{%static 'js/TwoWaychat.js'%}"></script>
+{% endif %}
+
+{% if groupChat %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript" src="{%static 'js/GroupChat.js'%}"></script>
 {% endif %}
 </body>
 </html>

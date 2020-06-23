@@ -177,15 +177,9 @@ function request(action,user1,user2){
         }
     })
     }
-      
         
-        
-    }
+  }
 
-
-
-
-//
 document.getElementById("introAlertMessage").style.display="none";
     function introSubmission(){
         
@@ -270,3 +264,37 @@ document.getElementById("introAlertMessage").style.display="none";
         })
     }
     document.getElementById('loader').style.display = 'none';
+   
+
+
+    //Friends
+
+function tagPeopleFun1(ID)
+{
+  
+  document.getElementById("tagLoader").style.display="block";
+  $.ajax({
+      method:'POST',
+      url:'/taggedSearchFriends/',
+      data:{
+        id:ID,
+        action:'friend'
+      },
+      success:function(e){
+        
+        $('#friendsListId').empty();
+        console.log(e);
+        document.getElementById("tagLoader").style.display="none";
+        for(i=0;i<(e.name).length;i++)
+        {
+        //  $('#friendsListId').append('<a href="/profile/'+e.userId[i]+'"><label ><span><img src="'+e.pic[i]+'" style="width:45px;height:45px;border-radius:50%;margin:8px;"></span>'+e.name[i]+'</label></a><br>');
+        $('#friendsListId').append('<a href="/profile/'+e.userId[i]+'"><h5 ><span><img src="'+e.pic[i]+'" style="width:45px;height:45px;border-radius:50%;margin:8px;"></span>'+e.name[i]+'</h5></a><br>');
+        }
+
+      },
+      error:function(data){
+        console.log('Failed');
+      }
+    })
+
+}

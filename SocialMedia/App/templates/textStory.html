@@ -1,0 +1,211 @@
+{%load static%}
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+	 <meta charset="utf-8">
+	 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>>
+<link rel="stylesheet" href="http://fortawesome.github.io/Font-Awesome/assets/font-awesome/css/font-awesome.css">   
+ <link rel="stylesheet" type="text/css" href="{%static 'css/story.css'%}">
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+
+<!--Nav Bar-->
+<div class="container-fluid">
+	<header>
+      <h3 id="brand">LetsChat</h3>
+  	</header>
+<br><br><br>
+
+ <!--Main Section-->
+<div>
+	<div class="row">
+		<div class="col-lg-3 col-md-3"  id="leftDivSect">
+			<h3 id="storyName">Your Stories</h3>
+			<textarea placeholder="Start typing..." class="form-control form-control-lg" name="storyText" id="storyTextFieldArea" oninput="storyTextFieldArea()"></textarea>
+			<br>
+			
+			<select class="form-control form-control-lg" onchange="fontSizeValue()" id="fontSizeValueDiv">
+				 <option value="x-small">FontSize</option>
+				 <option value="x-small" style="font-size:x-small;">
+				 	LetsChat
+				 </option>
+				 <option value="small" style="font-size:small;">
+				 LetsChat</option>
+				 <option value="medium" style="font-size:medium;">
+				 LetsChat
+				</option>
+				 <option value="large" style="font-size:large;">LetsChat</option>
+				<option value="x-large" style="font-size:x-large;">
+				LetsChat
+				</option>
+				<option value="xx-large" style="font-size:xx-large;">
+				LetsChat
+				</option>
+
+			</select>
+			<br>
+			<select class="form-control form-control-lg" onchange="fontFamilyValue()" id="fontFamilyValueSelect">
+				 <option>font family</option>
+				 <option style="font-family:Comic Sans MS, Comic Sans, cursive;" value="Comic Sans MS, Comic Sans, cursive">Large select</option>
+				 <option style="font-family:Snell Roundhand, cursive;" value="Snell Roundhand, cursive">Large select</option>
+				 <option style='font-family:Comic Sans MS, cursive, sans-serif;' value="Comic Sans MS, cursive, sans-serif">Large select</option>
+				 <option style="font-family:Brush Script MT;" value="Brush Script MT">Large select</option>
+				 <option style="font-family:impact;" value="impact">LetsChat</option>
+			</select>
+			<br>
+			<div id="colorOuterDiv" class="border">
+				<!--Color Section-->
+				<span style="background:red;" class="colorPickerValue" onclick="colorPickerValue('red')" title="red"></span>
+		        <span style="background:yellow;" class="colorPickerValue" onclick="colorPickerValue('yellow')" title="yellow"></span>
+		        <span style="background:green;"class="colorPickerValue" onclick="colorPickerValue('green')" title="green"></span>
+		        <span style="background:pink;"class="colorPickerValue" onclick="colorPickerValue('pink')" title="pink"></span>
+		        <span style="background:orange;"class="colorPickerValue" onclick="colorPickerValue('orange')" title="orange"></span>
+		        <span style="background:blue;"class="colorPickerValue" onclick="colorPickerValue('blue')" title="blue"></span>
+		        <span style="background:grey;"class="colorPickerValue" onclick="colorPickerValue('grey')" title="grey"></span>
+		        <span style="background:violet;"class="colorPickerValue" onclick="colorPickerValue('violet')" title="violet"></span>
+		        <span style="background:cyan;"class="colorPickerValue" onclick="colorPickerValue('cyan')" title="cyan"></span>
+		        <span style="background:#CD5C5C;"class="colorPickerValue" onclick="colorPickerValue('#CD5C5C')" title="INDIANRED"></span>
+		        <span style="background:#8B0000;"class="colorPickerValue" onclick="colorPickerValue('#8B0000')" title="DARKRED"></span>
+		        <span style="background:#DB7093;"class="colorPickerValue" onclick="colorPickerValue('#DB7093')" title="PALEVIOLETRED"></span>
+		        <span style="background:#FF7F50;"class="colorPickerValue" onclick="colorPickerValue('#FF7F50')" title="CORAL"></span>
+		        <span style="background:#FFD700;"class="colorPickerValue" onclick="colorPickerValue('#FFD700')" title="GOLD"></span>
+		        <span style="background:#8B008B;"class="colorPickerValue" onclick="colorPickerValue('#8B008B')" title="DARKMAGENTA"></span>
+		        <span style="background:#98FB98;"class="colorPickerValue" onclick="colorPickerValue('#98FB98')" title="PALEGREEN"></span>
+		        <span style="background:#00FA9A;"class="colorPickerValue" onclick="colorPickerValue('#00FA9A')" title="MEDIUMSPRINGGREEN"></span>
+		        <span style="background:#4682B4;"class="colorPickerValue" onclick="colorPickerValue('#4682B4')" title="STEELBLUE"></span>
+		        <span style="background:#7B68EE;"class="colorPickerValue" onclick="colorPickerValue('#7B68EE')" title="MEDIUMSLATEBLUE"></span>
+		        <input type="color" name="colorPicker" style="width:100%;height:15px;" onclick="colorPickerValue1()" onchange="colorPickerValue1()" onkeyup ="colorPickerValue1()" id="colorChooseList">
+				<!--end Color Section-->
+			</div><br>
+			<button class="btn btn-secondary">Discard</button>
+			<button class="btn btn-primary" onclick="share('text')">Share</button>
+		</div>
+
+		<div class="col-lg-9 col-md-9 col-sm-12 col-12 rightSideDiv border-left">
+
+
+			<!--set Alert-->
+			<div class="alert alert-warning alert-dismissible fade show" role="alert" id="alertBar">
+			  <strong><i class="fas fa-exclamation-triangle"></i>LetsChat</strong> Please Insert some text.
+			     <a class="close" onclick="$('.alert').hide()">×</a>
+			</div>
+			<center>
+
+			
+
+			<div class="card1" id="storySectionArea">
+				<h5 id="storyPrintSectionArea">Add Text</h5>
+			</div>
+			
+			
+			<textarea class="form-control" id="mobileScreenTextArea" rows="2" placeholder="start" oninput="storyTextFieldArea2()"></textarea>
+			
+			<button class="btn-block btn-success py-2" id="MobileshareStoryOption" onclick="share('text')">Share</button>
+			
+			</div>
+			</center>
+			
+		</div>
+	</div>
+</div>
+
+<!--Fixed Right Option Slide-->
+<div id="fixedRightIndicatorBar" style="display:none;">
+
+		 <div class="dropdown">               
+            <!-- Dropdown button -->
+            <button type="button" class="btn btn-success dropdown-toggle" 
+                    data-toggle="dropdown"> 
+		    	<i>
+		    		<svg class="bi bi-fonts"  width="1.5em" height="1.5em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+					  <path d="M12.258 3H3.747l-.082 2.46h.479c.26-1.544.758-1.783 2.693-1.845l.424-.013v7.827c0 .663-.144.82-1.3.923v.52h4.082v-.52c-1.162-.103-1.306-.26-1.306-.923V3.602l.43.013c1.935.062 2.434.301 2.694 1.846h.479L12.258 3z"/>
+					</svg>
+		    	</i>
+		  	</button>
+
+			  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+			    <a class="dropdown-item" href="#" onclick="fontSizeValue1('x-small')" style="font-size: x-small;">Action</a>
+			    <a class="dropdown-item" href="#" onclick="fontSizeValue1('small')" style="font-size: small;">Another action</a>
+			    <a class="dropdown-item" href="#" onclick="fontSizeValue1('medium')" style="font-size: medium;">Something else here</a>
+			    <a class="dropdown-item" href="#" onclick="fontSizeValue1('large')" style="font-size: large;">Something else here</a>
+			    <a class="dropdown-item" href="#" onclick="fontSizeValue1('x-large')" style="font-size: x-large;">Something else here</a>
+			    <a class="dropdown-item" href="#" onclick="fontSizeValue1('xx-large')" style="font-size: xx-large;">Something else here</a>
+			  </div>
+		</div>
+
+
+		<div class="dropdown mt-5">               
+            <!-- Dropdown button -->
+            <button type="button" class="btn btn-success dropdown-toggle" 
+                    data-toggle="dropdown"> 
+		    	<i onclick="myFunction(this)">
+		    		<svg class="bi bi-type-italic" width="1.5em" style="margin-left:0;padding-left:0;"height="1.5em" viewBox="0 0 16 16" fill="currentColor" xmlns="	http://www.w3.org/2000/svg">
+					  <path d="M7.991 11.674L9.53 4.455c.123-.595.246-.71 1.347-.807l.11-.52H7.211l-.11.52c1.06.096 1.128.212 1.005.807L6.57 11.674c-.123.595-.246.71-1.346.806l-.11.52h3.774l.11-.52c-1.06-.095-1.129-.211-1.006-.806z"/>
+					</svg>
+		    	</i>
+		  	</button>
+
+			  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" >
+			    <a class="dropdown-item" href="#" onclick="fontFamilyValue1('Comic Sans MS, Comic Sans, cursive')" style="font-family:Comic Sans MS, Comic Sans, cursive;">Action</a>
+			    <a class="dropdown-item" href="#" onclick="fontFamilyValue1('Snell Roundhand, cursive')" style="font-family:Snell Roundhand, cursive;">Another action</a>
+			    <a class="dropdown-item" href="#" onclick="fontFamilyValue1('Comic Sans MS, cursive, sans-serif')" style='font-family:Comic Sans MS, cursive, sans-serif;'>Something else here</a>
+			    <a class="dropdown-item" href="#" onclick="fontFamilyValue1('Brush Script MT')" style="font-family:Brush Script MT;">Something else here</a>
+			    <a class="dropdown-item" href="#" onclick="fontFamilyValue1('impact')" style="font-family:impact;"><span style="font-family:impact;">Something else here</span></a> 
+			  </div>
+		</div>
+
+		<!--	Color  -->
+		
+
+		<div class="dropdown mt-5">
+		  <button type="button" class="btn btn-success dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		    <i class="fas fa-palette"></i>
+		  </button>
+		  <div class="dropdown-menu mt-5" aria-labelledby="dropdownMenuButton">
+		    <div id="colorOuterDiv" class="border">
+				<!--Color Section-->
+				<span style="background:red;" class="colorPickerValue" onclick="colorPickerValue('red')" title="red"></span>
+		        <span style="background:yellow;" class="colorPickerValue" onclick="colorPickerValue('yellow')" title="yellow"></span>
+		        <span style="background:green;"class="colorPickerValue" onclick="colorPickerValue('green')" title="green"></span>
+		        <span style="background:pink;"class="colorPickerValue" onclick="colorPickerValue('pink')" title="pink"></span>
+		        <span style="background:orange;"class="colorPickerValue" onclick="colorPickerValue('orange')" title="orange"></span>
+		        <span style="background:blue;"class="colorPickerValue" onclick="colorPickerValue('blue')" title="blue"></span>
+		        <span style="background:grey;"class="colorPickerValue" onclick="colorPickerValue('grey')" title="grey"></span>
+		        <span style="background:violet;"class="colorPickerValue" onclick="colorPickerValue('violet')" title="violet"></span>
+		        <span style="background:cyan;"class="colorPickerValue" onclick="colorPickerValue('cyan')" title="cyan"></span>
+		        <span style="background:#CD5C5C;"class="colorPickerValue" onclick="colorPickerValue('#CD5C5C')" title="INDIANRED"></span>
+		        <span style="background:#8B0000;"class="colorPickerValue" onclick="colorPickerValue('#8B0000')" title="DARKRED"></span>
+		        <span style="background:#DB7093;"class="colorPickerValue" onclick="colorPickerValue('#DB7093')" title="PALEVIOLETRED"></span>
+		        <span style="background:#FF7F50;"class="colorPickerValue" onclick="colorPickerValue('#FF7F50')" title="CORAL"></span>
+		        <span style="background:#FFD700;"class="colorPickerValue" onclick="colorPickerValue('#FFD700')" title="GOLD"></span>
+		        <span style="background:#8B008B;"class="colorPickerValue" onclick="colorPickerValue('#8B008B')" title="DARKMAGENTA"></span>
+		        <span style="background:#98FB98;"class="colorPickerValue" onclick="colorPickerValue('#98FB98')" title="PALEGREEN"></span>
+		        <span style="background:#00FA9A;"class="colorPickerValue" onclick="colorPickerValue('#00FA9A')" title="MEDIUMSPRINGGREEN"></span>
+		        <span style="background:#4682B4;"class="colorPickerValue" onclick="colorPickerValue('#4682B4')" title="STEELBLUE"></span>
+		        <span style="background:#7B68EE;"class="colorPickerValue" onclick="colorPickerValue('#7B68EE')" title="MEDIUMSLATEBLUE"></span>
+		        <input type="color" name="colorPicker" style="width:100%;height:15px;" onclick="colorPickerValue2()" onchange="colorPickerValue2()" onkeyup ="colorPickerValue2()" id="colorChooseList2">
+				<!--end Color Section-->
+			</div>
+		  </div>
+		</div>
+</div>
+
+<!-- Use a button to open the snackbar -->
+
+
+<!-- The actual snackbar -->
+<div id="snackbar">Your Story is live now...</div>
+
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="{%static 'js/story.js'%}"></script>
+</body>
+</html>

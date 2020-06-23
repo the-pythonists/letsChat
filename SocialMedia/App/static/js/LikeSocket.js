@@ -53,6 +53,7 @@ function like(postId, postLikedOf, postLikedBy){
                 document.getElementById(postId).style.color = 'grey';
             }
             if(postLikedOf == loggedUser && postLikedOf != postLikedBy && message === 'liked'){
+                console.log('like')
             //** IF PERSON LIKES OWN POST OR DISLIKES ANY POST, NO NOTIFICATION WILL BE SENT **//
                 document.getElementById('noti_Counter').innerHTML = 'Liked';
             }

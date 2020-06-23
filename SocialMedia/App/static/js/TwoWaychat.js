@@ -38,7 +38,7 @@ function websocket_message_show(e){
 	console.log(message_data.message)
 	if(message_data.sender==myself && message_data.receiver==friend){
 		message_save(message_data.message);
-	coding ='<p class="sender"><img src="'+message_data.loggedUserPic+'" class="personProfilePicture"><strong class="ml-2">'+message_data.loggedUserFullName+'</strong><br><span class="ml-5">'+message_data.message+'</span><span class="float-right">'+time+'</span></p><br>';
+	coding ='<p class="sender"><img src="'+message_data.loggedUserPic+'" class="personProfilePicture"><strong class="ml-2">'+'You'+'</strong><br><span class="ml-5">'+message_data.message+'</span><span class="float-right">'+time+'</span></p><br>';
 	}
 	else if (message_data.sender==friend && message_data.receiver==myself){
 		coding ='<p class="reciver"><img src="'+message_data.loggedUserPic+'" class="personProfilePicture"><strong class="ml-2">'+message_data.loggedUserFullName+'</strong><br><span class="ml-5">'+message_data.message+'</span><span class="float-right">'+time+'</span></p><br>';
@@ -68,4 +68,29 @@ $.ajax({
 	}
 })
 // console.log(Users);
+}
+
+
+document.querySelector('#message').onclick = messaageSeen;
+document.querySelector('#friendName'+friend).onclick = messaageSeen;
+
+function messaageSeen(){
+	console.log(friend);
+	console.log(myself);
+
+	$.ajax({
+		method:'POST',
+		url:'/seenMessage/'+sender+'/'+receiver+'/',
+		data:{
+			sender:friend,
+			receiver:myself,
+		},
+		success:function(e){
+			console.log(e)
+			document.getElementById('unreadmsg'+friend).innerHTML = '';
+		},
+		error:function(e){
+			console.log('Failed');
+		}
+	})
 }
