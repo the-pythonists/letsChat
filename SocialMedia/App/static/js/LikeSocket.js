@@ -10,6 +10,7 @@ const likeSocket = new WebSocket(
     var loggedUser = document.getElementById('currentUserId').value;
 
 function postLiker(id,postLikedOf,postLikedBy){
+    console.log('called')
         const postId = id;
         var postLikedOf = postLikedOf;
         var postLikedBy = postLikedBy;

@@ -15,6 +15,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
   <link rel="stylesheet" type="text/css" href="{%static 'css/emojionearea.min.css'%}">
   <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+  
   <script src="{%static 'js/emojionearea.min.js'%}"></script>
   <link rel="stylesheet" type="text/css" href="{%static 'css/lightSlider.css'%}">
   <script type="text/javascript" src="{%static 'js/lightSlider.js'%}"></script>
@@ -32,7 +33,7 @@
   <a href="/profile/{{userInfo.userName}}"><img src="{{userInfo.profilePic.url}}" id="profilePicImage" style="">
   </a>
   <marquee direction="left" height="20" width="110" class="maquee_text">
-    <h5>{{userInfo.firstName}} {{userInfo.lastName}}</h5>
+    <h5 id="mynameId">{{userInfo.firstName}} {{userInfo.lastName}}</h5>
   </marquee>
   <hr id="profileInsideHR">
   
@@ -89,22 +90,24 @@
                 <!--A CIRCLE LIKE BUTTON TO DISPLAY NOTIFICATION DROPDOWN.-->
                 <a id="noti_Button"><i class="fas fa-bell top-right float-right"></i></a>    
 
-                <!--THE NOTIFICAIONS DROPDOWN BOX.-->
+                <!--THE NOTIFICAIONS DROPDOWN BOX.-->   
                 <div id="notifications" class="float-right">
                     <h3 id="noti_heading">Notifications</h3><hr>
-                    <div style="height:300px;"></div>
+                    <div style="height:300px;overflow-y:scroll;">
                     {% for data3,data4 in notification %}
-                      <div id="{{data.sender}}">
-                        <a href="/profile/{{data3.sender}}/">
-                        <img src="{{data4}}" class="profilePic" style="width: 20px;height:20px;">
-                          <button class="btn btn-primary">
-                            {{data3.notification}}
-                          </button>
+                      <div id="{{data.sender}}" style="padding: 1%;">
+                       <a href="/profile/{{data3.sender}}/" style="text-decoration:none;" onclick="location.replace('/profile/{{data3.sender}}/'),'_top'" >
+                        <span style="margin-top:18px;">
+                           <img src="{{data4}}" class="profilePic" style="width: 40px;height:40px;border-radius:50%;vertical-align: middle;">
+                      
+                                {{data3.notification}}
+                                </span>
                         </a>
                         
                       </div>
                       {% endfor %}
-                    <div class="seeAll" id="seeAll" ><i >See All</i></div>
+                    </div>
+                    <div class="seeAll" id="seeAll" ><a href="/notifications/" onclick="location.replace('/notifications/'),'_top'">See All</a></div>
                 </div>
           </span>
       
@@ -295,17 +298,35 @@
 
     <!--End Search Post Result-->
 
-     <div style="background:rgba(191, 191, 191, 0.5);padding:2%;width:90%;" id="postAllSectionId" >
+     <div style="background:rgba(191, 191, 191, 0.5);width:90%;padding:2%;" id="postAllSectionId" >
 
         
 
           <div>
-              {% for data,data2,data4 in userData %}
-              <a href="/profile/{{data.userId}}">
-            <img src="{{data.userPic}}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
-
-            <span style="font-weight:bold;padding-left:8px;color:rgba(0,125,136,1);" >{{data.userName}}</span>
-            </a>
+              {% for data,data2,data4,data5,data6,comment1,comment2,comment3,comment4 in userData %}
+              
+              {% if data.PostType == 'post' %}
+              <a href="/profile/{{data.userId}}" style="text-decoration: none;">
+              <img src="{{data.userPic}}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
+              <span style="font-weight:bold;padding-left:8px;color:rgba(0,125,136,1);"  >{{data.userName}} <span id="profile{{data.postId}}">
+                            </a><span style="color:black;">
+                            {%for nm in data5%}
+                            is with <a href = "/profile/{{nm.userName}}"><span style="color:rgba(0,125,136,1);">{{nm.firstName}} {{nm.lastName}}</span></a>
+                            {%endfor%}
+                            {% if data6 %}
+                            and <span style="color:rgba(0,125,136,1);">{{data6}}</span> <span onclick = "allTagList('{{data.postId}}')" data-toggle="modal" data-target=".AllTagPersonList" style="color:rgba(0,125,136,1);">others</span></span>
+                            {%endif%}</span>
+              
+              
+              {% elif data.PostType == 'profilePhoto' %}
+              <img src="{{data.userPic}}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
+              <span style="font-weight:bold;padding-left:8px;color:rgba(0,125,136,1);" >{{data.userName}}<span id="profile{{data.postId}}"></span>
+              <span style="color: gray; font-weight:normal;"> updated his profile photo.</span>
+              {% else %}
+              <img src="{{data.userPic}}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
+              <span style="font-weight:bold;padding-left:8px;color:rgba(0,125,136,1);" >{{data.userName}}<span id="profile{{data.postId}}"></span>
+                <span style="color: gray; font-weight:normal;"> updated his cover photo.</span>
+              {% endif %}
 
               
               <div class="btn-group dropleft float-sm-right">
@@ -328,7 +349,7 @@
                 </button>
 
                 {%if userInfo.userId == data.userId%}
-                <button class="dropdown-item" type="button" data-toggle="modal" data-target="#tagPeopleModel" onclick="tagPeopleFun1()">Tag</button>
+                <button class="dropdown-item" type="button" data-toggle="modal" data-target="#tagPeopleModel" onclick="tagPeopleFun1('{{data.postId}}')">Tag</button>
                  {% endif %}
                 <button class="dropdown-item" type="button">
                   {% if data.Message %}
@@ -346,7 +367,7 @@
               </div>
 
                 
-            <div><span style="margin-left: 7%; font-size: 70%; margin-top: -10px;">
+            <div><span style="margin-left: 7%; font-size: 70%; margin-top:0; color: black;">
             <b>
                 {% if data.date|date:"YmdHi" == date_now|date:"YmdHi" %}
                 Just Now
@@ -357,15 +378,15 @@
                 {% endif %}
             </b></span></div></span>
 
-            <br>
+        
             {% if data.Message %}
-            <p style="color:rgba(0,125,136,1);">{{data.Message}}</p>
+            <p style="color:black; margin-left: 1%;">{{data.Message}}</p>
             <input type="hidden" value="{{data.postId}}" id="like">
             {% endif %}
-            <br><br>
+          
             {% if data.post %}
-            <img src="{{data.post.url}}" style="max-width:100%;height:auto;">
-            <br>
+            <img src="{{data.post.url}}" style="max-width:100%;max-height:50vh;height:auto;">
+            
             {% endif %}
             
             <strong><p id="Counter{{data.postId}}" style="padding:8px 0px 0px 8px;">{{data2}} Likes</p></strong>
@@ -376,29 +397,29 @@
             
             <a><i class="fas fa-thumbs-up PostResponseLike" id="{{data.postId}}" name="{{data.postId}}" onclick="postLiker('{{data.postId}}','{{data.userId}}','{{userInfo.userId}}')" style="color:{{data4}};"></i></a>
             <a href="#"><i class="far fa-comment-alt" id="PostResponseComment"></i></a>
-            <hr>
+            
 
             <span id="NewComment{{data.postId}}"></span>
-            {% for comment in allComments %}
-            {% if comment.postId == data.postId %}
-            <img src="{{comment.userInfo.profilePic.url}}" alt="" width="40px" height="20px">
-            <span style="color: black;">{{comment.userInfo}}</span>
+            
             <br>
-            <span style="color: green;">{{comment.comment}}</span>
-            <span id="replybtn" onclick="reply('{{comment.postId}}','{{comment.commentId}}',
-            '{{comment.userInfo}}','{{comment.commentedBy}}')">Reply</span>
-            <span id="allReplies{{comment.commentId}}"></span>
-            <input type="text" style="display:none" id="reply{{comment.commentId}}">
+            {%if comment3.url%}
+            <img src="{{comment3.url}}" alt="" style="width:40px;height:40px;border-radius:50%;">
+            <span style="color: black;" class="font-weight-bold">{{comment2}}</span>
             <br>
-            {% endif %}
-            {% endfor %}
-            <br>
-            <br>
+            <span style="color: green; margin-left:45px;">{{comment1}}</span><br>
+            {%if data.post.url and data.Message%}
+            <span style="cursor:pointer;" data-toggle="modal" data-target="#seeAllComments" onclick="seeAllCommentFunction('{{data.postId}}','{{data.post.url}}','{{data.Message}}')"><strong style="color:grey;">View all Comments</strong></span>
+            {%elif data.post.url and not data.Message%}
+            <span style="cursor:pointer;" data-toggle="modal" data-target="#seeAllComments" onclick="seeAllCommentFunction('{{data.postId}}','{{data.post.url}}','')"><strong style="color:grey;">View all Comments</strong></span>
+            {%else%}
+            <span  style="cursor:pointer;" data-toggle="modal" data-target="#seeAllComments" onclick="seeAllCommentFunction('{{data.postId}}','','{{data.Message}}')"><strong style="color:grey;">View all Comments</strong></span>
+            {%endif%}
+            {%endif%}
             <form>
               <img src="{{userInfo.profilePic.url}}" style="width:50px;height:50px;border-radius:50%;vertical-align: middle;">
-              <input type="text" placeholder="Drop your Comment" style="width:90%;padding:8px;" id="Comment{{data.postId}}">
-              <input type="button" onclick="comments('{{data.postId}}','{{data.userId}}','{{userInfo.userId}}')" value="Post">
-            </form>
+              <input type="text" placeholder="Drop your Comment" style="width:60%;padding:8px;" id="Comment{{data.postId}}">
+              <input type="button" onclick="comments('{{data.postId}}','{{data.userId}}','{{userInfo.userId}}')" value="Comment" style="padding:8px;" class="btn btn-success">
+            </form><hr>
             <br><br>
             {% endfor %}
           </div>
@@ -408,7 +429,7 @@
           console.log(ID)
           document.getElementById('reply'+commentId).style.display='block';
           document.getElementById('reply'+commentId).focus();
-          document.getElementById('reply'+commentId).value=name;
+          //document.getElementById('reply'+commentId).value=name;
 
           $('#reply'+commentId).keyup(function(){
         var reply = $('#reply'+commentId).val();
@@ -425,7 +446,10 @@
                     reply:reply,
                   },
                   success:function(data){
+                    alert("your reply has been saved");
+                    $('#seeAllComments').modal('hide'); 
           document.getElementById('allReplies'+commentId).innerHTML=reply
+          document.getElementById('reply'+commentId).style.display='none';
         }
               });
         }
@@ -466,12 +490,57 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" onclick="tagSave()">Tag</button>
+        <button type="button" class="btn btn-primary" onclick="TagSubmissionForm()">Tag</button>
       </div>
     </div>
   </div>
 </div>
 
+
+<!--Post Tag Person-->
+<!-- Small modal -->
+
+
+<div class="modal fade AllTagPersonList" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    
+    <div class="modal-content" style=padding-left:2%;>
+        <span aria-hidden="true" class="close float-sm-right" data-dismiss="modal" aria-label="Close" style="margin-left:90%;margin-top:2%;color:grey;">&times;</span>
+
+        <h6 class="" style="color:grey;">Tag People</h6>
+        
+        <hr>
+        <div id="AllTagPersonListId"></div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!--see all Comments-->
+<!-- Button trigger modal -->
+
+<!-- Modal -->
+<div class="modal fade" id="seeAllComments" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="color:grey;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">All Comments</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="seeAllCommentsIdDiv"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        
+      </div>
+    </div>
+  </div>
+</div>
 
 <!--Start Modal for Top Account-->
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -499,6 +568,9 @@
 </div>
 
 </div>
+
+
+
 </body>
 
 
@@ -510,6 +582,7 @@
 <script type="text/javascript" src="{%static 'js/LikeSocket.js' %}"></script>
 <script type="text/javascript" src="{%static 'js/RequestSocket.js'%}"></script>
 <script type="text/javascript" src="{%static 'js/CommentSocket.js'%}"></script>
-<script type="text/javascript" src="{%static 'js/statusSocket.js'%}"></script>
+<script type="text/javascript" src="{%static 'js/StatusSocket.js'%}"></script>
+
 
 </html>

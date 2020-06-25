@@ -14,8 +14,13 @@ const statusSocket = new WebSocket(
     });
 
 statusSocket.onclose = function(e) {
-    console.log(loggedUser,'disconnected','online'+ loggedUser)
+    // $.post('/update_session/', function(data) {
+    //     loggedUser = data;
+    //     action = 'offline';
+    // });
+    
     try{
+        console.log(loggedUser,'disconnected','online'+ loggedUser)
     document.getElementById('online'+ loggedUser).className = 'fa fa-eye-slash'
     }catch{}
     console.error('Chat socket closed unexpectedly');
@@ -35,7 +40,7 @@ function sleep (time) {
     return new Promise((resolve) => setTimeout(resolve, time));
   }
   
-  sleep(500).then(() => {
+  sleep(5000).then(() => {
     
     statusSocket.send(JSON.stringify({
         'userId' : loggedUser,

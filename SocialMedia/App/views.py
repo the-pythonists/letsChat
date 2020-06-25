@@ -21,12 +21,13 @@ from django.db.models import Subquery
 def update_session(request):
 	if not request.is_ajax() or not request.method=='POST':
 		return HttpResponseNotAllowed(['POST'])
-	userRegistration.objects.filter(userId=request.session['user']).update(onlineStatus=True)
+	userRegistration.objects.filter(userId=request.session['user']).update(is_online=True)
 	return HttpResponse(request.session['user'])
 
 	# if request.POST.get('action') == 'offline':
-		# userRegistration.objects.filter(userId=request.session['user']).update(onlineStatus=False)
-
+	# 	# userId = request.session['user']
+	# 	userRegistration.objects.filter(userId=request.session['user']).update(is_online=False)
+	# 	return HttpResponse(request.session['user'])
 
 def index(request):
 	if request.session.has_key('user'):
@@ -143,12 +144,40 @@ def index(request):
 			else:
 				colorPost.append("grey")
 
-		# allComments = Comments.objects.all().values('comment','date','userInfo__firstName')
-		allComments = Comments.objects.all()
-		for i in allComments:
-			com = i.comment
-			name = i.userInfo.firstName
-		print(com,name)
+		qry =[]
+		lnth = []
+		for item in postList:
+			poId=item.postId
+			try:
+				s =(TaggedPeople.objects.get(postId=poId).taggedPersons)
+				qry.append(userRegistration.objects.filter(userId=s[0]))
+				lnth.append(len(s)-1)
+			except:
+				qry.append("")
+				lnth.append("")
+
+		commentContent = []
+		commentName = []
+		commentPic = []
+		commentId = []
+		for i in postList:
+			commentData = []
+			commentData.append(Comments.objects.filter(postId=i.postId).order_by('-date'))
+			for j in commentData:
+				print("j value = ",j)
+				if j:
+					for k in j:
+						commentContent.append(k.comment)
+						commentName.append(k.userInfo.firstName + ' ' + k.userInfo.lastName)
+						commentPic.append(k.userInfo.profilePic)
+						commentId.append(k.commentId)
+				else:
+					commentContent.append("")
+					commentName.append("")
+					commentPic.append("")
+					commentId.append("")
+					 	
+				break
 
 		notification = Notifications.objects.filter(receiver=request.session['user']).order_by('-date')
 		picsList1 = []
@@ -160,8 +189,8 @@ def index(request):
 				uname = detail.userName
 				picUrl = detail.profilePic
 				picsList1.append(picUrl.url)
-		params = {'userInfo':userInfo,'userData':zip(postList, like,colorPost),'date_now':datetime.datetime.now(),
-		'allComments':allComments,"storyData":storiesFullData,'notification':zip(notification,picsList1)}
+		params = {'userInfo':userInfo,'userData':zip(postList, like,colorPost,qry,lnth,commentContent,commentName,commentPic,commentId),'date_now':datetime.datetime.now(),
+		'allComments':zip(postList),"storyData":storiesFullData,'notification':zip(notification,picsList1)}
 		return render(request,'ds.html',params)
 	else:
 		return render(request,'index.html')
@@ -301,26 +330,29 @@ def story(request):
 def storydelete(request):
 	from datetime import timedelta 
 	
-	tm1 = (datetime.datetime.now() - timedelta(minutes=1)   )
+	tm1 = (datetime.datetime.now() - timedelta(minutes=1))
 	
-	s = Story.objects.filter(uploadTime__lte= tm1 ).delete()
+	s = Story.objects.filter(uploadTime__lte= tm1).delete()
 	
 	return JsonResponse({'Result':'Deleted'})
 
 def PostSubmission(request):
 	if request.session.has_key('user'):
-		Id = uuid.uuid4().hex		
+		postType = 'post'
+		Id = uuid.uuid4().hex	
 		user = request.session['user']
 		PostMessage = request.POST.get('Post_Title','DefaultValue')
 		PostMedia = request.FILES.get('MediaFile')
 	
-		PostStatus=UserPost(postId=Id,userId=user,userName=request.session['name'],post=PostMedia,
-		Message=PostMessage,userPic='/media/'+str(userRegistration.objects.get(userId=user).profilePic)).save()
-		
+		PostStatus = UserPost(PostType=postType,postId=Id,userId=user,userName=request.session['name'],post=PostMedia,
+		Message = PostMessage,userPic='/media/'+str(userRegistration.objects.get(userId=user).profilePic)
+		).save()
+		tagging = TaggedPeople(taggedId=request.session['name']+Id,postId=Id).save()
 		likes = Likes(postId=Id).save()
 		return HttpResponseRedirect('/')
 	else:
 		return HttpResponseRedirect('/')
+	# return render(request,'DashBoard.Html',{"flag":"Your post has uploaded"})
 
 @csrf_exempt
 def postlike(request):
@@ -420,18 +452,103 @@ def taggedSearchFriends(request):
 		if request.POST.get('action') == 'friend':
 			friend = request.POST.get('id')
 			friends = AllFriends.objects.get(userId=friend).Friends	
+			username = []
+			pic = []
+			userId = []
+			for i in friends:
+				userId.append(i)
+				friendName = userRegistration.objects.get(userId=i)
+				username.append(friendName.firstName + ' ' +friendName.lastName)
+				pic.append(friendName.profilePic.url)
+				
+			return JsonResponse({"name":username,"pic":pic,'userId':userId})
 		else:
 			friends = AllFriends.objects.get(userId=request.session['user']).Friends
-		username = []
-		pic = []
-		userId = []
-		for i in friends:
-			userId.append(i)
-			friendName = userRegistration.objects.get(userId=i)
-			username.append(friendName.firstName+friendName.lastName)
-			pic.append(friendName.profilePic.url)
-			
-		return JsonResponse({"name":username,"pic":pic,'userId':userId})
+			pid = request.POST.get('postId')
+			tagPerson = TaggedPeople.objects.filter(postId=pid)
+			for person in tagPerson:
+				tagPersonList = person.taggedPersons
+			else:
+				tagPersonList = []
+			taggedUsers = [userRegistration.objects.filter(userId=user) for user in tagPersonList]
+			allName = []
+			for userQuerySet in taggedUsers:
+				for user in userQuerySet:
+					fname = user.firstName
+					lname = user.lastName
+					allName.append(fname+' '+lname)
+			username = []
+			pic = []
+			userId = []
+			for i in friends:
+				userId.append(i)
+				friendName = userRegistration.objects.get(userId=i)
+				username.append(friendName.firstName + ' ' +friendName.lastName)
+				pic.append(friendName.profilePic.url)
+				
+			return JsonResponse({"name":username,"pic":pic,'userId':userId,'allTaggedList':tagPersonList,'allName':allName})
+
+@csrf_exempt
+def tagSubmissionForm(request):
+	tagPerson = request.POST.get('tagPerson')
+	postId = request.POST.get('postId')
+	tagPersonList = list(tagPerson.split(","))
+	taggedBy = request.session['user']
+	taggedByPerson = userRegistration.objects.get(userId=taggedBy)
+	notify = "You and "  +str(int(len(tagPersonList))-2)+ " others are tagged in " + str(taggedByPerson)+ "\'s post"
+	TaggedPeople.objects.filter(postId=postId).update(taggedPersons=tagPerson[1:])
+	print(notify)
+	for taggedUser in tagPersonList:
+		if taggedUser == '':
+			pass
+		else:
+			name = userRegistration.objects.get(userId=str(taggedUser))
+			Notifications(postId=postId,notificationType='tag',fullName=str(taggedByPerson),sender=taggedBy,receiver=taggedUser,
+			notification=notify,viewed=False).save()
+	return HttpResponse(tagPerson) 
+
+@csrf_exempt
+def showAllTagPerson(request):
+	postId = request.POST.get('postId')
+	qry = TaggedPeople.objects.get(postId = postId).taggedPersons
+	Fname =[]
+	Lname =[] 
+	for person in qry:
+		qry1=userRegistration.objects.get(userName=person)
+		Fname.append(qry1.firstName)
+		Lname.append(qry1.lastName)
+
+	return JsonResponse({"status":"successfully","userName":qry,"FName":Fname,"LName":Lname})
+
+@csrf_exempt
+def CommentShow(request):
+	ParentcommentByList = []
+	ParentComment = []
+	parentcommentName = []
+	ParentcommentId = []
+	ParentcommentUserpic = []
+	childComment=[]
+	childCommentBy = []
+	childcommentId=[]
+	childcommentName=[]
+	childcommentUserpic = []
+	comments = Comments.objects.filter(postId=request.POST.get("postId"))
+	for comment in comments:
+		ParentcommentByList.append(comment.commentedBy)
+		ParentComment.append(comment.comment)
+		ParentcommentId.append(comment.commentId)
+		parentcommentName.append(comment.userInfo.firstName +' '+ comment.userInfo.lastName)
+		ParentcommentUserpic.append(comment.userInfo.profilePic.url)
+		childComments = Replies.objects.filter(commentId=comment.commentId)
+		for child in childComments:
+			childCommentBy.append(child.repliedBy)
+			childComment.append(child.reply)
+			childcommentId.append(child.commentId)
+			childcommentName.append(child.userInfo.firstName +' '+ child.userInfo.lastName)
+			childcommentUserpic.append(child.userInfo.profilePic.url)
+	return JsonResponse({"ParentcommentByList":ParentcommentByList,"ParentComment":ParentComment,"ParentcommentId":ParentcommentId,"parentcommentName":
+	parentcommentName,"childcommentId":childcommentId,"ChildComment":childComment,"childcommentName":childcommentName,
+	"childCommentBy":childCommentBy,"ParentcommentUserpic":ParentcommentUserpic,"childcommentUserpic":childcommentUserpic})
 
 def changepassword(request):
 	if request.method == 'POST':
@@ -544,15 +661,33 @@ def profile(request,user):
 		isFriend = False
 
 	# request.session['Watchprofile'] = profileId
+	postList = []
 	postData = UserPost.objects.filter(userId=user).order_by('-date')
-	print(postData)
+	like=[]; colorPost = []
+	for post in postData:
+		postList.append(post)
+	for post in postList:
+		likes = Likes.objects.get(postId=post.postId)
+		like.append(len(likes.postLikedBy))
+		if request.session['user'] in likes.postLikedBy:
+				colorPost.append("rgba(0, 150, 136,1)")
+		else:
+			colorPost.append("grey")
+	 
+	
 	params = {'data':profileDetail,'currentUserId':request.session['user'],'currentUserFullName':request.session['name'],
 		'currentUserPic':userPic.url,'isFriend':isFriend,'isRequest':isRequest,'isRequested':isRequested,'ActiveUserPic':ActiveUserPic,'ActiveUser':ActiveUser.userName
-	,'ActiveUserName':ActiveUserName,'postData':postData}
+	,'ActiveUserName':ActiveUserName,'postData':zip(postData, like,colorPost)}
 	return render(request,'Profile1.html',params)
 
 def myfriends(request):
-	return render(request,'MyFriends.html')
+	friends = AllFriends.objects.get(userId=request.session['user']).Friends
+	friendList = []
+	for friend in friends:
+		friendData = userRegistration.objects.filter(userId=friend)
+		friendList.append(friendData)
+	params = {'friendList':friendList}
+	return render(request,'MyFriends.html',params)
 
 @csrf_exempt
 def myFriendsProcess(request):
@@ -728,8 +863,12 @@ def userProfileInsert(request):
 	if request.method == "POST":
 		profileUserId=request.POST.get('ProfileUser')
 		profileImage=request.FILES['profileImage']
-		print(profileUserId,profileImage)
 		loginUser=request.session['user']
+		postType = 'profilePhoto'
+		Id = uuid.uuid4().hex	
+		user = request.session['user']
+		PostMessage = ''
+	
 		if profileUserId==loginUser:
 			status=userRegistration.objects.get(userId=loginUser)
 			status.profilePic = profileImage
@@ -739,6 +878,10 @@ def userProfileInsert(request):
 			if not Album.objects.filter(AlbumID=request.session['user']):
 				Album(AlbumID=request.session['user'],Name='Profile Pictures').save()
 			
+			PostStatus = UserPost(PostType=postType,postId=Id,userId=user,userName=request.session['name'],post=profileImage,
+			Message = PostMessage,userPic='/media/'+str(userRegistration.objects.get(userId=user).profilePic)
+			).save()
+			likes = Likes(postId=Id).save()
 			Photos(Album='Profile Pictures',PhotoID=request.session['user'],Image=profileImage).save()
 
 			return HttpResponseRedirect('/profile/'+loginUser+'/')
@@ -775,19 +918,25 @@ def userIntroInsert(request):
 
 def userCoverInsert(request):
 	if request.method == "POST":
-		profileUserId=request.POST.get('coverUser')
-		coverImage=request.FILES['coverImage']
-		loginUser=request.session['user']
+		profileUserId = request.POST.get('coverUser','DefaultValue')
+		coverImage = request.FILES['coverImage']
+		loginUser = request.session['user']
+		postType = 'coverPhoto'
+		Id = uuid.uuid4().hex	
+		user = request.session['user']
+		PostMessage = ''
 		if profileUserId==loginUser:
 			status = userRegistration.objects.get(userId=loginUser)
 			status.coverPic = coverImage
 			status.save()
-
 			if not Album.objects.filter(AlbumID=request.session['user'],Name='Cover Photos'):
 				Album(AlbumID=request.session['user'],Name='Cover Photos').save()
 			
+			PostStatus = UserPost(PostType=postType,postId=Id,userId=user,userName=request.session['name'],post=coverImage,
+			Message = PostMessage,userPic='/media/'+str(userRegistration.objects.get(userId=user).profilePic)
+			).save()
+			likes = Likes(postId=Id).save()
 			Photos(Album='Cover Photos',PhotoID=request.session['user'],Image=coverImage).save()
-
 			return HttpResponseRedirect('/profile/'+loginUser+'/')
 		else:
 			return HttpResponse('<center><h1>you did somethong wrong</h1></center>')

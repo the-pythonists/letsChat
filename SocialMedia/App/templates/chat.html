@@ -55,14 +55,14 @@
           <li id="friendName{{friend.userId}}" class="this_Friend"><img src="{{friend.profilePic.url}}" class="onlineUserImage"><a href="/messages/{{friend.userId}}/" class="onlineUserName">{{friend}} 
             {% if newMsg != 0 %}
             <span id="unreadmsg{{friend.userId}}">{{newMsg}}</span></a>
-            {% if friend.onlineStatus %}
+            {% if friend.is_online %}
             <span class=" "><i id="online{{friend.userId}}" class="fa fa-eye "></i></span>
             {% else %}
             <span class=" "><i id="online{{friend.userId}}" class="fa fa-eye-slash "></i></span>
             {% endif %}
             {% else %}
 
-            {% if friend.onlineStatus %}
+            {% if friend.is_online %}
             <span class=" "><i id="online{{friend.userId}}" class="fa fa-eye "></i></span>
             {% else %}
             <span class=" "><i id="online{{friend.userId}}" class="fa fa-eye-slash "></i></span>

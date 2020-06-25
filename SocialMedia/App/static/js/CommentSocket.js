@@ -10,6 +10,7 @@ const commentSocket = new WebSocket(
     var loggedUser = document.getElementById('currentUserId').value;
 
 function comments(id,postCommentedOf,postCommentedBy){
+    console.log('called',id)
         const postId = id;
         var postCommentedOf = postCommentedOf;
         var postCommentedBy = postCommentedBy;

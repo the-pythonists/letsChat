@@ -18,7 +18,7 @@ class StatusConsumer(WebsocketConsumer):
 
     def disconnect(self, close_code):
         # Leave room group
-        userRegistration.objects.filter(userId=userId).update(onlineStatus=False)
+        userRegistration.objects.filter(userId=userId).update(is_online=False)
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name,
             self.channel_name

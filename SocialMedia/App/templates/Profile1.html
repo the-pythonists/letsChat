@@ -94,7 +94,9 @@
             <div id="Timeline" class="tabcontent">
               <h3>Timeline</h3><br>
               <br><br><br>
-              {% for i in postData %}
+              
+              {% for i,like,color in postData %}
+              {{i}}{{j}}{{k}}
               <section class="container pt-4" style="margin:4%;border-radius:8px;
                   box-shadow:0 10px 20px rgba(0,0,0,0.19),0 6px 6px rgba(0,0,0,0.23);">
   
@@ -113,15 +115,23 @@
       {% if i.post %}
         <img src="{{i.post.url}}" class="img-responsive" style='vertical-align: middle;max-height:200px;'>
         {% endif %}
+        <strong><p id="Counter{{i.postId}}" style="padding:8px 0px 0px 8px;">{{like}} Likes</p></strong>
+        <hr>
+        <div>
+        <a><i class="fas fa-thumbs-up" id="{{i.postId}}" name="{{i.postId}}" onclick="postLiker('{{i.postId}}','{{i.userId}}','{{currentUserId}}')" style="color:{{color}};"></i></a>
+      </div>
+        <hr>
         <div class="row my-4">
           <div class="col-lg-1 col-md-1 col-sm-1 col-1">
         <img src="{{ActiveUserPic.url}}" style="width:55px;height:55px;padding:2px;border-radius:50%;vertical-align:middle;">
         </div>
+        
         <div class="col-lg-9 col-md-9 col-sm-9 col-9">
-          <textarea placeholder="comment here..." class="form-control" style="resize:none;width:100%;border-radius:25px;border:2px solid grey;padding:8px;"></textarea>
+          {{i.postId}}','{{i.userId}}','{{currentUserId}}
+          <textarea placeholder="comment here..." id="Comment{{i.postId}}" class="form-control" style="resize:none;width:100%;border-radius:25px;border:2px solid grey;padding:8px;"></textarea>
           </div>
           <div class="col-lg-2 col-md-2 col-sm-2 col-2">
-          <button class = "btn btn-success" style=" border-radius:25px;padding:15px 25px 15px 25px;margin-left:-15%;">Send</button>
+          <button class = "btn btn-success" onclick="comments('{{i.postId}}','{{i.userId}}','{{currentUserId}}')" style=" border-radius:25px;padding:15px 25px 15px 25px;margin-left:-15%;">Send</button>
           </div>
           </div>
 		</div>
@@ -501,6 +511,10 @@
 <script type="text/javascript" src="{%static 'js/Userprofile.js'%}"></script>
 <script type="text/javascript" src="{%static 'js/notifications.js'%}"></script>
 <script type="text/javascript" src="{%static 'js/RequestSocket.js'%}"></script>
+<script type="text/javascript" src="{%static 'js/LikeSocket.js' %}"></script>
+<script type="text/javascript" src="{%static 'js/CommentSocket.js'%}"></script>
+
+
 
 
 <script type="text/javascript">

@@ -29,6 +29,7 @@ body{
   width:100%;
   margin-top:-200px;
   transition:all .4s;
+  z-index:10;
 }
 
 .header-container header
@@ -422,7 +423,7 @@ body {
 #notifications {
     margin-top: 6px;
     display:none;
-    width:430px;
+    width:380px;
     position:absolute;
     top:30px;
     right:0;
@@ -430,6 +431,7 @@ body {
     border:solid 1px rgba(100, 100, 100, .20);
     -webkit-box-shadow:0 3px 8px rgba(0, 0, 0, .20);
     z-index: 0;
+  
 }
 /* AN ARROW LIKE STRUCTURE JUST OVER THE NOTIFICATIONS WINDOW */
 #notifications:before {         
@@ -636,7 +638,7 @@ width:90%;
     padding-right: $badge-padding-x;
     padding-left: $badge-padding-x;
     margin-right: -$badge-padding-x;
-    font-size: inherit;
+    font-si ze: inherit;
     color: inherit;
     text-shadow: none;
   }

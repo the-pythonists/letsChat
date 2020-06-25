@@ -34,7 +34,7 @@ class userRegistration(models.Model):
     companyPosition = models.CharField(max_length=100,default='',blank=True)
     companyCity = models.CharField(max_length=50,default='',blank=True)
     companyDescription = models.CharField(max_length=1000,default='',blank=True)
-    onlineStatus = models.BooleanField(default=False,blank=True)
+    is_online = models.BooleanField(default=False,blank=True)
     joinedDate = models.DateTimeField(default=datetime.now)
 
     def __str__(self):
@@ -73,6 +73,7 @@ class Notifications(models.Model):
         return self.fullName    
 
 class UserPost(models.Model):
+    PostType = models.CharField(max_length=30,default='',blank=True)
     postId = models.CharField(max_length=100,default='',unique=True) 
     userId = models.CharField(max_length=50,default='')
     userName = models.CharField(max_length=50,default='')
@@ -95,7 +96,7 @@ class Story(models.Model):
         return self.userId
 
 class Album(models.Model):
-    AlbumID = models.CharField(max_length=50,default='',blank=True,unique=True)
+    AlbumID = models.CharField(max_length=50,default='',blank=True)
     Name = models.CharField(max_length=50,default='',blank=True)
     date = models.DateTimeField(default=datetime.now, blank=True)
 
@@ -104,7 +105,7 @@ class Album(models.Model):
 
 class Photos(models.Model):
     Album = models.CharField(max_length=50,default='',blank=True)
-    PhotoID = models.CharField(max_length=50,default='',blank=True,unique=True)
+    PhotoID = models.CharField(max_length=50,default='',blank=True)
     Image = models.ImageField(upload_to='media',blank=True)
     date = models.DateTimeField(default=datetime.now, blank=True)
 
@@ -207,3 +208,14 @@ class Report(models.Model):
     reportTitle= models.CharField(max_length=100,default='')
     status = models.BooleanField(default=False)
 
+class TaggedPeople(models.Model):
+    taggedId = models.CharField(max_length=50,default='',blank=True)
+    taggedPersons = ListCharField(
+        base_field=models.CharField(max_length=50,default='',blank=True),
+        max_length=(100 * 100)
+    )
+    postId = models.CharField(max_length=50,default='',blank=True)
+    date = models.DateTimeField(default=datetime.now, blank=True)
+
+    def __str__(self):
+        return self.taggedId
