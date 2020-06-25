@@ -91,46 +91,46 @@ function getCookie(){
   
   
    
-      $(document).ready(function () {
+    //   $(document).ready(function () {
   
-          // ANIMATEDLY DISPLAY THE NOTIFICATION COUNTER.
-          // $('#noti_Counter')
-          //     .css({ opacity: 0 })
-          //     .text('7')  // ADD DYNAMIC VALUE (YOU CAN EXTRACT DATA FROM DATABASE OR XML).
-          //     .css({ top: '-10px' })
-          //     .animate({ top: '-2px', opacity: 1 }, 500);
+    //       // ANIMATEDLY DISPLAY THE NOTIFICATION COUNTER.
+    //       // $('#noti_Counter')
+    //       //     .css({ opacity: 0 })
+    //       //     .text('7')  // ADD DYNAMIC VALUE (YOU CAN EXTRACT DATA FROM DATABASE OR XML).
+    //       //     .css({ top: '-10px' })
+    //       //     .animate({ top: '-2px', opacity: 1 }, 500);
   
-          // $('#noti_Button').click(function () {
+    //       // $('#noti_Button').click(function () {
   
-          //     // TOGGLE (SHOW OR HIDE) NOTIFICATION WINDOW.
-          //     $('#notifications').fadeToggle('fast', 'linear', function () {
-          //         if ($('#notifications').is(':hidden')) {
-          //             $('#noti_Button').css('background-color', '#2E467C');
-          //         }
-          //         // CHANGE BACKGROUND COLOR OF THE BUTTON.
-          //         else $('#noti_Button').css('background-color', '#FFF');
-          //     });
+    //       //     // TOGGLE (SHOW OR HIDE) NOTIFICATION WINDOW.
+    //       //     $('#notifications').fadeToggle('fast', 'linear', function () {
+    //       //         if ($('#notifications').is(':hidden')) {
+    //       //             $('#noti_Button').css('background-color', '#2E467C');
+    //       //         }
+    //       //         // CHANGE BACKGROUND COLOR OF THE BUTTON.
+    //       //         else $('#noti_Button').css('background-color', '#FFF');
+    //       //     });
   
-          //     $('#noti_Counter').fadeOut('slow');     // HIDE THE COUNTER.
+    //       //     $('#noti_Counter').fadeOut('slow');     // HIDE THE COUNTER.
   
-          //     return false;
-          // });
+    //       //     return false;
+    //       // });
   
-          // // HIDE NOTIFICATIONS WHEN CLICKED ANYWHERE ON THE PAGE.
-          // $(document).click(function () {
-          //     $('#notifications').hide();
+    //       // // HIDE NOTIFICATIONS WHEN CLICKED ANYWHERE ON THE PAGE.
+    //       // $(document).click(function () {
+    //       //     $('#notifications').hide();
   
-          //     // CHECK IF NOTIFICATION COUNTER IS HIDDEN.
-          //     if ($('#noti_Counter').is(':hidden')) {
-          //         // CHANGE BACKGROUND COLOR OF THE BUTTON.
-          //         $('#noti_Button').css('background-color', '#2E467C');
-          //     }
-          // });
+    //       //     // CHECK IF NOTIFICATION COUNTER IS HIDDEN.
+    //       //     if ($('#noti_Counter').is(':hidden')) {
+    //       //         // CHANGE BACKGROUND COLOR OF THE BUTTON.
+    //       //         $('#noti_Button').css('background-color', '#2E467C');
+    //       //     }
+    //       // });
   
-          $('#notifications').click(function () {
-              return false;       // DO NOTHING WHEN CONTAINER IS CLICKED.
-          });
-    });
+    //       $('#notifications').click(function () {
+    //           return false;       // DO NOTHING WHEN CONTAINER IS CLICKED.
+    //       });
+    // });
   
   //Validation for Post Image
   $("#file1").on("change", function(e) {
@@ -644,4 +644,54 @@ function allTagList(Id)
 
 
 
+}
+
+
+
+function seeAllCommentFunction(v1,v2,v3)
+{
+  $("#seeAllCommentsIdDiv").empty();
+
+  $("#seeAllCommentsIdDiv").append('<div><span class="ml-5">'+v3+'</span></div>');
+  if(v2!=""){
+  $("#seeAllCommentsIdDiv").append('<center><div style=""><img src="'+v2+'" style="width:80%;height:250px;" alt=""></div></center><br><br>');
+  }
+  
+  $.ajax({
+    method:'POST',
+    url:'/CommentShow/',
+
+    data:{
+     
+      postId:v1,
+    },
+    
+    success:function(e){
+      console.log(e);
+      nm=document.getElementById("mynameId").innerHTML;
+      for(i=0;i<(e.ParentcommentId).length;i++)
+      {
+
+        $("#seeAllCommentsIdDiv").append('<div style="padding:8px;background:#E9ECEF;border-radius:25px;display: inline-block;"><span><img src="'+e.ParentcommentUserpic[i]+'" style="width:35px;height:35px;border-radius:50%;"></span><span  style="color:#00a087;font-weight:bold;" class="ml-2">'+e.parentcommentName[i]+' </span><br><span class="ml-5">'+e.ParentComment[i]+'</span><span><span id="replybtn" onclick="reply(\''+v1+'\',\''+e.ParentcommentId[i]+'\',\''+nm+'\',\''+e.ParentcommentByList[i]+'\')"><strong style="cursor:pointer;" class="ml-2 font-weight-bold">Reply</strong></span><br><input type="text" style="display:none" id="reply'+e.ParentcommentId[i]+'" placeholder="Type your reply"></span></div><br><br>');
+        for(j=0;j<(e.childcommentId).length;j++)
+        {
+          if(e.ParentcommentId[i]==e.childcommentId[j]){
+          $("#seeAllCommentsIdDiv").append('<div><i class="fas fa-reply"></i><div style="padding:8px;background:#E9ECEF;border-radius:25px;display: inline-block;"><span><img src="'+e.childcommentUserpic[j]+'" style="width:35px;height:35px;border-radius:50%; class="font-weight-bold"></span><span style="color:#00a087;font-weight:bold;" class="ml-2">'+e.childcommentName[j]+' </span><br><span class="ml-5">'+e.ChildComment[j]+'</span></div></div> <br>');
+          
+          }
+          
+        }$("#seeAllCommentsIdDiv").append('<hr>');
+
+
+      }
+    
+    
+    },
+    error:function(data){
+      console.log('Failed');
+    }
+  })
+
+
+  
 }

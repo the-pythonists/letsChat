@@ -136,19 +136,44 @@ def index(request):
 		lnth = []
 		for item in postList:
 			poId=item.postId
-			s =(TaggedPeople.objects.get(postId=poId).taggedPersons)
-			if len(s)>0:
-				qry.append(userRegistration.objects.filter(userId=s[0]))
-				lnth.append(len(s)-1)
-			else:
-				qry.append("")
-				lnth.append("")
-				
-		# allComments = Comments.objects.all().values('comment','date','userInfo__firstName')
-		allComments = Comments.objects.all()
-		for i in allComments:
-			com = i.comment
-			name = i.userInfo.firstName
+			if TaggedPeople.objects.get(postId=poId).exists():
+				s =(TaggedPeople.objects.get(postId=poId).taggedPersons)
+				if len(s)>0:
+					qry.append(userRegistration.objects.filter(userId=s[0]))
+					lnth.append(len(s)-1)
+				else:
+					qry.append("")
+					lnth.append("")
+					
+		commentContent = []
+		commentName = []
+		commentPic = []
+		commentId = []
+		for i in postList:
+			commentData = []
+			commentData.append(Comments.objects.filter(postId=i.postId).order_by('-date'))
+			for j in commentData:
+				print("j value = ",j)
+				if j:
+					for k in j:
+						commentContent.append(k.comment)
+						commentName.append(k.userInfo.firstName + ' ' + k.userInfo.lastName)
+						commentPic.append(k.userInfo.profilePic)
+						commentId.append(k.commentId)
+				else:
+					commentContent.append("")
+					commentName.append("")
+					commentPic.append("")
+					commentId.append("")
+					 	
+				break
+
+
+		
+		print(commentContent,commentName)
+
+
+
 		
 		notification = Notifications.objects.filter(receiver=request.session['user']).order_by('-date')
 		picsList1 = []
@@ -160,8 +185,8 @@ def index(request):
 				uname = detail.userName
 				picUrl = detail.profilePic
 				picsList1.append(picUrl.url)
-		params = {'userInfo':userInfo,'userData':zip(postList, like,colorPost,qry,lnth),'date_now':datetime.datetime.now(),
-		'allComments':allComments,"storyData":storiesFullData,'notification':zip(notification,picsList1)}
+		params = {'userInfo':userInfo,'userData':zip(postList, like,colorPost,qry,lnth,commentContent,commentName,commentPic,commentId),'date_now':datetime.datetime.now(),
+		'allComments':zip(postList),"storyData":storiesFullData,'notification':zip(notification,picsList1)}
 		return render(request,'DashBoard.html',params)
 	else:
 		return render(request,'index.html')
@@ -354,10 +379,10 @@ def reply(request):
 	
 	Replies(postId=postId,commentId=commentId,replyId=replyId,repliedBy=repliedBy,repliedOn=repliedOn,reply=reply,
 	userInfo=user).save()
-	
-	notify = str(user) + ' Replied to your Comment'
-	Notifications(postId=postId,notificationType='reply',fullName=str(user),sender=repliedBy,receiver=repliedOn,
-	notification=notify,viewed=False).save()
+	if repliedBy != repliedOn:
+		notify = str(user) + ' Replied to your Comment'
+		Notifications(postId=postId,notificationType='reply',fullName=str(user),sender=repliedBy,receiver=repliedOn,
+		notification=notify,viewed=False).save()
 	return JsonResponse({'Success':'Done'})
 
 @csrf_exempt
@@ -979,10 +1004,20 @@ def tagSubmissionForm(request):
 	tagPerson = request.POST.get('tagPerson')
 	postId = request.POST.get('postId')
 	tagPersonList = list(tagPerson.split(","))
-	
+	taggedBy = request.session['user']
+	taggedByPerson = userRegistration.objects.get(userId=taggedBy)
+	notify = "You and "  +str(int(len(tagPersonList))-2)+ " others are tagged in " + str(taggedByPerson)+ "\'s post"
 	TaggedPeople.objects.filter(postId=postId).update(taggedPersons=tagPerson[1:])
-	
+	print(notify)
+	for taggedUser in tagPersonList:
+		if taggedUser == '':
+			pass
+		else:
+			name = userRegistration.objects.get(userId=str(taggedUser))
+			Notifications(postId=postId,notificationType='tag',fullName=str(taggedByPerson),sender=taggedBy,receiver=taggedUser,
+			notification=notify,viewed=False).save()
 	return HttpResponse(tagPerson) 
+
 @csrf_exempt
 def showAllTagPerson(request):
 	postId = request.POST.get('postId')
@@ -995,3 +1030,33 @@ def showAllTagPerson(request):
 		Lname.append(qry1.lastName)
 
 	return JsonResponse({"status":"successfully","userName":qry,"FName":Fname,"LName":Lname})
+
+@csrf_exempt
+def CommentShow(request):
+	ParentcommentByList = []
+	ParentComment = []
+	parentcommentName = []
+	ParentcommentId = []
+	ParentcommentUserpic = []
+	childComment=[]
+	childCommentBy = []
+	childcommentId=[]
+	childcommentName=[]
+	childcommentUserpic = []
+	comments = Comments.objects.filter(postId=request.POST.get("postId"))
+	for comment in comments:
+		ParentcommentByList.append(comment.commentedBy)
+		ParentComment.append(comment.comment)
+		ParentcommentId.append(comment.commentId)
+		parentcommentName.append(comment.userInfo.firstName +' '+ comment.userInfo.lastName)
+		ParentcommentUserpic.append(comment.userInfo.profilePic.url)
+		childComments = Replies.objects.filter(commentId=comment.commentId)
+		for child in childComments:
+			childCommentBy.append(child.repliedBy)
+			childComment.append(child.reply)
+			childcommentId.append(child.commentId)
+			childcommentName.append(child.userInfo.firstName +' '+ child.userInfo.lastName)
+			childcommentUserpic.append(child.userInfo.profilePic.url)
+	return JsonResponse({"ParentcommentByList":ParentcommentByList,"ParentComment":ParentComment,"ParentcommentId":ParentcommentId,"parentcommentName":
+	parentcommentName,"childcommentId":childcommentId,"ChildComment":childComment,"childcommentName":childcommentName,
+	"childCommentBy":childCommentBy,"ParentcommentUserpic":ParentcommentUserpic,"childcommentUserpic":childcommentUserpic})

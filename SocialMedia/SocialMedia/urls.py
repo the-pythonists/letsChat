@@ -82,6 +82,7 @@ urlpatterns = [
 
     path("tagSubmissionForm/",views.tagSubmissionForm,name="tagSubmissionForm"),
     path("showAllTagPerson/",views.showAllTagPerson,name="showAllTagPerson"),
+    path("CommentShow/",views.CommentShow,name="CommentShow"),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

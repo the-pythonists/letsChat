@@ -15,6 +15,8 @@ function comments(id,postCommentedOf,postCommentedBy){
         var postCommentedBy = postCommentedBy;
          try{
         comment = document.getElementById('Comment'+postId).value;
+        alert("Your Comment has been Saved");
+        document.getElementById('Comment'+postId).value="";
          }catch{}
         console.log(postCommentedOf, postCommentedBy,postId,comment)
        

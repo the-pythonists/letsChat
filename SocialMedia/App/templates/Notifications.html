@@ -23,16 +23,9 @@
 <h4><strong id="pageTitle">Notifications</strong></h4>
 <section id="wrapper">
 
-<div class="tab">
 
-  <button class="tablinks" onclick="openCity(event, 'All')">All</button>
-  <button class="tablinks" onclick="openCity(event, 'friendRequests')">Friend Requests</button>
-  <button class="tablinks" onclick="openCity(event, 'likeComment')">Like and Comments</button>
+<div id="friendRequests" >
   
-</div>
-
-<div id="friendRequests" class="tabcontent">
-  <h3>Friend Requests</h3>
 
   <div class="notificationSect">
       <span class="NotificationNotes" id="NotificationNotes"></span> <p >
@@ -55,26 +48,26 @@
 
 </div>
 
-<div id="likeComment" class="tabcontent">
-  <h4>Like and Comment</h4>
+<div id="likeComment">
+
   <div class="notificationSect">
-  	<p ><img src="{%static 'images/Logo.png'%}" class="profilePic">
+  	<p >
       <span class="NotificationNotes" id="likeComment"></span></p><hr>
   </div>
 
 </div>
 
-<div id="All" class="tabcontent">
-  <h3>All</h3>
+<div id="All" >
+  
   <div class="notificationSect">
     {% for data3,data4 in notification %}
     <!-- {{data2}} -->
     <div id="{{data.sender}}">
       <a href="/profile/{{data3.sender}}/">
       <img src="{{data4}}" class="profilePic">
-        <button class="btn btn-primary">
+      <a href="/profile/{{data3.sender}}/">
           {{data3.notification}}
-        </button>
+        </a>
       </a>
       <div style="margin-left: 8%; margin-top: -20px;">
       </div>

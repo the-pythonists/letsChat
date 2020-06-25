@@ -90,13 +90,13 @@
                 <!--A CIRCLE LIKE BUTTON TO DISPLAY NOTIFICATION DROPDOWN.-->
                 <a id="noti_Button"><i class="fas fa-bell top-right float-right"></i></a>    
 
-                <!--THE NOTIFICAIONS DROPDOWN BOX.-->
+                <!--THE NOTIFICAIONS DROPDOWN BOX.-->   
                 <div id="notifications" class="float-right">
                     <h3 id="noti_heading">Notifications</h3><hr>
-                    <div style="height:300px;">
+                    <div style="height:300px;overflow-y:scroll;">
                     {% for data3,data4 in notification %}
                       <div id="{{data.sender}}" style="padding: 1%;">
-                       <a href="/profile/{{data3.sender}}/" style="text-decoration:none;" >
+                       <a href="/profile/{{data3.sender}}/" style="text-decoration:none;" onclick="location.replace('/profile/{{data3.sender}}/'),'_top'" >
                         <span style="margin-top:18px;">
                            <img src="{{data4}}" class="profilePic" style="width: 40px;height:40px;border-radius:50%;vertical-align: middle;">
                       
@@ -107,7 +107,7 @@
                       </div>
                       {% endfor %}
                     </div>
-                    <div class="seeAll" id="seeAll" ><i >See All</i></div>
+                    <div class="seeAll" id="seeAll" ><a href="/notifications/" onclick="location.replace('/notifications/'),'_top'">See All</a></div>
                 </div>
           </span>
       
@@ -298,12 +298,12 @@
 
     <!--End Search Post Result-->
 
-     <div style="background:rgba(191, 191, 191, 0.5);width:90%;" id="postAllSectionId" >
+     <div style="background:rgba(191, 191, 191, 0.5);width:90%;padding:2%;" id="postAllSectionId" >
 
         
 
           <div>
-              {% for data,data2,data4,data5,data6 in userData %}
+              {% for data,data2,data4,data5,data6,comment1,comment2,comment3,comment4 in userData %}
               
               {% if data.PostType == 'post' %}
               <a href="/profile/{{data.userId}}" style="text-decoration: none;">
@@ -314,7 +314,7 @@
                             is with <a href = "/profile/{{nm.userName}}"><span style="color:rgba(0,125,136,1);">{{nm.firstName}} {{nm.lastName}}</span></a>
                             {%endfor%}
                             {% if data6 %}
-                            and {{data6}} <span onclick = "allTagList('{{data.postId}}')" data-toggle="modal" data-target=".AllTagPersonList" style="color:black;">others</span></span>
+                            and <span style="color:rgba(0,125,136,1);">{{data6}}</span> <span onclick = "allTagList('{{data.postId}}')" data-toggle="modal" data-target=".AllTagPersonList" style="color:rgba(0,125,136,1);">others</span></span>
                             {%endif%}</span>
               
               
@@ -397,28 +397,29 @@
             
             <a><i class="fas fa-thumbs-up PostResponseLike" id="{{data.postId}}" name="{{data.postId}}" onclick="postLiker('{{data.postId}}','{{data.userId}}','{{userInfo.userId}}')" style="color:{{data4}};"></i></a>
             <a href="#"><i class="far fa-comment-alt" id="PostResponseComment"></i></a>
-            <hr>
+            
 
             <span id="NewComment{{data.postId}}"></span>
-            {% for comment in allComments %}
-            {% if comment.postId == data.postId %}
-            <img src="{{comment.userInfo.profilePic.url}}" alt="" width="40px" height="20px">
-            <span style="color: black;">{{comment.userInfo}}</span>
+            
             <br>
-            <span style="color: green;">{{comment.comment}}</span>
-            <span id="replybtn" onclick="reply('{{comment.postId}}','{{comment.commentId}}',
-            '{{comment.userInfo}}','{{comment.commentedBy}}')">Reply</span>
-            <span id="allReplies{{comment.commentId}}"></span>
-            <input type="text" style="display:none" id="reply{{comment.commentId}}">
-            
-            {% endif %}
-            {% endfor %}
-            
+            {%if comment3.url%}
+            <img src="{{comment3.url}}" alt="" style="width:40px;height:40px;border-radius:50%;">
+            <span style="color: black;" class="font-weight-bold">{{comment2}}</span>
+            <br>
+            <span style="color: green; margin-left:45px;">{{comment1}}</span><br>
+            {%if data.post.url and data.Message%}
+            <span style="cursor:pointer;" data-toggle="modal" data-target="#seeAllComments" onclick="seeAllCommentFunction('{{data.postId}}','{{data.post.url}}','{{data.Message}}')"><strong style="color:grey;">View all Comments</strong></span>
+            {%elif data.post.url and not data.Message%}
+            <span style="cursor:pointer;" data-toggle="modal" data-target="#seeAllComments" onclick="seeAllCommentFunction('{{data.postId}}','{{data.post.url}}','')"><strong style="color:grey;">View all Comments</strong></span>
+            {%else%}
+            <span  style="cursor:pointer;" data-toggle="modal" data-target="#seeAllComments" onclick="seeAllCommentFunction('{{data.postId}}','','{{data.Message}}')"><strong style="color:grey;">View all Comments</strong></span>
+            {%endif%}
+            {%endif%}
             <form>
               <img src="{{userInfo.profilePic.url}}" style="width:50px;height:50px;border-radius:50%;vertical-align: middle;">
               <input type="text" placeholder="Drop your Comment" style="width:60%;padding:8px;" id="Comment{{data.postId}}">
               <input type="button" onclick="comments('{{data.postId}}','{{data.userId}}','{{userInfo.userId}}')" value="Comment" style="padding:8px;" class="btn btn-success">
-            </form>
+            </form><hr>
             <br><br>
             {% endfor %}
           </div>
@@ -428,7 +429,7 @@
           console.log(ID)
           document.getElementById('reply'+commentId).style.display='block';
           document.getElementById('reply'+commentId).focus();
-          document.getElementById('reply'+commentId).value=name;
+          //document.getElementById('reply'+commentId).value=name;
 
           $('#reply'+commentId).keyup(function(){
         var reply = $('#reply'+commentId).val();
@@ -445,7 +446,10 @@
                     reply:reply,
                   },
                   success:function(data){
+                    alert("your reply has been saved");
+                    $('#seeAllComments').modal('hide'); 
           document.getElementById('allReplies'+commentId).innerHTML=reply
+          document.getElementById('reply'+commentId).style.display='none';
         }
               });
         }
@@ -507,6 +511,33 @@
         
         <hr>
         <div id="AllTagPersonListId"></div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!--see all Comments-->
+<!-- Button trigger modal -->
+
+<!-- Modal -->
+<div class="modal fade" id="seeAllComments" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="color:grey;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">All Comments</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="seeAllCommentsIdDiv"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        
+      </div>
     </div>
   </div>
 </div>
