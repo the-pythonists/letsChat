@@ -224,7 +224,7 @@ function getCookie(){
       });
       
   document.getElementById("SubmitPost").style.display="block";
-  Mode();
+  
   
     }
     

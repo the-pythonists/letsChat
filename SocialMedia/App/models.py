@@ -219,3 +219,16 @@ class TaggedPeople(models.Model):
 
     def __str__(self):
         return self.taggedId
+
+class createAlbum(models.Model):
+    userId = models.CharField(max_length=75,default='')
+    albumName = models.CharField(max_length=75,default='')
+    albumDescription = models.CharField(max_length=250,default='')
+    albumAccessibility = models.CharField(max_length=75,default='')
+    albumId = models.CharField(max_length=200,default='')
+
+
+class AlbumImageData(models.Model):
+    media = models.ImageField(upload_to="profiles",blank=True)
+    albumId = models.CharField(max_length=200,default='')
+    picAlbumId = models.CharField(max_length=200,default='')

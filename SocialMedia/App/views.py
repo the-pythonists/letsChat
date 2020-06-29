@@ -7,6 +7,7 @@ import random
 from django.core.mail import send_mail
 from .models import *
 from django.contrib.auth.hashers import make_password,check_password
+import time
 import datetime
 import uuid,json
 from django.utils.datastructures import MultiValueDictKeyError
@@ -215,6 +216,11 @@ def signup(request):
 				mobile=mobile,emailAddress = email, password = make_password(pwd)).save()
 				# Creating Blank Frined List
 				AllFriends(userId=username).save()
+				code = str(username + "profile").encode('utf-8')
+				createAlbum(userId = username,albumName="profile",albumId=code.hex()).save()
+				
+				code = str(username + "cover").encode('utf-8')
+				createAlbum(userId = username,albumName="cover",albumId=code.hex()).save()
 				return HttpResponseRedirect('/')	
 		else:
 			return render(request,'CreateAccount.html',{'message':'Incorrect OTP'})
@@ -227,13 +233,13 @@ def OtpGeneration(request):
 	RandomValue="LetsChat"+str(random.randint(1001,99999))
 	print(RandomValue)
 	request.session["Otp"]=RandomValue
-	message=f"Your Email Address  {Email}  Your OTP is {RandomValue} Do not share your password to anyone."
-	send_mail(
-    	'LetsChat',
-    	message,
-    	settings.EMAIL_HOST_USER,
-    	[Email],
-    	fail_silently=False)
+	# message=f"Your Email Address  {Email}  Your OTP is {RandomValue} Do not share your password to anyone."
+	# send_mail(
+    # 	'LetsChat',
+    # 	message,
+    # 	settings.EMAIL_HOST_USER,
+    # 	[Email],
+    # 	fail_silently=False)
 	# request.session["Otp"]=RandomValue
 	# request.session["Email"]=Email
 	return JsonResponse({'Result':"Successfully"})
@@ -611,17 +617,25 @@ def forgetPasswordProcess(request):
 def album(request):
 	if request.session.has_key('user'):
 		photos = UserPost.objects.filter(userId=request.session['user'])
-		profilePhotos = Photos.objects.filter(Album='Profile Pictures',PhotoID=request.session['user'])
-		coverPhotos = Photos.objects.filter(Album='Cover Photos',PhotoID=request.session['user'])
-		params = {'photos':photos,'profilePhotos':profilePhotos,'coverPhotos':coverPhotos}
+		myGallery = createAlbum.objects.filter(userId=request.session['user'])
+		code = str(request.session['user'] + "profile").encode('utf-8')
+		code = code.hex()
+		profileData = AlbumImageData.objects.filter(albumId = code)
+		# profiledataList = []
+		# for item in profileData:
+		# 	profiledataList.append(item.media.url)
+		code = str(request.session['user'] + "cover").encode('utf-8')
+		code = code.hex()
+		coverData = AlbumImageData.objects.filter(albumId = code)
+		# coverdataList = []
+		# for item in coverData:
+		# 	profiledataList.append(item.media.url)
+		print(myGallery)
+		print("photos = ",photos)
 		
-		if request.method == 'POST':
-			name = request.POST.get('album').title()
-			if not Album.objects.filter(AlbumID=request.session['user'],Name=name):
-				Album(AlbumID=request.session['user'],Name=name).save()
-			return render(request,'Album.html',params)
-		else:
-			return render(request,'Album.html',params)
+
+		params = {'photos':photos,'myGallery':myGallery,'profileData':profileData,'coverData':coverData}
+		return render(request,'Album.html',params)
 	else:
 		return HttpResponseRedirect('/')
 
@@ -875,14 +889,24 @@ def userProfileInsert(request):
 			status.save()
 			UserPost.objects.filter(userId=loginUser).update(userPic='/media/'+str(userRegistration.objects.get(userId=loginUser).profilePic))
 			GroupChat.objects.filter(sender=loginUser).update(senderPic='/media/'+str(userRegistration.objects.get(userId=loginUser).profilePic))
-			if not Album.objects.filter(AlbumID=request.session['user']):
-				Album(AlbumID=request.session['user'],Name='Profile Pictures').save()
+			# if not Album.objects.filter(AlbumID=request.session['user']):
+				# Album(AlbumID=request.session['user'],Name='Profile Pictures').save()
 			
 			PostStatus = UserPost(PostType=postType,postId=Id,userId=user,userName=request.session['name'],post=profileImage,
 			Message = PostMessage,userPic='/media/'+str(userRegistration.objects.get(userId=user).profilePic)
 			).save()
 			likes = Likes(postId=Id).save()
-			Photos(Album='Profile Pictures',PhotoID=request.session['user'],Image=profileImage).save()
+			# Photos(Album='Profile Pictures',PhotoID=request.session['user'],Image=profileImage).save()
+
+
+			code = str(request.session['user'] + "profile").encode('utf-8')
+			img = []
+			picId = []
+			t = time.localtime()
+			current_time = time.strftime("%H:%M:%S", t)	
+			current_time =(str(current_time).encode('utf-8')).hex()+code.hex() 
+			
+			AlbumImageData(albumId=code.hex(),media=profileImage,picAlbumId=current_time).save()
 
 			return HttpResponseRedirect('/profile/'+loginUser+'/')
 		else:
@@ -929,14 +953,23 @@ def userCoverInsert(request):
 			status = userRegistration.objects.get(userId=loginUser)
 			status.coverPic = coverImage
 			status.save()
-			if not Album.objects.filter(AlbumID=request.session['user'],Name='Cover Photos'):
-				Album(AlbumID=request.session['user'],Name='Cover Photos').save()
+			# if not Album.objects.filter(AlbumID=request.session['user'],Name='Cover Photos'):
+				# Album(AlbumID=request.session['user'],Name='Cover Photos').save()
 			
 			PostStatus = UserPost(PostType=postType,postId=Id,userId=user,userName=request.session['name'],post=coverImage,
 			Message = PostMessage,userPic='/media/'+str(userRegistration.objects.get(userId=user).profilePic)
 			).save()
 			likes = Likes(postId=Id).save()
 			Photos(Album='Cover Photos',PhotoID=request.session['user'],Image=coverImage).save()
+
+			code = str(request.session['user'] + "cover").encode('utf-8')
+			img = []
+			picId = []
+			t = time.localtime()
+			current_time = time.strftime("%H:%M:%S", t)	
+			current_time =(str(current_time).encode('utf-8')).hex()+code.hex() 
+			
+			AlbumImageData(albumId=code.hex(),media=coverImage,picAlbumId=current_time).save()
 			return HttpResponseRedirect('/profile/'+loginUser+'/')
 		else:
 			return HttpResponse('<center><h1>you did somethong wrong</h1></center>')
@@ -1070,3 +1103,117 @@ def groupMessage_Save(request):
 def seenMessage(request,sender,receiver):
 	Messages.objects.filter(is_read=False,sender=sender,receiver=receiver).update(is_read=True)
 	return JsonResponse({'Result':'Success'})
+
+
+@csrf_exempt
+def createAlbumDetails(request):
+	if request.method == "POST":
+		name = request.POST.get('name',"defaultValue")
+		
+		result = createAlbum.objects.filter(Q(userId=request.session['user']) & Q(albumName=name))
+		status = ""
+		# code = str(request.session['user'] + name).encode('utf-8')
+		# print(code.hex())
+		if result.exists():
+			status = "allready"
+
+			album_Id =""
+			for i in result:
+				album_Id=i.albumId
+				break
+			imgList = AlbumImageData.objects.filter(albumId=album_Id)
+			img = []
+			picId = []
+			for image in imgList:
+				img.append(image.media.url)
+				picId.append(image.picAlbumId)
+
+			return JsonResponse({"status":status,"media":img,"picId":picId})
+		else:
+			description = request.POST.get('description',"defaultValue")
+			accessibility = request.POST.get('accessibility',"defaultValue")
+			code = str(request.session['user'] + name).encode('utf-8')
+			
+			createAlbum(userId=request.session['user'],albumName=name,albumDescription=description,albumAccessibility=accessibility,albumId=code.hex()).save();
+			status = "created"
+			return JsonResponse({"status":status})
+
+@csrf_exempt
+def UploadAlbumImage(request):
+	print("Hellllllllllllloooooo")
+	if request.method == "POST":
+		image = request.FILES.get('theFile')
+		Reponame = request.POST.get('repoName',"defaultValue")
+		print(Reponame)
+		code = str(request.session['user'] + Reponame).encode('utf-8')
+		img = []
+		picId = []
+		t = time.localtime()
+		current_time = time.strftime("%H:%M:%S", t)	
+		current_time =(str(current_time).encode('utf-8')).hex()+code.hex() 
+			
+		AlbumImageData(albumId=code.hex(),media=image,picAlbumId=current_time).save()
+		return HttpResponseRedirect("/album/")
+		# photos = UserPost.objects.filter(userId=request.session['user'])
+		# myGallery = createAlbum.objects.filter(userId=request.session['user'])
+		# print(myGallery)
+		# print("Donnnnnnnnnnnnnne")
+		# params = {'photos':photos,'myGallery':myGallery}
+		# return render(request,'Album.html',params)
+
+@csrf_exempt
+def deleteAlbumRepo(request):
+	if request.method == "POST":
+		title = request.POST.get('title',"defaultValue")
+		code = str(request.session['user'] + title).encode('utf-8')
+		code = code.hex()
+		createAlbum.objects.get(albumId = code).delete()
+		AlbumImageData.objects.filter(albumId=code).delete()
+		return JsonResponse({"Status":"successfully"})
+
+@csrf_exempt
+def UpdateAlbumRepo(request):
+	if request.method == "POST":
+		name = request.POST.get('name',"defaultValue")
+		description = request.POST.get('description',"defaultValue")
+		accessibility = request.POST.get('accessibility',"defaultValue")
+		code = str(request.session['user'] + name).encode('utf-8')
+		query=createAlbum.objects.get(albumId = code.hex())
+		query.albumDescription = description
+		query.albumAccessibility=accessibility
+		query.save()
+		return JsonResponse({"Status":"successfully"})
+
+@csrf_exempt
+def deleteAlbumPicture(request):
+	if request.method == "POST":
+		name = request.POST.get('pic',"defaultValue")
+		title = request.POST.get('title',"defaultValue")
+		code = str(request.session['user'] + title).encode('utf-8')
+		code = code.hex()
+		print(name)
+		print(title)
+		AlbumImageData.objects.filter(picAlbumId=name).delete()
+		return JsonResponse({"Status":"successfully"})
+		
+def showPost(request,postid):
+	postData = UserPost.objects.get(postId=postid)
+	allComments = Comments.objects.filter(postId=postid)
+	allLikes = Likes.objects.get(postId=postid).postLikedBy
+	totalLikes = len(allLikes)
+	if request.session['user'] in allLikes:
+		colorPost = "rgba(0, 150, 136,1)"
+	else:
+		colorPost = "grey"
+
+	params = {'postData':postData,'allComments':allComments,
+	'totalLikes':totalLikes,'colorPost':colorPost,'loggedUser':request.session['user']}
+	return render(request,'showPost.html',params)
+
+@csrf_exempt
+def deshboarDeletePost(request):
+	if request.method == "POST":
+		postId = request.POST.get("postId")
+		print(postId)
+		UserPost.objects.get(postId = postId).delete()
+		return JsonResponse({"status":"success"})		

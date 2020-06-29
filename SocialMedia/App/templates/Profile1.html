@@ -88,7 +88,7 @@
               <button class="tablinks" onclick="openCity(event, 'Timeline')">Timeline</button>
               <button class="tablinks" onclick="openCity(event, 'About')">About</button>
               <span onclick="tagPeopleFun1('{{data.userId}}')"><button class="tablinks" onclick="openCity(event, 'Friends')">Friends</button></span>
-              <button class="tablinks" onclick="openCity(event, 'Photos')">Photos</button>
+              <span onclick="showPhotos('{{data.userId}}')"><button class="tablinks" onclick="openCity(event, 'Photos')">Photos</button></span>
             </div>
 
             <div id="Timeline" class="tabcontent">
@@ -205,6 +205,7 @@
 
             <div id="Photos" class="tabcontent">
               <h3>Photos</h3>
+              <!-- hum yha pr sare photos show kr skte hain album name k sath -->
               
             </div>
 

@@ -38,7 +38,7 @@ commentSocket.onclose = function(e) {
     commentSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
         console.log(data.postCommentedOf,loggedUser)
-        
+        document.getElementById('Comment'+postId).value='';
         try{
             document.getElementById('NewComment'+data.postId).innerHTML = data.comment;
         }catch{}

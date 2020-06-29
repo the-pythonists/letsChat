@@ -297,3 +297,33 @@ function tagPeopleFun1(ID)
     })
 
 }
+
+
+function showPhotos(val)
+{
+ 
+  $.ajax({
+    method:'POST',
+    url:'/showPhotosfun/',
+    data:{
+      id:val,
+      
+    },
+    success:function(e){
+      
+      // $('#friendsListId').empty();
+      // console.log(e);
+      // document.getElementById("tagLoader").style.display="none";
+      // for(i=0;i<(e.name).length;i++)
+      // {
+      //  $('#friendsListId').append('<a href="/profile/'+e.userId[i]+'"><label ><span><img src="'+e.pic[i]+'" style="width:45px;height:45px;border-radius:50%;margin:8px;"></span>'+e.name[i]+'</label></a><br>');
+      // }
+
+    },
+    error:function(data){
+      console.log('Failed');
+    }
+  })
+
+
+}

@@ -4,67 +4,111 @@
 	box-sizing: border-box;
 }
 
-header{
-	
-	position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 9999;
-  width: 100%;
-  
+
+.header-container
+{
+  position:absolute;
+  width:100%;
+  margin-top:-200px;
+  transition:all .4s;
+}
+
+.header-container header
+{
+  margin-top:200px;
+}
+
+header
+{
+  display:flex;
+  flex-direction: column;
   background-color:#E9ECEF;
-
+  
 }
 
+.heading
+{
+  padding:24px 0 24px 10px;
+  box-shadow:0px 0px 23px 0px rgba(0,0,0,0.5);
+  z-index:1;
+}
+.heading #brand
+{
+  
+  color:#00a087;    
+  font-weight:bold;
+  cursor:pointer;
+  font-size:2em;
+}
 
-#brand{
-		padding:16px;
-		color:#00a087;
-		margin-left:5%;
-		font-weight:bold;
-		padding:16px;
-		cursor:pointer;
-		
+.col-centered{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  height:200px;
+  align-items: stretch;
+}
 
-	}
 img{
-	filter:grayscale(0%);
-	transition: 1s;
-	width:100%;
-	overflow:hidden;
-	margin:8px;
-}
-img:hover{
-	filter:grayscale(0%);;
-	/*
-	transform:scale(1.1);
-	*/
+  align-items: stretch;
+  border-radius:5px;
+  object-fit: cover;
+  
+  padding:5px;
+  margin-top:8px;
 }
 
-
-.container{
-	column-count: 3;
-	
-	margin:0 auto;
-	
-	
-	/*
-	box-shadow:0 0 30px grey;
-	*/
+.col-lg-3{
+  
 }
 
-@media only screen and (max-width: 520px){
-	.container{
-		column-count:2;
-	}
+.top-right{
+  border:2px solid #00a087;
+  padding:12px;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-left:8px;
+
 }
 
-@media only screen and (max-width: 400px){
-	.container{
-		column-count:1;
-	}
+#topsearchBox{
+  width: 90%;
+  padding:12px;
+  display:inline-block;
+  border:2px solid #00a087;
+  color:#00a087;
+  border-radius:25px 0 0 25px;
+  border-right:none;
 }
 
+#searchBoxSectionContainer
+{
+  display:none;
+}
+
+#searchBoxSectionContainer :focus
+{
+  outline:none;
+}
+
+.fa-times-circle{
+  padding:16px;
+  border:2px solid #00a087;
+  border-radius:0 25px 25px 0;
+  margin-left:-30px;
+  background:#00a087;
+  color:red;
+
+}
+
+@media (max-width: 330px)
+{
+  .top-right
+  {
+    margin-left:4px;
+  }
+}
 
 /* Style the tab */
 .tab {
@@ -103,4 +147,24 @@ img:hover{
   padding: 6px 12px;
   border: 1px solid #ccc;
   border-top: none;
+}
+
+.hiddenFileInput > input{
+  height: 100%;
+  width: 100;
+  opacity: 0;
+  cursor: pointer;
+}
+.hiddenFileInput{
+  border: none;
+  width: 100%;
+  height: auto;
+  display: inline-block;
+  overflow: hidden;
+  cursor: pointer;
+  
+  /*for the background, optional*/
+  background: center center no-repeat;
+  
+  
 }

@@ -86,6 +86,17 @@ urlpatterns = [
     path("showAllTagPerson/",views.showAllTagPerson,name="showAllTagPerson"),
     path("CommentShow/",views.CommentShow,name="CommentShow"),
     
+
+    path("createAlbumDetails/",views.createAlbumDetails,name="createAlbumDetails"), #For createAlbumDetails
+    path("UploadAlbumImage/",views.UploadAlbumImage,name="UploadAlbumImage"), #Add Image in Album
+    path("deleteAlbumRepo/",views.deleteAlbumRepo,name="deleteAlbumRepo"), #delete Album Repo
+    path("UpdateAlbumRepo/",views.UpdateAlbumRepo,name="UpdateAlbumRepo"), #delete Album Repo
+    path("deleteAlbumPicture/",views.deleteAlbumPicture,name="deleteAlbumPicture"), #delete deleteAlbumPicture    
+
+    path("showPost/<str:postid>/",views.showPost,name="showPost"), #delete deleteAlbumPicture    
+    path("deshboarDeletePost/",views.deshboarDeletePost,name="deshboarDeletePost"), #deshboarDeletePost   
+    # path("showPhotosfun/",views.showPhotosfun,name="showPhotosfun"), #showPhotosfun   
+
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
