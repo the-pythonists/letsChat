@@ -1,6 +1,6 @@
 from django.urls import re_path
 
-from . import consumers,likeConsumer,ChatConsumer,CommentConsumer, GroupConsumer
+from . import consumers,likeConsumer,ChatConsumer,CommentConsumer, GroupConsumer, StatusConsumer
 
 websocket_urlpatterns = [
     re_path(r'ws/like/(?P<room_name>\w+)/$', likeConsumer.likeConsumer),
@@ -8,4 +8,5 @@ websocket_urlpatterns = [
     re_path(r'ws/chat/(?P<room_name>\w+)/$', ChatConsumer.ChatConsumer),
     re_path(r'ws/comment/(?P<room_name>\w+)/$', CommentConsumer.CommentConsumer),
     re_path(r'ws/group/(?P<room_name>\w+)/$', GroupConsumer.GroupConsumer),
+    re_path(r'ws/letschat/(?P<room_name>\w+)/$', StatusConsumer.StatusConsumer),
 ]

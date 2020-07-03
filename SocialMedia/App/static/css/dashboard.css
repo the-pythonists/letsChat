@@ -638,7 +638,7 @@ width:90%;
     padding-right: $badge-padding-x;
     padding-left: $badge-padding-x;
     margin-right: -$badge-padding-x;
-    font-si ze: inherit;
+    font-size: inherit;
     color: inherit;
     text-shadow: none;
   }

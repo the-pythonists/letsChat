@@ -41,9 +41,15 @@
         <ul class="siderbar_menu" style=" overflow-y:scroll;
     overflow-x:hidden;margin-bottom:15%;">
           <h4 class="sidebar_Heading">Online Friends</h4>
-          <li><img src="profile.png" class="onlineUserImage"><a href="#" class="onlineUserName">Online Person name</a>
-            <span class="pull-right" style="padding-right: 8px;"><i class="fas fa-dot-circle "></i></span>
+          {% for query in friendList %}
+          {% for friend in query %}
+          {% if friend.is_online %}
+          <li><img src="{{friend.profilePic.url}}" class="onlineUserImage"><a href="/messages/{{friend.userId}}/" class="onlineUserName">{{friend}}</a>
+            <span class="" style="padding-right: 8px;"><i class="fa fa-eye "></i></span>
           </li><hr>
+          {% endif %}
+          {% endfor %}
+          {% endfor %}
           
          
           

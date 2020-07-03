@@ -17,6 +17,14 @@ from itertools import chain
 from django.urls import reverse
 from django.db.models import Subquery
 
+
+@csrf_exempt
+def update_session(request):
+	if not request.is_ajax() or not request.method=='POST':
+		return HttpResponseNotAllowed(['POST'])
+	userRegistration.objects.filter(userId=request.session['user']).update(is_online=True)
+	return HttpResponse(request.session['user'])
+
 def index(request):
 	if request.session.has_key('user'):
 		userInfo = userRegistration.objects.get(userId=request.session['user'])
@@ -136,14 +144,13 @@ def index(request):
 		lnth = []
 		for item in postList:
 			poId=item.postId
-			if TaggedPeople.objects.get(postId=poId).exists():
+			try:
 				s =(TaggedPeople.objects.get(postId=poId).taggedPersons)
-				if len(s)>0:
-					qry.append(userRegistration.objects.filter(userId=s[0]))
-					lnth.append(len(s)-1)
-				else:
-					qry.append("")
-					lnth.append("")
+				qry.append(userRegistration.objects.filter(userId=s[0]))
+				lnth.append(len(s)-1)
+			except:
+				qry.append("")
+				lnth.append("")
 					
 		commentContent = []
 		commentName = []
@@ -288,7 +295,7 @@ def OtpGeneration(request):
 @csrf_exempt
 def storydelete(request):
 	from datetime import timedelta 
-	tm1 = (datetime.datetime.now() - timedelta(minutes=5)   )
+	tm1 = (datetime.datetime.now() - timedelta(minutes=1)   )
 	s = Story.objects.filter(uploadTime__lte= tm1 ).delete()	
 	return JsonResponse({'Result':'Deleted'})
 
@@ -769,8 +776,13 @@ def userIntroInsert(request):
 
 #Shows login user list of all friends
 def myfriends(request):
-	return render(request,'MyFriends.html')
-
+	friends = AllFriends.objects.get(userId=request.session['user']).Friends
+	friendList = []
+	for friend in friends:
+		friendData = userRegistration.objects.filter(userId=friend)
+		friendList.append(friendData)
+	params = {'friendList':friendList}
+	return render(request,'MyFriends.html',params)
 
 @csrf_exempt
 def myFriendsProcess(request):
