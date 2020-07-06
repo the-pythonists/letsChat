@@ -10,13 +10,12 @@ const commentSocket = new WebSocket(
     var loggedUser = document.getElementById('currentUserId').value;
 
 function comments(id,postCommentedOf,postCommentedBy){
+    console.log('called',id)
         const postId = id;
         var postCommentedOf = postCommentedOf;
         var postCommentedBy = postCommentedBy;
          try{
         comment = document.getElementById('Comment'+postId).value;
-        alert("Your Comment has been Saved");
-        document.getElementById('Comment'+postId).value="";
          }catch{}
         console.log(postCommentedOf, postCommentedBy,postId,comment)
        
@@ -39,7 +38,7 @@ commentSocket.onclose = function(e) {
     commentSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
         console.log(data.postCommentedOf,loggedUser)
-        
+        document.getElementById('Comment'+postId).value='';
         try{
             document.getElementById('NewComment'+data.postId).innerHTML = data.comment;
         }catch{}
@@ -82,5 +81,5 @@ function changeNotification(postCommentedBy,action){
             document.getElementById('likeComment').innerHTML = '<img src="'+e.pic+'">'+e.commenter + ' Commented on Your Post'
             }catch{}
         }
-    });
+    })
 }

@@ -95,8 +95,9 @@
                     <h3 id="noti_heading">Notifications</h3><hr>
                     <div style="height:300px;overflow-y:scroll;">
                     {% for data3,data4 in notification %}
+                    {% if data3.notificationType == "comment" or data3.notificationType == "like" %}
                       <div id="{{data.sender}}" style="padding: 1%;">
-                       <a href="/profile/{{data3.sender}}/" style="text-decoration:none;" onclick="location.replace('/profile/{{data3.sender}}/'),'_top'" >
+                       <a href="/showPost/{{data3.postId}}/" style="text-decoration:none;" onclick="location.replace('/showPost/{{data3.postId}}/'),'_top'" >
                         <span style="margin-top:18px;">
                            <img src="{{data4}}" class="profilePic" style="width: 40px;height:40px;border-radius:50%;vertical-align: middle;">
                       
@@ -105,6 +106,19 @@
                         </a>
                         
                       </div>
+                      {% elif data3.notificationType == "friend" %}
+                      <div id="{{data.sender}}" style="padding: 1%;">
+                        <a href="/profile/{{data.sender}}/" style="text-decoration:none;" onclick="location.replace('/profile/{{data3.sender}}/'),'_top'" >
+                         <span style="margin-top:18px;">
+                            <img src="{{data4}}" class="profilePic" style="width: 40px;height:40px;border-radius:50%;vertical-align: middle;">
+                       
+                                 {{data3.notification}}
+                                 </span>
+                         </a>
+                         
+                       </div>
+
+                      {% endif %}
                       {% endfor %}
                     </div>
                     <div class="seeAll" id="seeAll" ><a href="/notifications/" onclick="location.replace('/notifications/'),'_top'">See All</a></div>
@@ -304,7 +318,7 @@
 
           <div>
               {% for data,data2,data4,data5,data6,comment1,comment2,comment3,comment4 in userData %}
-              
+              <div id="postBox{{data.postId}}">
               {% if data.PostType == 'post' %}
               <a href="/profile/{{data.userId}}" style="text-decoration: none;">
               <img src="{{data.userPic}}" style="width:50px;height:50px;border-radius: 50%;vertical-align: middle;">
@@ -349,6 +363,7 @@
                 </button>
 
                 {%if userInfo.userId == data.userId%}
+                <button onclick="deletePost('{{data.postId}}')">Delete Post</button>
                 <button class="dropdown-item" type="button" data-toggle="modal" data-target="#tagPeopleModel" onclick="tagPeopleFun1('{{data.postId}}')">Tag</button>
                  {% endif %}
                 <button class="dropdown-item" type="button">
@@ -421,6 +436,7 @@
               <input type="button" onclick="comments('{{data.postId}}','{{data.userId}}','{{userInfo.userId}}')" value="Comment" style="padding:8px;" class="btn btn-success">
             </form><hr>
             <br><br>
+          </div>
             {% endfor %}
           </div>
       </div>
@@ -582,6 +598,40 @@
 <script type="text/javascript" src="{%static 'js/LikeSocket.js' %}"></script>
 <script type="text/javascript" src="{%static 'js/RequestSocket.js'%}"></script>
 <script type="text/javascript" src="{%static 'js/CommentSocket.js'%}"></script>
-<script type="text/javascript" src="{%static 'js/statusSocket.js'%}"></script>
+<script type="text/javascript" src="{%static 'js/StatusSocket.js'%}"></script>
+<script type="text/javascript">
+  function deletePost(val)
+  {
+    var result = confirm("Want to delete?");
+    if (result) {
+        
+  
+        $.ajax({
+        method:'POST',
+        url:'/deshboarDeletePost/',
+        data:{
+          postId:val,
+        },
+        
+        success:function(e){
+          
+          console.log(e);
+          $("#postBox"+val).remove();
+        },
+        error:function(data){
+          console.log('Failed');
+        }
+      })
+  
+  
+  
+  
+    }
+    else
+    {
+      alert("Not Deleted = ",+val);
+    }
+  }
+  </script>
 
 </html>
